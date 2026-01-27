@@ -72,7 +72,7 @@ public class ScsbidInfoSttsController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveScsbidInfoStts(String serviceId, String serviceDescription) throws Exception {

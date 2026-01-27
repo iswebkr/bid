@@ -72,7 +72,7 @@ public class OrderPlanSttusController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveOrderPlanSttus(String serviceId, String serviceDescription) throws Exception {

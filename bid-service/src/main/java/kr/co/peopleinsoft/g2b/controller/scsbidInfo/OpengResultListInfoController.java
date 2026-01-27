@@ -72,7 +72,7 @@ public class OpengResultListInfoController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {

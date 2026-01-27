@@ -73,7 +73,7 @@ public class BidPublicInfoController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {

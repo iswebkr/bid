@@ -60,7 +60,7 @@ public class DminsttInfoController extends CmmnAbstractController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveDminsttInfo(String serviceId, String serviceDescription) throws Exception {

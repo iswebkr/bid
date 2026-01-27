@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OpengResultListInfoPreparPcDetailMapper">
+	<sql id="insertOpengResultListInfoPreparPcDetailQuery">
+		-- 예정가격 등록
+		INSERT INTO tb_bid_predict_price (
+		bid_ntce_no -- 입찰공고번호
+		,   bid_ntce_ord -- 입찰공고차수
+		,   bid_clsfc_no -- 입찰분류번호 (예: 0=일반입찰)
+		,   rbid_no -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
+		,   bid_ntce_nm -- 입찰공고명
+		,   plnprc -- 예정가격 (원, 최종 확정된 예정가격)
+		,   bssamt -- 기초금액 (원, 예정가격 산출의 기초가 되는 금액)
+		,   tot_rsrvtn_prce_num -- 총예비가격개수 (생성된 전체 예비가격 수)
+		,   compno_rsrvtn_prce_sno -- 작성번호예비가격일련번호 (예비가격 작성 일련번호)
+		,   bsis_plnprc -- 기초예정가격 (원, 기초가 되는 예정가격)
+		,   drwt_yn -- 추첨여부 (Y:추첨함, N:추첨안함)
+		,   drwt_num -- 추첨번호 (예비가격 중 추첨된 번호)
+		,   bidwinr_slctn_apl_bss_cntnts -- 낙찰자선정신청기준내용 (낙찰자 선정 시 적용되는 기준)
+		,   rl_openg_dt -- 실제개찰일시 (실제로 개찰이 진행된 일시)
+		,   compno_rsrvtn_prce_mkng_dt -- 작성번호예비가격작성일시 (예비가격이 작성된 일시)
+		,   inpt_dt -- 입력일시 (시스템에 입력된 일시)
+		,   bssamt_bss_up_num -- 기초금액기초상향번호 (기초금액 상향 조정 번호)
+		,   prearng_prce_purcnstcst -- 예정가격순공사비 (원, 건설공사의 순수 공사비)
+		,   created_dt -- 생성일시 (시스템 등록일시)
+		,   created_by -- 생성자 (시스템 등록자)
+		,   updated_dt -- 수정일시 (시스템 수정일시)
+		,   updated_by -- 수정자 (시스템 수정자)
+		) VALUES (
+		#{bidNtceNo} -- 입찰공고번호
+		,   #{bidNtceOrd} -- 입찰공고차수
+		,   #{bidClsfcNo} -- 입찰분류번호 (예: 0=일반입찰)
+		,   #{rbidNo} -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
+		,   #{bidNtceNm} -- 입찰공고명
+		,   #{plnprc} -- 예정가격 (원, 최종 확정된 예정가격)
+		,   #{bssamt} -- 기초금액 (원, 예정가격 산출의 기초가 되는 금액)
+		,   #{totRsrvtnPrceNum} -- 총예비가격개수 (생성된 전체 예비가격 수)
+		,   #{compnoRsrvtnPrceSno} -- 작성번호예비가격일련번호 (예비가격 작성 일련번호)
+		,   #{bsisPlnprc} -- 기초예정가격 (원, 기초가 되는 예정가격)
+		,   #{drwtYn} -- 추첨여부 (Y:추첨함, N:추첨안함)
+		,   #{drwtNum} -- 추첨번호 (예비가격 중 추첨된 번호)
+		,   #{bidwinrSlctnAplBssCntnts} -- 낙찰자선정신청기준내용 (낙찰자 선정 시 적용되는 기준)
+		,   #{rlOpengDt} -- 실제개찰일시 (실제로 개찰이 진행된 일시)
+		,   #{compnoRsrvtnPrceMkngDt} -- 작성번호예비가격작성일시 (예비가격이 작성된 일시)
+		,   #{inptDt} -- 입력일시 (시스템에 입력된 일시)
+		,   #{bssamtBssUpNum} -- 기초금액기초상향번호 (기초금액 상향 조정 번호)
+		,   #{prearngPrcePurcnstcst} -- 예정가격순공사비 (원, 건설공사의 순수 공사비)
+		,   #{createdDt} -- 생성일시 (시스템 등록일시)
+		,   #{createdBy} -- 생성자 (시스템 등록자)
+		,   #{updatedDt} -- 수정일시 (시스템 수정일시)
+		,   #{updatedBy} -- 수정자 (시스템 수정자)
+		)
+	</sql>
+
+	<select id="selectOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto" resultType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
+		-- 예정가격 조회
+		SELECT
+		a.bid_ntce_no -- 입찰공고번호
+		,   a.bid_ntce_ord -- 입찰공고차수
+		,   a.bid_clsfc_no -- 입찰분류번호 (예: 0=일반입찰)
+		,   a.rbid_no -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
+		,   a.bid_ntce_nm -- 입찰공고명
+		,   a.plnprc -- 예정가격 (원, 최종 확정된 예정가격)
+		,   a.bssamt -- 기초금액 (원, 예정가격 산출의 기초가 되는 금액)
+		,   a.tot_rsrvtn_prce_num -- 총예비가격개수 (생성된 전체 예비가격 수)
+		,   a.compno_rsrvtn_prce_sno -- 작성번호예비가격일련번호 (예비가격 작성 일련번호)
+		,   a.bsis_plnprc -- 기초예정가격 (원, 기초가 되는 예정가격)
+		,   a.drwt_yn -- 추첨여부 (Y:추첨함, N:추첨안함)
+		,   a.drwt_num -- 추첨번호 (예비가격 중 추첨된 번호)
+		,   a.bidwinr_slctn_apl_bss_cntnts -- 낙찰자선정신청기준내용 (낙찰자 선정 시 적용되는 기준)
+		,   a.rl_openg_dt -- 실제개찰일시 (실제로 개찰이 진행된 일시)
+		,   a.compno_rsrvtn_prce_mkng_dt -- 작성번호예비가격작성일시 (예비가격이 작성된 일시)
+		,   a.inpt_dt -- 입력일시 (시스템에 입력된 일시)
+		,   a.bssamt_bss_up_num -- 기초금액기초상향번호 (기초금액 상향 조정 번호)
+		,   a.prearng_prce_purcnstcst -- 예정가격순공사비 (원, 건설공사의 순수 공사비)
+		,   a.created_dt -- 생성일시 (시스템 등록일시)
+		,   a.created_by -- 생성자 (시스템 등록자)
+		,   a.updated_dt -- 수정일시 (시스템 수정일시)
+		,   a.updated_by -- 수정자 (시스템 수정자)
+		FROM tb_bid_predict_price a -- 예정가격
+	</select>
+
+	<insert id="batchInsertOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
+		<include refid="insertOpengResultListInfoPreparPcDetailQuery" />
+	</insert>
+</mapper>

@@ -51,7 +51,7 @@ public class OpengComptResultListInfoController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveOpengResultListInfoOpengCompt(String serviceId, String serviceDescription) throws Exception {

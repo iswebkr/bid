@@ -77,7 +77,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription) throws Exception {

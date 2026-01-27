@@ -329,7 +329,7 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 		return switch (value) {
 			case null -> "null";
 			case String s -> "'" + value + "'";
-			case java.sql.Date date -> "'" + value.toString() + "'";
+			case java.sql.Date date -> "'" + value + "'";
 			case java.sql.Timestamp timestamp -> "'" + DATE_FORMAT.format(timestamp) + "'";
 			case Date date -> "'" + DATE_FORMAT.format(date) + "'";
 			default -> value.toString();

@@ -51,7 +51,7 @@ public class PrcrmntCorpBasicInfoController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription) throws Exception {

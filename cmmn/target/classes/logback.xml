@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" debug="true" scanPeriod="60 seconds">
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<timestamp key="byDate" datePattern="yyyy-MM-dd"/>
+
+	<!-- pattern for logging -->
+	<property name="PATTERN_DEFAULT" value="%-5level %d{yy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n"/>
+	<property name="PATTERN_CONSOLE_LOG" value="%cyan(%date{ISO8601}) %highlight(%-5level) [%(%t)] %yellow(%class) - %msg%n%xException"/>
+	<property name="PATTERN_ROLLING_FILE" value="%-4relative [%thread] %-5level %logger{35} -%kvp- %msg%n"/>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${PATTERN_CONSOLE_LOG}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+
+	<appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/opt/jboss/wildfly/standalone/log/application.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/opt/jboss/wildfly/standalone/log/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>3GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${PATTERN_ROLLING_FILE}</pattern>
+		</encoder>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</root>
+
+	<logger name="jdbc.sqlonly" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="jdbc.resultsettable" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.jdbc" level="TRACE" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.session.jdbc" level="INFO" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="TRACE" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.session.web.http.SessionRepositoryFilter.SESSION_LOGGER" level="INFO" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+	<logger name="org.springframework.jndi" level="WARN" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ROLLING_FILE"/>
+	</logger>
+</configuration>

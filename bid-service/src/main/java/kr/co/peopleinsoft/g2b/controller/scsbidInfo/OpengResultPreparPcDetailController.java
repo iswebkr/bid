@@ -72,7 +72,7 @@ public class OpengResultPreparPcDetailController {
 			}
 			return "success";
 		});
-		return ResponseEntity.ok().body(stepResult.get());
+		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription) throws Exception {
