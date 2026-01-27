@@ -54,8 +54,12 @@
 				, max(colct_tot_page) - count(distinct colct_cmpl_page) as diff_page
 		from 	tb_colct_hist
 		where 	colct_id = #{colctId}
-		and 	colct_bgn_dt = #{colctBgnDt}
-		and 	colct_end_dt = #{colctEndDt}
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(colctBgnDt)">
+			and 	colct_bgn_dt = #{colctBgnDt}
+		</if>
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(colctEndDt)">
+			and 	colct_end_dt = #{colctEndDt}
+		</if>
 		group by colct_id, colct_bgn_dt, colct_end_dt
 	</select>
 
