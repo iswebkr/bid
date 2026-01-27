@@ -14,6 +14,7 @@ import kr.co.peopleinsoft.g2b.jobs.OpengComptResultListInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.OpengResultListInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.OpengResultPreparPcDetailJob;
 import kr.co.peopleinsoft.g2b.jobs.OrderPlanSttusJob;
+import kr.co.peopleinsoft.g2b.jobs.PrcrmntCorpBasicInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.ScsbidInfoSttsJob;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
@@ -67,7 +68,7 @@ public class BidSchedulerController extends CmmnAbstractController {
 	public ResponseEntity<String> prcrmntCorpBasicInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 */1 * * ?");
 		cmmnScheduleManager.deleteJob("prcrmntCorpBasicInfoJob", "usrInfoService"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(DminsttInfoJob.class, "prcrmntCorpBasicInfoJob", "usrInfoService", "사용자정보 - 조달업체 정보 조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.createCronJob(PrcrmntCorpBasicInfoJob.class, "PrcrmntCorpBasicInfoJob", "usrInfoService", "사용자정보 - 조달업체 정보 조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
@@ -142,6 +143,22 @@ public class BidSchedulerController extends CmmnAbstractController {
 		cmmnScheduleManager.createCronJob(ScsbidInfoSttsJob.class, "scsbidInfoSttsJob", "scsbidInfo", "나라장터 검색조건에 의한 낙찰된 목록 현황 정보 수집", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
+	}
+
+	@Operation(summary = "모든 Job 실행", description = "모든 Job 실행")
+	@GetMapping("/shcduler/jobs/executeAllJobs")
+	public ResponseEntity<String> executeAllJobs() throws SchedulerException, JsonProcessingException {
+		bidPublicInfoService(null); // 입찰공고수집
+		dminsttInfoJob(null); // 수요기관정보수집
+		prcrmntCorpBasicInfoJob(null); // 조달업체정보수집
+		OrderPlanSttusJob(null); // 발주계획수집
+		HrcspSsstndrdInfoJob(null); // 사전규격수집
+		opengComptResultListInfo(null); // 개찰결과-개찰완료
+		opengResultListInfoJob(null); // 개찰결과정보
+		opengResultPreparPcDetailJob(null); // 예비가격
+		scsbidInfoSttsJob(null); // 낙찰목록현황
+
+		return ResponseEntity.ok().body("success");
 	}
 
 	@Operation(summary = "Job 목록 조회", description = "등록된 Job 목록 조회")
