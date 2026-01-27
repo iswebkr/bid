@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for bid" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="C:/maven/bid-repository/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="C:/maven/bid-repository/org/springframework/boot/spring-boot-configuration-processor/4.0.2/spring-boot-configuration-processor-4.0.2.jar" />
+        </processorPath>
+        <module name="cmmn" />
+        <module name="bid-service" />
+        <module name="bid-web" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="bid" options="-parameters -implicit:none -verbose -parameters" />
+      <module name="bid-service" options="-parameters -implicit:none -verbose -parameters" />
+      <module name="bid-web" options="-parameters -implicit:none -verbose -parameters" />
+      <module name="cmmn" options="-parameters -implicit:none -verbose -parameters" />
+    </option>
+  </component>
+</project>

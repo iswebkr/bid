@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PrcrmntCorpBasicInfoMapper">
+
+	<sql id="insertPrcrmntCorpBasicInfoQuery">
+		-- 조달업체기본 등록
+		INSERT INTO tb_bid_procurement_company (
+		bizno -- 사업자번호 (업체를 고유하게 식별하는 사업자등록번호, 10자리)
+		,   corp_nm -- 업체명 (업체의 정식 명칭)
+		,   eng_corp_nm -- 영문업체명 (업체의 영문 명칭)
+		,   ceo_nm -- 대표자명 (업체 대표자의 성명)
+		,   opbiz_dt -- 개업일자 (사업자등록증에 기재된 개업일자)
+		,   rgn_cd -- 지역코드 (행정구역 코드)
+		,   rgn_nm -- 지역명 (행정구역명, 예: 서울특별시, 경기도 등)
+		,   zip -- 우편번호 (5자리 또는 6자리)
+		,   adrs -- 주소 (기본 주소)
+		,   dtl_adrs -- 상세주소 (상세 주소)
+		,   tel_no -- 전화번호 (업체의 대표 전화번호)
+		,   fax_no -- 팩스번호 (업체의 팩스번호)
+		,   cntry_nm -- 국가명 (업체가 소재한 국가, 예: 대한민국, 미국 등)
+		,   hmpg_adrs -- 홈페이지주소 (업체의 공식 웹사이트 URL)
+		,   mnfct_div_cd -- 제조구분코드 (제조업체 구분 코드)
+		,   mnfct_div_nm -- 제조구분명 (예: 제조업체, 판매업체, 제조판매업체 등)
+		,   emplye_num -- 직원수 (업체의 총 직원 수)
+		,   corp_bsns_div_cd -- 업체업무구분코드 (업체의 주요 업무 구분 코드)
+		,   corp_bsns_div_nm -- 업체업무구분명 (예: 물품, 용역, 공사 등)
+		,   hdoffce_div_nm -- 본사구분명 (예: 본사, 지사, 사업소 등)
+		,   rgst_dt -- 등록일시 (조달청 시스템 등록일시)
+		,   chg_dt -- 변경일시 (조달청 시스템 변경일시)
+		,   esntl_no_cert_rgst_yn -- 필수인증등록여부 (Y:필수인증등록됨, N:미등록)
+		,   created_dt -- 생성일시 (시스템 등록일시)
+		,   created_by -- 생성자 (시스템 등록자)
+		,   updated_dt -- 수정일시 (시스템 수정일시)
+		,   updated_by -- 수정자 (시스템 수정자)
+		) VALUES (
+		#{bizno} -- 사업자번호 (업체를 고유하게 식별하는 사업자등록번호, 10자리)
+		,   #{corpNm} -- 업체명 (업체의 정식 명칭)
+		,   #{engCorpNm} -- 영문업체명 (업체의 영문 명칭)
+		,   #{ceoNm} -- 대표자명 (업체 대표자의 성명)
+		,   #{opbizDt} -- 개업일자 (사업자등록증에 기재된 개업일자)
+		,   #{rgnCd} -- 지역코드 (행정구역 코드)
+		,   #{rgnNm} -- 지역명 (행정구역명, 예: 서울특별시, 경기도 등)
+		,   #{zip} -- 우편번호 (5자리 또는 6자리)
+		,   #{adrs} -- 주소 (기본 주소)
+		,   #{dtlAdrs} -- 상세주소 (상세 주소)
+		,   #{telNo} -- 전화번호 (업체의 대표 전화번호)
+		,   #{faxNo} -- 팩스번호 (업체의 팩스번호)
+		,   #{cntryNm} -- 국가명 (업체가 소재한 국가, 예: 대한민국, 미국 등)
+		,   #{hmpgAdrs} -- 홈페이지주소 (업체의 공식 웹사이트 URL)
+		,   #{mnfctDivCd} -- 제조구분코드 (제조업체 구분 코드)
+		,   #{mnfctDivNm} -- 제조구분명 (예: 제조업체, 판매업체, 제조판매업체 등)
+		,   #{emplyeNum} -- 직원수 (업체의 총 직원 수)
+		,   #{corpBsnsDivCd} -- 업체업무구분코드 (업체의 주요 업무 구분 코드)
+		,   #{corpBsnsDivNm} -- 업체업무구분명 (예: 물품, 용역, 공사 등)
+		,   #{hdoffceDivNm} -- 본사구분명 (예: 본사, 지사, 사업소 등)
+		,   #{rgstDt} -- 등록일시 (조달청 시스템 등록일시)
+		,   #{chgDt} -- 변경일시 (조달청 시스템 변경일시)
+		,   #{esntlNoCertRgstYn} -- 필수인증등록여부 (Y:필수인증등록됨, N:미등록)
+		,   #{createdDt} -- 생성일시 (시스템 등록일시)
+		,   #{createdBy} -- 생성자 (시스템 등록자)
+		,   #{updatedDt} -- 수정일시 (시스템 수정일시)
+		,   #{updatedBy} -- 수정자 (시스템 수정자)
+		)
+	</sql>
+
+	<select id="selectPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto">
+		-- 조달업체기본 조회
+		SELECT
+		a.bizno -- 사업자번호 (업체를 고유하게 식별하는 사업자등록번호, 10자리)
+		,   a.corp_nm -- 업체명 (업체의 정식 명칭)
+		,   a.eng_corp_nm -- 영문업체명 (업체의 영문 명칭)
+		,   a.ceo_nm -- 대표자명 (업체 대표자의 성명)
+		,   a.opbiz_dt -- 개업일자 (사업자등록증에 기재된 개업일자)
+		,   a.rgn_cd -- 지역코드 (행정구역 코드)
+		,   a.rgn_nm -- 지역명 (행정구역명, 예: 서울특별시, 경기도 등)
+		,   a.zip -- 우편번호 (5자리 또는 6자리)
+		,   a.adrs -- 주소 (기본 주소)
+		,   a.dtl_adrs -- 상세주소 (상세 주소)
+		,   a.tel_no -- 전화번호 (업체의 대표 전화번호)
+		,   a.fax_no -- 팩스번호 (업체의 팩스번호)
+		,   a.cntry_nm -- 국가명 (업체가 소재한 국가, 예: 대한민국, 미국 등)
+		,   a.hmpg_adrs -- 홈페이지주소 (업체의 공식 웹사이트 URL)
+		,   a.mnfct_div_cd -- 제조구분코드 (제조업체 구분 코드)
+		,   a.mnfct_div_nm -- 제조구분명 (예: 제조업체, 판매업체, 제조판매업체 등)
+		,   a.emplye_num -- 직원수 (업체의 총 직원 수)
+		,   a.corp_bsns_div_cd -- 업체업무구분코드 (업체의 주요 업무 구분 코드)
+		,   a.corp_bsns_div_nm -- 업체업무구분명 (예: 물품, 용역, 공사 등)
+		,   a.hdoffce_div_nm -- 본사구분명 (예: 본사, 지사, 사업소 등)
+		,   a.rgst_dt -- 등록일시 (조달청 시스템 등록일시)
+		,   a.chg_dt -- 변경일시 (조달청 시스템 변경일시)
+		,   a.esntl_no_cert_rgst_yn -- 필수인증등록여부 (Y:필수인증등록됨, N:미등록)
+		,   a.created_dt -- 생성일시 (시스템 등록일시)
+		,   a.created_by -- 생성자 (시스템 등록자)
+		,   a.updated_dt -- 수정일시 (시스템 수정일시)
+		,   a.updated_by -- 수정자 (시스템 수정자)
+		FROM tb_bid_procurement_company a -- 조달업체기본
+	</select>
+
+	<insert id="batchInsertPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto">
+		<include refid="insertPrcrmntCorpBasicInfoQuery" />
+	</insert>
+
+</mapper>

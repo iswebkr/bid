@@ -1,0 +1,147 @@
+package kr.co.peopleinsoft.g2b.controller.useInfo;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
+import kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoRequestDto;
+import kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoResponseDto;
+import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
+import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
+import kr.co.peopleinsoft.g2b.service.usrInfo.PrcrmntCorpBasicInfoService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+@Controller
+@RequestMapping("/g2b/usrInfoService")
+@Tag(name = "조달청_나라장터 사용자정보 서비스 - 조달업체 기본정보 조회", description = "https://www.data.go.kr/data/15129466/openapi.do")
+public class PrcrmntCorpBasicInfoController {
+
+	private final G2BCmmnService g2BCmmnService;
+	private final WebClient publicWebClient;
+	private final PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService;
+	private final BidSchdulHistManageService g2BSchdulHistManageService;
+
+	public PrcrmntCorpBasicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService, BidSchdulHistManageService g2BSchdulHistManageService) {
+		this.g2BCmmnService = g2BCmmnService;
+		this.publicWebClient = publicWebClient;
+		this.prcrmntCorpBasicInfoService = prcrmntCorpBasicInfoService;
+		this.g2BSchdulHistManageService = g2BSchdulHistManageService;
+	}
+
+	@Operation(summary = "조달업체 기본정보 / 업종정보 / 공급물품정보 수집")
+	@GetMapping("/saveStepPrcrmntCorpBasicInfo")
+	public ResponseEntity<String> saveStepPrcrmntCorpBasicInfo() throws Exception {
+		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
+			try {
+				savePrcrmntCorpBasicInfo("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회");
+			} catch (Exception e) {
+				return "failure";
+			}
+			return "success";
+		});
+		return ResponseEntity.ok().body(stepResult.get());
+	}
+
+	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription) throws Exception {
+
+		int startYear = 2000;
+		int endYear = 2026;
+		int startMonth = 1;
+		int endMonth = 12; // 이번달 자료까지만
+
+		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
+		if (startYear == LocalDate.now().getYear()) {
+			endMonth = LocalDateTime.now().getMonthValue();
+		}
+
+		for (int targetYear = startYear; targetYear <= endYear; targetYear++) {
+			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
+				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
+
+				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
+				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
+
+				int startPage;
+				int endPage;
+
+				PrcrmntCorpBasicInfoRequestDto requestDto = PrcrmntCorpBasicInfoRequestDto.builder()
+					.serviceKey(BidEnum.SERIAL_KEY.getKey())
+					.serviceId(serviceId)
+					.serviceDescription(serviceDescription)
+					.inqryBgnDt(inqryBgnDt)
+					.inqryEndDt(inqryEndDt)
+					.numOfRows(100)
+					.inqryDiv(1)
+					.type("json")
+					.build();
+
+				// serviceId 에 해당하는 해당 기간(inqryBgnDt ~ inqryEndDt) 에 수집완료된 데이터는 수집 대상에서 제외
+				if (!g2BSchdulHistManageService.colctCmplYn(requestDto)) {
+					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+						.scheme("https")
+						.host("apis.data.go.kr")
+						.pathSegment("1230000/ao/UsrInfoService02", requestDto.getServiceId())
+						.queryParam("serviceKey", requestDto.getServiceKey())
+						.queryParam("pageNo", 1)
+						.queryParam("numOfRows", requestDto.getNumOfRows())
+						.queryParam("inqryDiv", requestDto.getInqryDiv())
+						.queryParam("type", "json")
+						.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+						.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+
+					URI firstPageUri = uriComponentsBuilder.build().toUri();
+
+					// 1 페이지 API 호출
+					PrcrmntCorpBasicInfoResponseDto responseDto = publicWebClient.get()
+						.uri(firstPageUri)
+						.retrieve()
+						.bodyToMono(PrcrmntCorpBasicInfoResponseDto.class)
+						.block();
+
+					if (responseDto == null) {
+						throw new Exception("API 호출 실패");
+					}
+
+					int totalCount = responseDto.getResponse().getBody().getTotalCount();
+					int totalPage = (int) Math.ceil((double) totalCount / 100);
+
+					requestDto.setTotalCount(totalCount);
+					requestDto.setTotalPage(totalPage);
+
+					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+
+					startPage = (Integer) pageMap.get("startPage");
+					endPage = (Integer) pageMap.get("endPage");
+
+					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+						URI uri = uriComponentsBuilder.cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
+
+						prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(uri, pageNo, requestDto);
+
+						// 10초
+						Thread.sleep(10000);
+					}
+
+					if (startPage < endPage) {
+						// 30초
+						Thread.sleep(10000 * 3);
+					}
+				}
+			}
+		}
+	}
+}
