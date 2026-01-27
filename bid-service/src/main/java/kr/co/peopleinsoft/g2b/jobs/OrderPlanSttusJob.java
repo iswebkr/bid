@@ -9,9 +9,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.web.reactive.function.client.WebClient;
 
-public class G2BOrderPlanSttusJob extends OrderPlanSttusController implements Job {
+public class OrderPlanSttusJob extends OrderPlanSttusController implements Job {
 
-	public G2BOrderPlanSttusJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OrderPlanSttusService g2bOrderPlanSttusService, BidSchdulHistManageService g2BSchdulHistManageService) {
+	public OrderPlanSttusJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OrderPlanSttusService g2bOrderPlanSttusService, BidSchdulHistManageService g2BSchdulHistManageService) {
 		super(publicWebClient, g2BCmmnService, g2bOrderPlanSttusService, g2BSchdulHistManageService);
 	}
 

@@ -9,9 +9,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.web.reactive.function.client.WebClient;
 
-public class G2BHrcspSsstndrdInfoJob extends HrcspSsstndrdInfoController implements Job {
+public class HrcspSsstndrdInfoJob extends HrcspSsstndrdInfoController implements Job {
 
-	public G2BHrcspSsstndrdInfoJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService g2BHrcspSsstndrdInfoService, BidSchdulHistManageService g2BSchdulHistManageService) {
+	public HrcspSsstndrdInfoJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService g2BHrcspSsstndrdInfoService, BidSchdulHistManageService g2BSchdulHistManageService) {
 		super(publicWebClient, g2BCmmnService, g2BHrcspSsstndrdInfoService, g2BSchdulHistManageService);
 	}
 
