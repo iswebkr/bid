@@ -60,7 +60,7 @@
 	<repositories>
 		<repository>
 			<id>localRepository</id>
-			<url>http://172.30.1.11:8081/repository/maven-public/</url>
+			<url>http://220.89.189.24:8081/repository/maven-public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -73,7 +73,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>pluginRepository</id>
-			<url>http://172.30.1.11:8081/repository/maven-public/</url>
+			<url>http://220.89.189.24:8081/repository/maven-public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
