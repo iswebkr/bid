@@ -116,7 +116,11 @@ public class CmmnDataSourceTransactionConfig {
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	Advisor txAdviceAdvisor(TransactionInterceptor txAdvice) {
 		AspectJExpressionPointcut aspectJExpressionPointcut = new AspectJExpressionPointcut();
-		aspectJExpressionPointcut.setExpression("@within(org.springframework.stereotype.Service) && execution(public * *(..)) ");
+		aspectJExpressionPointcut.setExpression("" +
+			"@within(org.springframework.stereotype.Service) " +
+			"&& execution(public * *(..)) " +
+			"&& !@annotation(org.springframework.transaction.annotation.Transactional)"
+		);
 
 		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor();
 		advisor.setPointcut(aspectJExpressionPointcut);
