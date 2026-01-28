@@ -10,7 +10,7 @@ public class CmmnSimpleQueryHandler implements CmmnSlowQueryHandler {
 	private static final Logger logger = LoggerFactory.getLogger(CmmnSimpleQueryHandler.class);
 
 	@Override
-	public void handle(CmmnMyBatisPrettyLogInterceptor.QueryExecutionInfo queryExecutionInfo) {
-		logger.info("{} seconds", queryExecutionInfo.getExecutionTimeSeconds());
+	public void handle(CmmnMyBatisPrettyLogInterceptor.QueryExecutionInfo queryInfo) {
+
 	}
 }

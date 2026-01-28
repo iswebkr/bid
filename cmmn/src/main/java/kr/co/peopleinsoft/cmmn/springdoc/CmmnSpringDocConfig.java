@@ -84,6 +84,14 @@ public class CmmnSpringDocConfig {
 	}
 
 	@Bean
+	GroupedOpenApi cntrctInfoServiceGroup() {
+		return GroupedOpenApi.builder()
+			.group("나라장터 계약정보서비스(CntrctInfoService)")
+			.pathsToMatch ("/g2b/cntrctInfoService/**")
+			.build();
+	}
+
+	@Bean
 	GroupedOpenApi schedulerInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("스케줄러 서비스")

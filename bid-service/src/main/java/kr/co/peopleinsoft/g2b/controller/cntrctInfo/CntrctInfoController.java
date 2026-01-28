@@ -1,12 +1,14 @@
-package kr.co.peopleinsoft.g2b.controller.bidPublicInfo;
+package kr.co.peopleinsoft.g2b.controller.cntrctInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoResponseDto;
-import kr.co.peopleinsoft.g2b.service.bidPublicInfo.BidPublicInfoService;
+import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
+import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoReponseDto;
+import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoRequestDto;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
+import kr.co.peopleinsoft.g2b.service.cntrctInfo.CntrctInfoService;
 import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,49 +26,49 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Controller
-@RequestMapping("/g2b/bidPublicInfoService")
-@Tag(name = "조달청_나라장터 입찰공고정보서비스", description = "https://www.data.go.kr/data/15129394/openapi.do")
-public class BidPublicInfoController {
+@RequestMapping("/g2b/cntrctInfoService")
+@Tag(name = "나라장터 계약정보서비스", description = "https://www.data.go.kr/data/15129427/openapi.do")
+public class CntrctInfoController {
 
 	private final G2BCmmnService g2BCmmnService;
 	private final WebClient publicWebClient;
-	private final BidPublicInfoService bidPublicInfoService;
+	private final CntrctInfoService cntrctInfoService;
 	private final BidSchdulHistManageService bidSchdulHistManageService;
 
-	public BidPublicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService, BidSchdulHistManageService bidSchdulHistManageService) {
+	public CntrctInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService, BidSchdulHistManageService bidSchdulHistManageService) {
 		this.g2BCmmnService = g2BCmmnService;
 		this.publicWebClient = publicWebClient;
-		this.bidPublicInfoService = bidPublicInfoService;
+		this.cntrctInfoService = cntrctInfoService;
 		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
 
-	@Operation(summary = "모든 입찰공고 정보 수집")
-	@GetMapping("/saveStepBidPublicInfo")
-	public ResponseEntity<String> saveStepBidPublicInfo() throws Exception {
+	@Operation(summary = "모든 나라장터 검색조건에 의한 계약현황 수집")
+	@GetMapping("/saveStepCntrctInfo")
+	public ResponseEntity<String> saveStepCntrctInfo() throws Exception {
 		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
 			try {
-				saveBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회");
+				saveCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회");
 			} catch (Exception e) {
 				return "failure";
 			}
 			return "success";
 		}).thenApplyAsync(result -> {
 			try {
-				saveBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회");
+				saveCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회");
 			} catch (Exception e) {
 				return "failure";
 			}
 			return "success";
 		}).thenApplyAsync(result -> {
 			try {
-				saveBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회");
+				saveCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회");
 			} catch (Exception e) {
 				return "failure";
 			}
 			return "success";
 		}).thenApplyAsync(result -> {
 			try {
-				saveBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회");
+				saveCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회");
 			} catch (Exception e) {
 				return "failure";
 			}
@@ -75,7 +77,7 @@ public class BidPublicInfoController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {
+	private void saveCntrctInfo(String serviceId, String serviceDescription) throws Exception {
 		int startYear = 2025;
 		int endYear = 2026;
 		int startMonth = 1;
@@ -90,17 +92,16 @@ public class BidPublicInfoController {
 			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
-				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
-				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
+				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "01";
+				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 				int startPage;
 				int endPage;
 
-				BidPublicInfoRequestDto bidRequestDto = BidPublicInfoRequestDto.builder()
+				CntrctInfoRequestDto requestDto = CntrctInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
 					.serviceId(serviceId)
 					.serviceDescription(serviceDescription)
-					.bidType(bidType)
 					.inqryBgnDt(inqryBgnDt)
 					.inqryEndDt(inqryEndDt)
 					.numOfRows(100)
@@ -108,26 +109,26 @@ public class BidPublicInfoController {
 					.type("json")
 					.build();
 
-				if (!bidSchdulHistManageService.colctCmplYn(bidRequestDto)) {
+				if (!bidSchdulHistManageService.colctCmplYn(requestDto)) {
 					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
 						.scheme("https")
 						.host("apis.data.go.kr")
-						.pathSegment("1230000/ad/BidPublicInfoService", bidRequestDto.getServiceId())
-						.queryParam("serviceKey", bidRequestDto.getServiceKey())
+						.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
+						.queryParam("serviceKey", requestDto.getServiceKey())
 						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", bidRequestDto.getNumOfRows())
-						.queryParam("inqryDiv", bidRequestDto.getInqryDiv())
+						.queryParam("numOfRows", requestDto.getNumOfRows())
+						.queryParam("inqryDiv", requestDto.getInqryDiv())
 						.queryParam("type", "json")
-						.queryParam("inqryBgnDt", bidRequestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", bidRequestDto.getInqryEndDt());
+						.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
+						.queryParam("inqryEndDate", requestDto.getInqryEndDt());
 
 					URI firstPageUri = uriComponentsBuilder.build().toUri();
 
 					// 1 페이지 API 호출
-					BidPublicInfoResponseDto responseDto = publicWebClient.get()
+					CntrctInfoReponseDto responseDto = publicWebClient.get()
 						.uri(firstPageUri)
 						.retrieve()
-						.bodyToMono(BidPublicInfoResponseDto.class)
+						.bodyToMono(CntrctInfoReponseDto.class)
 						.block();
 
 					if (responseDto == null) {
@@ -137,10 +138,10 @@ public class BidPublicInfoController {
 					int totalCount = responseDto.getResponse().getBody().getTotalCount();
 					int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					bidRequestDto.setTotalCount(totalCount);
-					bidRequestDto.setTotalPage(totalPage);
+					requestDto.setTotalCount(totalCount);
+					requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(bidRequestDto);
+					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
 					startPage = (Integer) pageMap.get("startPage");
 					endPage = (Integer) pageMap.get("endPage");
@@ -149,7 +150,7 @@ public class BidPublicInfoController {
 						URI uri = uriComponentsBuilder.cloneBuilder()
 							.replaceQueryParam("pageNo", pageNo)
 							.build().toUri();
-						bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, bidRequestDto);
+						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 						// 30초
 						Thread.sleep(10000 * 3);

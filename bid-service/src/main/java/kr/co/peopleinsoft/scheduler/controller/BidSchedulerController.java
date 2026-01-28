@@ -8,6 +8,7 @@ import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.quartz.manager.CmmnScheduleManager;
 import kr.co.peopleinsoft.cmmn.quartz.service.CmmnSchedulerInfoService;
 import kr.co.peopleinsoft.g2b.jobs.BidPublicInfoJob;
+import kr.co.peopleinsoft.g2b.jobs.CntrctInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.DminsttInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.HrcspSsstndrdInfoJob;
 import kr.co.peopleinsoft.g2b.jobs.OpengComptResultListInfoJob;
@@ -145,6 +146,18 @@ public class BidSchedulerController extends CmmnAbstractController {
 		return ResponseEntity.ok().body(jobList);
 	}
 
+	@Operation(summary = "나라장터 검색조건에 의한 계약현황 현황 정보 수집", description = "나라장터 검색조건에 의한 계약현황 현황 정보 수집", parameters = {
+		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
+	})
+	@GetMapping("/shcduler/cntrctInfo/cntrctInfoJob")
+	public ResponseEntity<String> cntrctInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 5 * * ?");
+		cmmnScheduleManager.deleteJob("cntrctInfoJob", "cntrctInfo"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(CntrctInfoJob.class, "cntrctInfoJob", "cntrctInfo", "나라장터 검색조건에 의한 계약현황 정보 수집", cronJobExpression, new HashMap<>());
+		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
+		return ResponseEntity.ok().body(jobList);
+	}
+
 	@Operation(summary = "모든 Job 실행", description = "모든 Job 실행")
 	@GetMapping("/shcduler/jobs/executeAllJobs")
 	public ResponseEntity<String> executeAllJobs() throws SchedulerException, JsonProcessingException {
@@ -157,6 +170,7 @@ public class BidSchedulerController extends CmmnAbstractController {
 		opengResultListInfoJob(null); // 개찰결과정보
 		opengResultPreparPcDetailJob(null); // 예비가격
 		scsbidInfoSttsJob(null); // 낙찰목록현황
+		cntrctInfoJob(null); // 계약현황
 
 		return ResponseEntity.ok().body("success");
 	}

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CntrctInfoMapper">
+	<sql id="insertCntrctInfoQuery">
+		-- 계약현황 등록
+		INSERT INTO tb_bid_contract_status (
+				unty_cntrct_no -- 통합계약번호 (계약을 고유하게 식별하는 번호)
+				, bsns_div_nm -- 업무구분명 (예: 물품구매, 용역, 공사 등)
+				, dcsn_cntrct_no -- 결정계약번호 (계약 결정 시 부여되는 번호)
+				, cntrct_ref_no -- 계약참조번호 (계약 참조용 번호)
+				, cmmnc_ntrct_yn -- 공동계약여부 (Y:공동계약, N:단독계약)
+				, lngtrm_ctnu_div_nm -- 장기계속구분명 (예: 장기계속계약, 일반계약 등)
+				, cntrct_cncls_date -- 계약체결일자 (계약서에 서명한 날짜)
+				, cntrct_prd -- 계약기간 (계약 시작일부터 종료일까지의 기간)
+				, cntrct_date -- 계약일자 (계약 체결 일자)
+				, tot_cntrct_amt -- 총계약금액 (원, 전체 계약금액)
+				, thtm_cntrct_amt -- 당해연도계약금액 (원, 해당 연도 집행 예정 금액)
+				, grntymny_rate -- 보증금율 (%, 계약보증금 비율)
+				, dfrcmpnst_rt -- 지체상금율 (%, 계약 지연 시 부과되는 상금 비율)
+				, cntrct_nm -- 계약명 (계약 건의 명칭)
+				, base_law_nm -- 근거법령명 (계약의 법적 근거가 되는 법령)
+				, cntrct_cncls_mthd_nm -- 계약체결방법명 (예: 일반경쟁, 제한경쟁, 수의계약 등)
+				, pay_div_nm -- 지급구분명 (예: 선금, 중도금, 준공금 등)
+				, cntrct_info_url -- 계약정보URL (계약 정보 조회 URL)
+				, cntrct_dtl_info_url -- 계약상세정보URL (계약 상세 정보 조회 URL)
+				, req_no -- 요청번호 (계약 요청 시 부여되는 번호)
+				, ntce_no -- 공고번호 (입찰공고번호)
+				, cntrct_instt_cd -- 계약기관코드
+				, cntrct_instt_nm -- 계약기관명
+				, cntrct_instt_jrsdctn_div_nm -- 계약기관관할구분명 (예: 중앙, 지방 등)
+				, cntrct_instt_chrg_dept_nm -- 계약기관담당부서명
+				, cntrct_instt_ofcl_nm -- 계약기관담당자명
+				, cntrct_instt_ofcl_tel_no -- 계약기관담당자전화번호
+				, cntrct_instt_ofcl_fax_no -- 계약기관담당자팩스번호
+				, dminstt_list -- 수요기관목록 (계약에 포함된 수요기관들의 목록, JSON 또는 구분자로 저장)
+				, corp_list -- 업체목록 (계약에 참여한 업체들의 목록, JSON 또는 구분자로 저장)
+				, crdtr_nm -- 채권자명 (계약 상대방)
+				, base_dtls -- 기초상세 (계약의 기초가 되는 상세 정보)
+				, rgst_dt -- 등록일시 (조달청 시스템 등록일시)
+				, chg_dt -- 변경일시 (조달청 시스템 변경일시)
+				, pub_prcrmnt_clsfc_no -- 공공조달분류번호
+				, pub_prcrmnt_clsfc_nm -- 공공조달분류명
+				, pub_prcrmnt_mid_clsfc_nm -- 공공조달중분류명
+				, pub_prcrmnt_lrg_clsfc_nm -- 공공조달대분류명
+				, info_biz_yn -- 정보화사업여부 (Y:정보화사업, N:일반사업)
+				, cnstwk_nm -- 공사명 (건설공사의 명칭)
+				, cnstrsite_rgn_nm -- 건설현장지역명 (건설공사 현장 위치)
+				, prces_change_apl_bss_cd -- 공정변경신청기준코드
+				, prces_change_apl_bss_nm -- 공정변경신청기준명 (공정 변경 시 적용되는 기준)
+				, cbgn_date -- 계약시작일자 (계약이 시작되는 날짜)
+				, thtm_ccmplt_date -- 당해연도계약완료일자 (해당 연도 내 완료 예정일)
+				, ttal_ccmplt_date -- 총계약완료일자 (전체 계약 완료 예정일)
+				, wbgn_date -- 작업시작일자 (실제 작업 시작 날짜, 공사/용역)
+				, thtm_scmplt_date -- 당해연도공사완료일자 (해당 연도 내 공사 완료 예정일)
+				, ttal_scmplt_date -- 총공사완료일자 (전체 공사 완료 예정일)
+				, adi_prdct_clsfc_no -- 추가제품분류번호 (추가 제품 분류 번호)
+				, prdct_clsfc_no -- 제품분류번호 (물품의 분류 번호)
+				, prdct_idnt_no -- 제품식별번호 (제품 고유 식별 번호)
+				, prdct_clsfc_no_nm -- 제품분류번호명 (제품 분류의 명칭)
+				, krn_prdct_nm -- 한글제품명 (제품의 한글 명칭)
+				, prdct_clsfc_no_nm_nd_spec -- 제품분류번호명및규격 (제품 분류명과 상세 규격)
+				, orgplce_cd -- 원산지코드 (제품 원산지 코드)
+				, orgplce_nm -- 원산지명 (제품 원산지 명칭)
+				, qty_uprc_amt -- 수량단가금액 (원, 단위당 가격)
+				, prdct_qty -- 제품수량 (계약 물품의 수량)
+				, prdct_amt -- 제품금액 (원, 제품 총 금액)
+				, prdct_amt_crncy -- 제품금액통화 (예: KRW, USD 등)
+				, dlvry_cndtn_cd -- 납품조건코드
+				, dlvry_cndtn_nm -- 납품조건명 (예: 본사납품, 지정장소납품 등)
+				, dlvr_daynum -- 납품일수 (계약 후 납품까지 소요 일수)
+				, dlvr_tmlmt -- 납품기한 (납품 완료 기한일)
+				, srvce_sno -- 용역일련번호 (용역의 일련번호)
+				, rprsnt_yn -- 대표여부 (Y:대표업체, N:구성원업체)
+				, srvce_amt -- 용역금액 (원, 용역 계약 금액)
+				, rltn_corp_nm -- 관련업체명 (계약에 관련된 업체명)
+				, created_dt -- 생성일시 (시스템 등록일시)
+				, created_by -- 생성자 (시스템 등록자)
+				, updated_dt -- 수정일시 (시스템 수정일시)
+				, updated_by -- 수정자 (시스템 수정자)
+		) VALUES (
+				#{untyCntrctNo} -- 통합계약번호 (계약을 고유하게 식별하는 번호)
+				, #{bsnsDivNm} -- 업무구분명 (예: 물품구매, 용역, 공사 등)
+				, #{dcsnCntrctNo} -- 결정계약번호 (계약 결정 시 부여되는 번호)
+				, #{cntrctRefNo} -- 계약참조번호 (계약 참조용 번호)
+				, #{cmmncNtrctYn} -- 공동계약여부 (Y:공동계약, N:단독계약)
+				, #{lngtrmCtnuDivNm} -- 장기계속구분명 (예: 장기계속계약, 일반계약 등)
+				, #{cntrctCnclsDate} -- 계약체결일자 (계약서에 서명한 날짜)
+				, #{cntrctPrd} -- 계약기간 (계약 시작일부터 종료일까지의 기간)
+				, #{cntrctDate} -- 계약일자 (계약 체결 일자)
+				, #{totCntrctAmt} -- 총계약금액 (원, 전체 계약금액)
+				, #{thtmCntrctAmt} -- 당해연도계약금액 (원, 해당 연도 집행 예정 금액)
+				, #{grntymnyRate} -- 보증금율 (%, 계약보증금 비율)
+				, #{dfrcmpnstRt} -- 지체상금율 (%, 계약 지연 시 부과되는 상금 비율)
+				, #{cntrctNm} -- 계약명 (계약 건의 명칭)
+				, #{baseLawNm} -- 근거법령명 (계약의 법적 근거가 되는 법령)
+				, #{cntrctCnclsMthdNm} -- 계약체결방법명 (예: 일반경쟁, 제한경쟁, 수의계약 등)
+				, #{payDivNm} -- 지급구분명 (예: 선금, 중도금, 준공금 등)
+				, #{cntrctInfoUrl} -- 계약정보URL (계약 정보 조회 URL)
+				, #{cntrctDtlInfoUrl} -- 계약상세정보URL (계약 상세 정보 조회 URL)
+				, #{reqNo} -- 요청번호 (계약 요청 시 부여되는 번호)
+				, #{ntceNo} -- 공고번호 (입찰공고번호)
+				, #{cntrctInsttCd} -- 계약기관코드
+				, #{cntrctInsttNm} -- 계약기관명
+				, #{cntrctInsttJrsdctnDivNm} -- 계약기관관할구분명 (예: 중앙, 지방 등)
+				, #{cntrctInsttChrgDeptNm} -- 계약기관담당부서명
+				, #{cntrctInsttOfclNm} -- 계약기관담당자명
+				, #{cntrctInsttOfclTelNo} -- 계약기관담당자전화번호
+				, #{cntrctInsttOfclFaxNo} -- 계약기관담당자팩스번호
+				, #{dminsttList} -- 수요기관목록 (계약에 포함된 수요기관들의 목록, JSON 또는 구분자로 저장)
+				, #{corpList} -- 업체목록 (계약에 참여한 업체들의 목록, JSON 또는 구분자로 저장)
+				, #{crdtrNm} -- 채권자명 (계약 상대방)
+				, #{baseDtls} -- 기초상세 (계약의 기초가 되는 상세 정보)
+				, #{rgstDt} -- 등록일시 (조달청 시스템 등록일시)
+				, #{chgDt} -- 변경일시 (조달청 시스템 변경일시)
+				, #{pubPrcrmntClsfcNo} -- 공공조달분류번호
+				, #{pubPrcrmntClsfcNm} -- 공공조달분류명
+				, #{pubPrcrmntMidClsfcNm} -- 공공조달중분류명
+				, #{pubPrcrmntLrgClsfcNm} -- 공공조달대분류명
+				, #{infoBizYn} -- 정보화사업여부 (Y:정보화사업, N:일반사업)
+				, #{cnstwkNm} -- 공사명 (건설공사의 명칭)
+				, #{cnstrsiteRgnNm} -- 건설현장지역명 (건설공사 현장 위치)
+				, #{prcesChangeAplBssCd} -- 공정변경신청기준코드
+				, #{prcesChangeAplBssNm} -- 공정변경신청기준명 (공정 변경 시 적용되는 기준)
+				, #{cbgnDate} -- 계약시작일자 (계약이 시작되는 날짜)
+				, #{thtmCcmpltDate} -- 당해연도계약완료일자 (해당 연도 내 완료 예정일)
+				, #{ttalCcmpltDate} -- 총계약완료일자 (전체 계약 완료 예정일)
+				, #{wbgnDate} -- 작업시작일자 (실제 작업 시작 날짜, 공사/용역)
+				, #{thtmScmpltDate} -- 당해연도공사완료일자 (해당 연도 내 공사 완료 예정일)
+				, #{ttalScmpltDate} -- 총공사완료일자 (전체 공사 완료 예정일)
+				, #{adiPrdctClsfcNo} -- 추가제품분류번호 (추가 제품 분류 번호)
+				, #{prdctClsfcNo} -- 제품분류번호 (물품의 분류 번호)
+				, #{prdctIdntNo} -- 제품식별번호 (제품 고유 식별 번호)
+				, #{prdctClsfcNoNm} -- 제품분류번호명 (제품 분류의 명칭)
+				, #{krnPrdctNm} -- 한글제품명 (제품의 한글 명칭)
+				, #{prdctClsfcNoNmNdSpec} -- 제품분류번호명및규격 (제품 분류명과 상세 규격)
+				, #{orgplceCd} -- 원산지코드 (제품 원산지 코드)
+				, #{orgplceNm} -- 원산지명 (제품 원산지 명칭)
+				, #{qtyUprcAmt} -- 수량단가금액 (원, 단위당 가격)
+				, #{prdctQty} -- 제품수량 (계약 물품의 수량)
+				, #{prdctAmt} -- 제품금액 (원, 제품 총 금액)
+				, #{prdctAmtCrncy} -- 제품금액통화 (예: KRW, USD 등)
+				, #{dlvryCndtnCd} -- 납품조건코드
+				, #{dlvryCndtnNm} -- 납품조건명 (예: 본사납품, 지정장소납품 등)
+				, #{dlvrDaynum} -- 납품일수 (계약 후 납품까지 소요 일수)
+				, #{dlvrTmlmt} -- 납품기한 (납품 완료 기한일)
+				, #{srvceSno} -- 용역일련번호 (용역의 일련번호)
+				, #{rprsntYn} -- 대표여부 (Y:대표업체, N:구성원업체)
+				, #{srvceAmt} -- 용역금액 (원, 용역 계약 금액)
+				, #{rltnCorpNm} -- 관련업체명 (계약에 관련된 업체명)
+				, CURRENT_TIMESTAMP -- 생성일시 (시스템 등록일시)
+				, #{createdBy} -- 생성자 (시스템 등록자)
+				, CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
+				, #{updatedBy} -- 수정자 (시스템 수정자)
+		)
+	</sql>
+
+	<select id="selectCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto">
+		-- 계약현황 조회
+		SELECT
+				a.unty_cntrct_no -- 통합계약번호 (계약을 고유하게 식별하는 번호)
+				, a.bsns_div_nm -- 업무구분명 (예: 물품구매, 용역, 공사 등)
+				, a.dcsn_cntrct_no -- 결정계약번호 (계약 결정 시 부여되는 번호)
+				, a.cntrct_ref_no -- 계약참조번호 (계약 참조용 번호)
+				, a.cmmnc_ntrct_yn -- 공동계약여부 (Y:공동계약, N:단독계약)
+				, a.lngtrm_ctnu_div_nm -- 장기계속구분명 (예: 장기계속계약, 일반계약 등)
+				, a.cntrct_cncls_date -- 계약체결일자 (계약서에 서명한 날짜)
+				, a.cntrct_prd -- 계약기간 (계약 시작일부터 종료일까지의 기간)
+				, a.cntrct_date -- 계약일자 (계약 체결 일자)
+				, a.tot_cntrct_amt -- 총계약금액 (원, 전체 계약금액)
+				, a.thtm_cntrct_amt -- 당해연도계약금액 (원, 해당 연도 집행 예정 금액)
+				, a.grntymny_rate -- 보증금율 (%, 계약보증금 비율)
+				, a.dfrcmpnst_rt -- 지체상금율 (%, 계약 지연 시 부과되는 상금 비율)
+				, a.cntrct_nm -- 계약명 (계약 건의 명칭)
+				, a.base_law_nm -- 근거법령명 (계약의 법적 근거가 되는 법령)
+				, a.cntrct_cncls_mthd_nm -- 계약체결방법명 (예: 일반경쟁, 제한경쟁, 수의계약 등)
+				, a.pay_div_nm -- 지급구분명 (예: 선금, 중도금, 준공금 등)
+				, a.cntrct_info_url -- 계약정보URL (계약 정보 조회 URL)
+				, a.cntrct_dtl_info_url -- 계약상세정보URL (계약 상세 정보 조회 URL)
+				, a.req_no -- 요청번호 (계약 요청 시 부여되는 번호)
+				, a.ntce_no -- 공고번호 (입찰공고번호)
+				, a.cntrct_instt_cd -- 계약기관코드
+				, a.cntrct_instt_nm -- 계약기관명
+				, a.cntrct_instt_jrsdctn_div_nm -- 계약기관관할구분명 (예: 중앙, 지방 등)
+				, a.cntrct_instt_chrg_dept_nm -- 계약기관담당부서명
+				, a.cntrct_instt_ofcl_nm -- 계약기관담당자명
+				, a.cntrct_instt_ofcl_tel_no -- 계약기관담당자전화번호
+				, a.cntrct_instt_ofcl_fax_no -- 계약기관담당자팩스번호
+				, a.dminstt_list -- 수요기관목록 (계약에 포함된 수요기관들의 목록, JSON 또는 구분자로 저장)
+				, a.corp_list -- 업체목록 (계약에 참여한 업체들의 목록, JSON 또는 구분자로 저장)
+				, a.crdtr_nm -- 채권자명 (계약 상대방)
+				, a.base_dtls -- 기초상세 (계약의 기초가 되는 상세 정보)
+				, a.rgst_dt -- 등록일시 (조달청 시스템 등록일시)
+				, a.chg_dt -- 변경일시 (조달청 시스템 변경일시)
+				, a.pub_prcrmnt_clsfc_no -- 공공조달분류번호
+				, a.pub_prcrmnt_clsfc_nm -- 공공조달분류명
+				, a.pub_prcrmnt_mid_clsfc_nm -- 공공조달중분류명
+				, a.pub_prcrmnt_lrg_clsfc_nm -- 공공조달대분류명
+				, a.info_biz_yn -- 정보화사업여부 (Y:정보화사업, N:일반사업)
+				, a.cnstwk_nm -- 공사명 (건설공사의 명칭)
+				, a.cnstrsite_rgn_nm -- 건설현장지역명 (건설공사 현장 위치)
+				, a.prces_change_apl_bss_cd -- 공정변경신청기준코드
+				, a.prces_change_apl_bss_nm -- 공정변경신청기준명 (공정 변경 시 적용되는 기준)
+				, a.cbgn_date -- 계약시작일자 (계약이 시작되는 날짜)
+				, a.thtm_ccmplt_date -- 당해연도계약완료일자 (해당 연도 내 완료 예정일)
+				, a.ttal_ccmplt_date -- 총계약완료일자 (전체 계약 완료 예정일)
+				, a.wbgn_date -- 작업시작일자 (실제 작업 시작 날짜, 공사/용역)
+				, a.thtm_scmplt_date -- 당해연도공사완료일자 (해당 연도 내 공사 완료 예정일)
+				, a.ttal_scmplt_date -- 총공사완료일자 (전체 공사 완료 예정일)
+				, a.adi_prdct_clsfc_no -- 추가제품분류번호 (추가 제품 분류 번호)
+				, a.prdct_clsfc_no -- 제품분류번호 (물품의 분류 번호)
+				, a.prdct_idnt_no -- 제품식별번호 (제품 고유 식별 번호)
+				, a.prdct_clsfc_no_nm -- 제품분류번호명 (제품 분류의 명칭)
+				, a.krn_prdct_nm -- 한글제품명 (제품의 한글 명칭)
+				, a.prdct_clsfc_no_nm_nd_spec -- 제품분류번호명및규격 (제품 분류명과 상세 규격)
+				, a.orgplce_cd -- 원산지코드 (제품 원산지 코드)
+				, a.orgplce_nm -- 원산지명 (제품 원산지 명칭)
+				, a.qty_uprc_amt -- 수량단가금액 (원, 단위당 가격)
+				, a.prdct_qty -- 제품수량 (계약 물품의 수량)
+				, a.prdct_amt -- 제품금액 (원, 제품 총 금액)
+				, a.prdct_amt_crncy -- 제품금액통화 (예: KRW, USD 등)
+				, a.dlvry_cndtn_cd -- 납품조건코드
+				, a.dlvry_cndtn_nm -- 납품조건명 (예: 본사납품, 지정장소납품 등)
+				, a.dlvr_daynum -- 납품일수 (계약 후 납품까지 소요 일수)
+				, a.dlvr_tmlmt -- 납품기한 (납품 완료 기한일)
+				, a.srvce_sno -- 용역일련번호 (용역의 일련번호)
+				, a.rprsnt_yn -- 대표여부 (Y:대표업체, N:구성원업체)
+				, a.srvce_amt -- 용역금액 (원, 용역 계약 금액)
+				, a.rltn_corp_nm -- 관련업체명 (계약에 관련된 업체명)
+				, a.created_dt -- 생성일시 (시스템 등록일시)
+				, a.created_by -- 생성자 (시스템 등록자)
+				, a.updated_dt -- 수정일시 (시스템 수정일시)
+				, a.updated_by -- 수정자 (시스템 수정자)
+		FROM tb_bid_contract_status a -- 계약현황
+	</select>
+
+	<insert id="batchInsertCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto">
+		<include refid="insertCntrctInfoQuery"/>
+	</insert>
+</mapper>
