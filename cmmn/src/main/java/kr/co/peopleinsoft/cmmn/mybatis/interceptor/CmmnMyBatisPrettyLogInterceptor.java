@@ -600,15 +600,14 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 		int indentLevel = 0;
 
 		for (String line : lines) {
-			String trimmedLine = line.trim();
+			String trimmedLine = line.stripTrailing();
 
 			if (trimmedLine.isEmpty()) {
 				continue;
 			}
 
 			// 들여쓰기 감소 키워드 체크 (먼저 처리)
-			if (startsWithKeywordIgnoreCase(trimmedLine, "END") ||
-				startsWithKeywordIgnoreCase(trimmedLine, ")")) {
+			if (startsWithKeywordIgnoreCase(trimmedLine, "END") || startsWithKeywordIgnoreCase(trimmedLine, ")")) {
 				indentLevel = Math.max(0, indentLevel - 1);
 			}
 
