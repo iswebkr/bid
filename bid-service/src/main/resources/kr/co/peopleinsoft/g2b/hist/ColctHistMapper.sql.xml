@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="BidColctHistMapper">
-	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistDto">
+	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
 		-- 수집이력관리 등록
 		INSERT INTO tb_colct_hist (
 				colct_id -- 수집대상아이디
@@ -35,7 +35,7 @@
 		)
 	</insert>
 
-	<select id="selectColctHistResultByDate" parameterType="kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistDto" resultType="kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistResultDto">
+	<select id="selectColctHistResultByDate" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto" resultType="kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto">
 		select
 				colct_id
 				, colct_bgn_dt
@@ -63,7 +63,7 @@
 		group by colct_id, colct_bgn_dt, colct_end_dt
 	</select>
 
-	<update id="updateColctPageInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistDto">
+	<update id="updateColctPageInfo" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
 		-- 수집이력관리 수정
 		UPDATE tb_colct_hist
 		SET

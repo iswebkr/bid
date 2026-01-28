@@ -1,0 +1,17 @@
+package kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo;
+
+import kr.co.peopleinsoft.cmmn.dto.BidResponse;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+@Getter
+@Setter
+public class DminsttInfoResponseDto implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
+
+	private BidResponse<DminsttInfoDto> response;
+}

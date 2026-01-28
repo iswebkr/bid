@@ -154,7 +154,7 @@
 		)
 	</sql>
 
-	<select id="selectCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto">
+	<select id="selectCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoDto" resultType="kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoDto">
 		-- 계약현황 조회
 		SELECT
 				a.unty_cntrct_no -- 통합계약번호 (계약을 고유하게 식별하는 번호)
@@ -233,7 +233,7 @@
 		FROM tb_bid_contract_status a -- 계약현황
 	</select>
 
-	<insert id="batchInsertCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoDto">
+	<insert id="batchInsertCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoDto">
 		<include refid="insertCntrctInfoQuery"/>
 	</insert>
 </mapper>

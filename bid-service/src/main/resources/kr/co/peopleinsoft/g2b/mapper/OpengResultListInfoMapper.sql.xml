@@ -50,7 +50,7 @@
 		)
 	</sql>
 
-	<select id="selectOpengResultListInfo" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultList.OpengResultListInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultList.OpengResultListInfoDto">
+	<select id="selectOpengResultListInfo" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoDto" resultType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoDto">
 		-- 개찰결과 조회
 		SELECT
 				a.bid_clsfc_no -- 입찰분류번호 (예: 0=일반입찰)
@@ -76,7 +76,7 @@
 		FROM 	tb_bid_open_result a -- 개찰결과
 	</select>
 
-	<insert id="batchInsertOpengResultListInfo" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultList.OpengResultListInfoDto">
+	<insert id="batchInsertOpengResultListInfo" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoDto">
 		<include refid="insertOpengResultListInfoQuery" />
 	</insert>
 

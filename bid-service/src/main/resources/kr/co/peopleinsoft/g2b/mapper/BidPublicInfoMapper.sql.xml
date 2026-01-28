@@ -542,7 +542,7 @@
 		FROM 	tb_bid_notice a -- 입찰공고
 	</select>
 
-	<insert id="batchInsertPublicInfo" parameterType="kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoDto">
+	<insert id="batchInsertPublicInfo" parameterType="kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoDto">
 		<include refid="insertPublicInfoQuery" />
 	</insert>
 

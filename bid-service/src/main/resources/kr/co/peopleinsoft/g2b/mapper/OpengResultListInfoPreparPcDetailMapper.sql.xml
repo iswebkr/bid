@@ -53,7 +53,7 @@
 		)
 	</sql>
 
-	<select id="selectOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto" resultType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
+	<select id="selectOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailDto" resultType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
 		-- 예정가격 조회
 		SELECT
 		a.bid_ntce_no -- 입찰공고번호
@@ -81,7 +81,7 @@
 		FROM tb_bid_predict_price a -- 예정가격
 	</select>
 
-	<insert id="batchInsertOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
+	<insert id="batchInsertOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
 		<include refid="insertOpengResultListInfoPreparPcDetailQuery" />
 	</insert>
 </mapper>

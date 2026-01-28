@@ -63,7 +63,7 @@
 		)
 	</sql>
 
-	<select id="selectPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto">
+	<select id="selectPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoDto" resultType="kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoDto">
 		-- 조달업체기본 조회
 		SELECT
 		a.bizno -- 사업자번호 (업체를 고유하게 식별하는 사업자등록번호, 10자리)
@@ -96,7 +96,7 @@
 		FROM tb_bid_procurement_company a -- 조달업체기본
 	</select>
 
-	<insert id="batchInsertPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.prcrmntCorp.PrcrmntCorpBasicInfoDto">
+	<insert id="batchInsertPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoDto">
 		<include refid="insertPrcrmntCorpBasicInfoQuery" />
 	</insert>
 

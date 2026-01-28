@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +46,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi bidPublicInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 입찰공고정보서비스(BidPublicInfoService)")
-			.pathsToMatch ("/g2b/bidPublicInfoService/**")
+			.pathsToMatch("/g2b/bidPublicInfoService/**")
 			.build();
 	}
 
@@ -55,7 +54,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi orderPlanSttusServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 발주계획현황서비스(OrderPlanSttusService)")
-			.pathsToMatch ("/g2b/orderPlanSttusService/**")
+			.pathsToMatch("/g2b/orderPlanSttusService/**")
 			.build();
 	}
 
@@ -63,7 +62,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi hrcspSsstndrdInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 사전규격정보서비스(HrcspSsstndrdInfoService)")
-			.pathsToMatch ("/g2b/hrcspSsstndrdInfoService/**")
+			.pathsToMatch("/g2b/hrcspSsstndrdInfoService/**")
 			.build();
 	}
 
@@ -71,7 +70,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi scsbidInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 낙찰정보서비스(ScsbidInfoService)")
-			.pathsToMatch ("/g2b/scsbidInfoService/**")
+			.pathsToMatch("/g2b/scsbidInfoService/**")
 			.build();
 	}
 
@@ -79,7 +78,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi usrInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 사용자정보서비스(UsrInfoService)")
-			.pathsToMatch ("/g2b/usrInfoService/**")
+			.pathsToMatch("/g2b/usrInfoService/**")
 			.build();
 	}
 
@@ -87,7 +86,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi cntrctInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 계약정보서비스(CntrctInfoService)")
-			.pathsToMatch ("/g2b/cntrctInfoService/**")
+			.pathsToMatch("/g2b/cntrctInfoService/**")
 			.build();
 	}
 
@@ -95,7 +94,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi schedulerInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("스케줄러 서비스")
-			.pathsToMatch ("/shcduler/**")
+			.pathsToMatch("/shcduler/**")
 			.build();
 	}
 
@@ -104,19 +103,18 @@ public class CmmnSpringDocConfig {
 	 * JWT 의 인증정보등을 Header 에 포함하여 호출하는 등 작업 시 설정하여 사용 가능
 	 * 그룹설정시.addOperationCustomizer 로 추가 가능
 
-	@Bean
-	OperationCustomizer operationCustomizer() {
-		return (operation, handlerMethod) -> {
-			 Parameter parameter = new Parameter()
-			 .in(ParameterIn.HEADER.toString())
-			 .schema(new StringSchema()._default("SAMPLE_API01").name("API_ID"))
-			 .name("AppID")
-			 .description("Sample API Description")
-			 .required(true);
-			 operation.addParametersItem(parameter);
-			 return operation;
-			return operation;
-		};
-	}
-		*/
+	 @Bean OperationCustomizer operationCustomizer() {
+	 return (operation, handlerMethod) -> {
+	 Parameter parameter = new Parameter()
+	 .in(ParameterIn.HEADER.toString())
+	 .schema(new StringSchema()._default("SAMPLE_API01").name("API_ID"))
+	 .name("AppID")
+	 .description("Sample API Description")
+	 .required(true);
+	 operation.addParametersItem(parameter);
+	 return operation;
+	 return operation;
+	 };
+	 }
+	 */
 }

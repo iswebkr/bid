@@ -73,7 +73,7 @@
 		)
 	</sql>
 
-	<select id="selectDemandInstituteList" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.dminsttInfo.DminsttInfoDto" resultType="kr.co.peopleinsoft.g2b.dto.userInfo.dminsttInfo.DminsttInfoDto">
+	<select id="selectDemandInstituteList" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoDto" resultType="kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoDto">
 		-- 수요기관 조회
 		SELECT
 				a.dminstt_cd -- 수요기관코드 (수요기관을 고유하게 식별하는 코드)
@@ -111,7 +111,7 @@
 		FROM tb_bid_demand_institute a -- 수요기관
 	</select>
 
-	<insert id="batchInsertDminsttInfo" parameterType="kr.co.peopleinsoft.g2b.dto.userInfo.dminsttInfo.DminsttInfoDto">
+	<insert id="batchInsertDminsttInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoDto">
 		<include refid="insertDminsttInfoQuery" />
 	</insert>
 </mapper>

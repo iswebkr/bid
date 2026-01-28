@@ -136,7 +136,7 @@
 		)
 	</sql>
 
-	<select id="selectOrderPlan" parameterType="kr.co.peopleinsoft.g2b.dto.orderPlanSttus.OrderPlanSttusDto" resultType="kr.co.peopleinsoft.g2b.dto.orderPlanSttus.OrderPlanSttusDto">
+	<select id="selectOrderPlan" parameterType="kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusDto" resultType="kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusDto">
 		-- 발주계획 조회
 		SELECT
 		a.order_plan_unty_no -- 발주계획통합번호 (발주계획의 고유 통합 번호)
@@ -205,7 +205,7 @@
 		FROM tb_bid_order_plan a -- 발주계획
 	</select>
 
-	<insert id="batchInsertOrderPlan" parameterType="kr.co.peopleinsoft.g2b.dto.orderPlanSttus.OrderPlanSttusDto">
+	<insert id="batchInsertOrderPlan" parameterType="kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusDto">
 		<include refid="insertOrderPlanQuery" />
 	</insert>
 </mapper>
