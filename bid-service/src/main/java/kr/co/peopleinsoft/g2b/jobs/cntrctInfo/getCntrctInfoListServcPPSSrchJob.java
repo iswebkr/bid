@@ -1,4 +1,4 @@
-package kr.co.peopleinsoft.g2b.jobs;
+package kr.co.peopleinsoft.g2b.jobs.cntrctInfo;
 
 import kr.co.peopleinsoft.g2b.controller.cntrctInfo.CntrctInfoController;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
@@ -8,16 +8,16 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.web.reactive.function.client.WebClient;
 
-public class CntrctInfoJob extends CntrctInfoController implements Job {
+public class getCntrctInfoListServcPPSSrchJob extends CntrctInfoController implements Job {
 
-	public CntrctInfoJob(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
+	public getCntrctInfoListServcPPSSrchJob(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
 		super(g2BCmmnService, publicWebClient, cntrctInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		try {
-			saveStepCntrctInfo();
+			getCntrctInfoListServcPPSSrch();
 		} catch (Exception ignore) {
 		}
 	}

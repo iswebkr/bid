@@ -1,4 +1,4 @@
-package kr.co.peopleinsoft.g2b.jobs;
+package kr.co.peopleinsoft.g2b.jobs.hrcspSsstndrdInfo;
 
 import kr.co.peopleinsoft.g2b.controller.hrcspSsstndrdInfo.HrcspSsstndrdInfoController;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;

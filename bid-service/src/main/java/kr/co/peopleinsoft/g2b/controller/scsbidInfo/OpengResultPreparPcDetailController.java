@@ -16,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -73,18 +72,20 @@ public class OpengResultPreparPcDetailController {
 	}
 
 	private void saveOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2025;
-		int endYear = 2026;
-		int startMonth = 1;
-		int endMonth = 12; // 이번달 자료까지만
+		int startYear = 2026;
+		int endYear = 2025;
+		int startMonth = 12;
+		int endMonth = 1;
 
-		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if (startYear == LocalDate.now().getYear()) {
-			endMonth = LocalDateTime.now().getMonthValue();
-		}
+		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 
-		for (int targetYear = startYear; targetYear <= endYear; targetYear++) {
-			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
+			if (LocalDate.now().getYear() == targetYear) {
+				startMonth = LocalDate.now().getMonthValue();
+			} else {
+				startMonth = 12;
+			}
+
+			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

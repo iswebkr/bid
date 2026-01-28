@@ -16,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -37,54 +36,69 @@ public class BidPublicInfoController {
 		this.bidPublicInfoService = bidPublicInfoService;
 	}
 
-	@Operation(summary = "모든 입찰공고 정보 수집")
-	@GetMapping("/saveStepBidPublicInfo")
-	public ResponseEntity<String> saveStepBidPublicInfo() throws Exception {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
+	@Operation(summary = "나라장터검색조건에 의한 입찰공고공사조회")
+	@GetMapping("/getBidPblancListInfoCnstwkPPSSrch")
+	public ResponseEntity<String> getBidPblancListInfoCnstwkPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
-		}).thenApplyAsync(result -> {
-			try {
-				saveBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회");
-			} catch (Exception e) {
-				return "failure";
-			}
-			return "success";
-		}).thenApplyAsync(result -> {
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회")
+	@GetMapping("/getBidPblancListInfoFrgcptPPSSrch")
+	public ResponseEntity<String> getBidPblancListInfoFrgcptPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
-		}).thenApplyAsync(result -> {
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 입찰공고용역조회")
+	@GetMapping("/getBidPblancListInfoServcPPSSrch")
+	public ResponseEntity<String> getBidPblancListInfoServcPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회");
+			} catch (Exception ignore) {
+			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 입찰공고물품조회")
+	@GetMapping("/getBidPblancListInfoThngPPSSrch")
+	public ResponseEntity<String> getBidPblancListInfoThngPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
 		});
 		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {
 		int startYear = 2026;
-		int endYear = 2026;
-		int startMonth = 1;
-		int endMonth = 12;
+		int endYear = 2025;
+		int startMonth = 12;
+		int endMonth = 1;
 
-		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if (startYear == LocalDate.now().getYear()) {
-			endMonth = LocalDateTime.now().getMonthValue();
-		}
+		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 
-		for (int targetYear = startYear; targetYear <= endYear; targetYear++) {
-			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
+			if (LocalDate.now().getYear() == targetYear) {
+				startMonth = LocalDate.now().getMonthValue();
+			} else {
+				startMonth = 12;
+			}
+
+			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

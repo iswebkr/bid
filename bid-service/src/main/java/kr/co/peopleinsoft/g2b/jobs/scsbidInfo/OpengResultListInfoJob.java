@@ -1,4 +1,4 @@
-package kr.co.peopleinsoft.g2b.jobs;
+package kr.co.peopleinsoft.g2b.jobs.scsbidInfo;
 
 import kr.co.peopleinsoft.g2b.controller.scsbidInfo.OpengResultListInfoController;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;

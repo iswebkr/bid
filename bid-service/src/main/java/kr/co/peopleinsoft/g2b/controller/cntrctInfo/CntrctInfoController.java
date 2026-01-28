@@ -7,7 +7,6 @@ import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoRequestDto;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.service.cntrctInfo.CntrctInfoService;
-import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -38,54 +36,69 @@ public class CntrctInfoController {
 		this.cntrctInfoService = cntrctInfoService;
 	}
 
-	@Operation(summary = "모든 나라장터 검색조건에 의한 계약현황 수집")
-	@GetMapping("/saveStepCntrctInfo")
-	public ResponseEntity<String> saveStepCntrctInfo() throws Exception {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
+	@Operation(summary = "나라장터검색조건에 의한 계약현황 공사조회")
+	@GetMapping("/getCntrctInfoListCnstwkPPSSrch")
+	public ResponseEntity<String> getCntrctInfoListCnstwkPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
-		}).thenApplyAsync(result -> {
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 계약현황 용역조회")
+	@GetMapping("/getCntrctInfoListServcPPSSrch")
+	public ResponseEntity<String> getCntrctInfoListServcPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
-		}).thenApplyAsync(result -> {
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 계약현황 외자조회")
+	@GetMapping("/getCntrctInfoListFrgcptPPSSrch")
+	public ResponseEntity<String> getCntrctInfoListFrgcptPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
-		}).thenApplyAsync(result -> {
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 계약현황 물품조회")
+	@GetMapping("/getCntrctInfoListThngPPSSrch")
+	public ResponseEntity<String> getCntrctInfoListThngPPSSrch() throws Exception {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
 		});
 		return ResponseEntity.ok().body("success");
 	}
 
 	private void saveCntrctInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2025;
-		int endYear = 2026;
-		int startMonth = 1;
-		int endMonth = 12;
+		int startYear = 2026;
+		int endYear = 2020;
+		int startMonth = 12;
+		int endMonth = 1;
 
-		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if (startYear == LocalDate.now().getYear()) {
-			endMonth = LocalDateTime.now().getMonthValue();
-		}
+		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 
-		for (int targetYear = startYear; targetYear <= endYear; targetYear++) {
-			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
+			if (LocalDate.now().getYear() == targetYear) {
+				startMonth = LocalDate.now().getMonthValue();
+			} else {
+				startMonth = 12;
+			}
+
+			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "01";

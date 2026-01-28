@@ -1,4 +1,4 @@
-package kr.co.peopleinsoft.g2b.jobs;
+package kr.co.peopleinsoft.g2b.jobs.orderPlanSttus;
 
 import kr.co.peopleinsoft.g2b.controller.orderPlanSttus.OrderPlanSttusController;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;

@@ -1,4 +1,4 @@
-package kr.co.peopleinsoft.g2b.jobs;
+package kr.co.peopleinsoft.g2b.jobs.bidPublicInfo;
 
 import kr.co.peopleinsoft.g2b.controller.bidPublicInfo.BidPublicInfoController;
 import kr.co.peopleinsoft.g2b.service.bidPublicInfo.BidPublicInfoService;
@@ -8,16 +8,16 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.web.reactive.function.client.WebClient;
 
-public class BidPublicInfoJob extends BidPublicInfoController implements Job {
+public class getBidPblancListInfoFrgcptPPSSrchJob extends BidPublicInfoController implements Job {
 
-	public BidPublicInfoJob(G2BCmmnService g2BCmmnService, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService) {
+	public getBidPblancListInfoFrgcptPPSSrchJob(G2BCmmnService g2BCmmnService, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService) {
 		super(g2BCmmnService, publicWebClient, bidPublicInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		try {
-			saveStepBidPublicInfo();
+			getBidPblancListInfoFrgcptPPSSrch();
 		} catch (Exception ignore) {
 		}
 	}

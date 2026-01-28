@@ -6,9 +6,8 @@ import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.dto.userInfo.dminsttInfo.DminsttInfoResponseDto;
-import kr.co.peopleinsoft.g2b.service.usrInfo.DminsttInfoService;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
-import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
+import kr.co.peopleinsoft.g2b.service.usrInfo.DminsttInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +19,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Controller
 @RequestMapping("/g2b/usrInfoService")
@@ -59,19 +56,20 @@ public class DminsttInfoController extends CmmnAbstractController {
 	}
 
 	private void saveDminsttInfo(String serviceId, String serviceDescription) throws Exception {
+		int startYear = 2026;
+		int endYear = 2025;
+		int startMonth = 12;
+		int endMonth = 1;
 
-		int startYear = 2000;
-		int endYear = 2026;
-		int startMonth = 1;
-		int endMonth = 12; // 이번달 자료까지만
+		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 
-		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if (startYear == LocalDate.now().getYear()) {
-			endMonth = LocalDateTime.now().getMonthValue();
-		}
+			if (LocalDate.now().getYear() == targetYear) {
+				startMonth = LocalDate.now().getMonthValue();
+			} else {
+				startMonth = 12;
+			}
 
-		for (int targetYear = startYear; targetYear <= endYear; targetYear++) {
-			for (int targetMonth = startMonth; targetMonth <= endMonth; targetMonth++) {
+			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
