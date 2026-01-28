@@ -11,6 +11,12 @@ public class CmmnSimpleQueryHandler implements CmmnSlowQueryHandler {
 
 	@Override
 	public void handle(CmmnMyBatisPrettyLogInterceptor.QueryExecutionInfo queryInfo) {
-
+		if (logger.isWarnEnabled()) {
+			logger.warn("========================================");
+			logger.warn("⚠️ SLOW QUERY DETECTED");
+			logger.warn("Query ID: {}", queryInfo.getQueryId());
+			logger.warn("Execution Time: {} seconds", queryInfo.getExecutionTimeSeconds());
+			logger.warn("========================================");
+		}
 	}
 }
