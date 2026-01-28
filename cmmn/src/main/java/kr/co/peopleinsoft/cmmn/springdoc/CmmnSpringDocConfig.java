@@ -47,7 +47,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi bidPublicInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("나라장터 입찰공고정보서비스(BidPublicInfoService)")
-			.pathsToMatch ("/g2b/BidPublicInfoService/**")
+			.pathsToMatch ("/g2b/bidPublicInfoService/**")
 			.build();
 	}
 

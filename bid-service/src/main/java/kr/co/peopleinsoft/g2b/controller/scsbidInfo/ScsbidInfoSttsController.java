@@ -31,13 +31,11 @@ public class ScsbidInfoSttsController {
 	private final WebClient publicWebClient;
 	private final G2BCmmnService g2BCmmnService;
 	private final ScsbidInfoSttsService ScsbidInfoSttsService;
-	private final BidSchdulHistManageService schdulHistManageService;
 
-	public ScsbidInfoSttsController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, ScsbidInfoSttsService scsbidInfoSttsService, BidSchdulHistManageService schdulHistManageService) {
+	public ScsbidInfoSttsController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, ScsbidInfoSttsService scsbidInfoSttsService) {
 		this.publicWebClient = publicWebClient;
 		this.g2BCmmnService = g2BCmmnService;
 		ScsbidInfoSttsService = scsbidInfoSttsService;
-		this.schdulHistManageService = schdulHistManageService;
 	}
 
 	@Operation(summary = "모든 낙찰 목록 정보 저장")
@@ -107,57 +105,55 @@ public class ScsbidInfoSttsController {
 					.type("json")
 					.build();
 
-				if (!schdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("type", "json")
-						.queryParam("inqryDiv", requestDto.getInqryDiv())
-						.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("type", "json")
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					ScsbidListSttusResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(ScsbidListSttusResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				ScsbidListSttusResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(ScsbidListSttusResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						ScsbidInfoSttsService.batchInsertScsbidListSttus(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					ScsbidInfoSttsService.batchInsertScsbidListSttus(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

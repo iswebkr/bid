@@ -31,13 +31,11 @@ public class OrderPlanSttusController {
 	private final WebClient publicWebClient;
 	private final G2BCmmnService g2BCmmnService;
 	private final OrderPlanSttusService orderPlanSttusService;
-	private final BidSchdulHistManageService bidSchdulHistManageService;
 
-	public OrderPlanSttusController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OrderPlanSttusService orderPlanSttusService, BidSchdulHistManageService bidSchdulHistManageService) {
+	public OrderPlanSttusController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OrderPlanSttusService orderPlanSttusService) {
 		this.publicWebClient = publicWebClient;
 		this.g2BCmmnService = g2BCmmnService;
 		this.orderPlanSttusService = orderPlanSttusService;
-		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
 
 	@Operation(summary = "모든 발주계획 정보 수집")
@@ -110,58 +108,56 @@ public class OrderPlanSttusController {
 					.type("json")
 					.build();
 
-				if (!bidSchdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("type", "json")
-						.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
-						.queryParam("orderEndYm", requestDto.getOrderEndYm())
-						.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("type", "json")
+					.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
+					.queryParam("orderEndYm", requestDto.getOrderEndYm())
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					OrderPlanSttusResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(OrderPlanSttusResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				OrderPlanSttusResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(OrderPlanSttusResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

@@ -67,7 +67,7 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 	private boolean prettifySQL = true; // SQL 포맷팅 여부
 	private boolean uppercaseKeywords = false; // SQL 키워드 대문자 변환 여부
 	private int indentSize = 4; // SQL 들여쓰기 크기
-	private boolean includeStackTrace = false; // 에러 시 스택 트레이스 포함 여부
+	private boolean includeStackTrace = true; // 에러 시 스택 트레이스 포함 여부
 
 	private CmmnSlowQueryHandler cmmnSlowQueryHandler;
 
@@ -186,6 +186,7 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 		queryInfo.setSqlCommandType(mappedStatement.getSqlCommandType().name());
 		queryInfo.setStatementType(mappedStatement.getStatementType().name());
 		queryInfo.setExecutorType(executorType);
+		queryInfo.setExecutedSql(boundSql.getSql()); // 매핑전 쿼리를 미리 등록 (exception 발생 시 해당 쿼리를 출력)
 
 		// 데이터베이스 정보 추출
 		Connection connection = executor.getTransaction().getConnection();
@@ -341,7 +342,6 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 						MetaObject metaObject = configuration.newMetaObject(parameterObject);
 						value = metaObject.getValue(propertyName);
 					}
-
 					parameterValues.add(formatValue(value));
 				}
 			}
@@ -804,7 +804,8 @@ public class CmmnMyBatisPrettyLogInterceptor implements Interceptor {
 		log.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
 
 		if (logger.isErrorEnabled()) {
-			logger.error(log.toString(), includeStackTrace ? e : null);
+			logger.error(log.toString());
+			// logger.error(log.toString(), includeStackTrace ? e : null);
 		}
 	}
 

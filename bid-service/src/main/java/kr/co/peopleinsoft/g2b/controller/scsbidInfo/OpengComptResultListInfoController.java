@@ -31,13 +31,11 @@ public class OpengComptResultListInfoController {
 	private final WebClient publicWebClient;
 	private final G2BCmmnService g2BCmmnService;
 	private final OpengComptResultListInfoService opengComptResultListInfoService;
-	private final BidSchdulHistManageService schdulHistManageService;
 
-	public OpengComptResultListInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengComptResultListInfoService opengComptResultListInfoService, BidSchdulHistManageService schdulHistManageService) {
+	public OpengComptResultListInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengComptResultListInfoService opengComptResultListInfoService) {
 		this.publicWebClient = publicWebClient;
 		this.g2BCmmnService = g2BCmmnService;
 		this.opengComptResultListInfoService = opengComptResultListInfoService;
-		this.schdulHistManageService = schdulHistManageService;
 	}
 
 	@Operation(summary = "입찰공고에 해당하는 모든 개찰결과 개찰완료 목록 정보 수집")
@@ -86,55 +84,53 @@ public class OpengComptResultListInfoController {
 					.type("json")
 					.build();
 
-				if (!schdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("bidNtceNo", requestDto.getBidNtceNo()) // 필수 (입찰공고번호)
-						.queryParam("type", "json");
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("bidNtceNo", requestDto.getBidNtceNo()) // 필수 (입찰공고번호)
+					.queryParam("type", "json");
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					OpengComptResultListInfoResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(OpengComptResultListInfoResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				OpengComptResultListInfoResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(OpengComptResultListInfoResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						opengComptResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					opengComptResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

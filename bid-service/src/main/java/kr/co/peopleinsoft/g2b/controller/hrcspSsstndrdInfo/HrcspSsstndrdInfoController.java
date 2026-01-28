@@ -36,13 +36,11 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 	private final WebClient publicWebClient;
 	private final G2BCmmnService g2BCmmnService;
 	private final HrcspSsstndrdInfoService hrcspSsstndrdInfoService;
-	private final BidSchdulHistManageService bidSchdulHistManageService;
 
-	public HrcspSsstndrdInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService, BidSchdulHistManageService bidSchdulHistManageService) {
+	public HrcspSsstndrdInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
 		this.publicWebClient = publicWebClient;
 		this.g2BCmmnService = g2BCmmnService;
 		this.hrcspSsstndrdInfoService = hrcspSsstndrdInfoService;
-		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
 
 	@Operation(summary = "모든 사전규격 정보 수집")
@@ -113,58 +111,55 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 					.type("json")
 					.build();
 
-				// serviceId 에 해당하는 해당 기간(inqryBgnDt ~ inqryEndDt) 에 수집완료된 데이터는 수집 대상에서 제외
-				if (!bidSchdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/ao/HrcspSsstndrdInfoService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("inqryDiv", requestDto.getInqryDiv())
-						.queryParam("type", "json")
-						.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/ao/HrcspSsstndrdInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("type", "json")
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					HrcspSsstndrdInfoResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(HrcspSsstndrdInfoResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				HrcspSsstndrdInfoResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(HrcspSsstndrdInfoResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

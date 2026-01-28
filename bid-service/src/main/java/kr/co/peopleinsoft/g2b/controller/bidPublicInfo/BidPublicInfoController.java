@@ -2,12 +2,11 @@ package kr.co.peopleinsoft.g2b.controller.bidPublicInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoResponseDto;
+import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.service.bidPublicInfo.BidPublicInfoService;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
-import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +30,11 @@ public class BidPublicInfoController {
 	private final G2BCmmnService g2BCmmnService;
 	private final WebClient publicWebClient;
 	private final BidPublicInfoService bidPublicInfoService;
-	private final BidSchdulHistManageService bidSchdulHistManageService;
 
-	public BidPublicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService, BidSchdulHistManageService bidSchdulHistManageService) {
+	public BidPublicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
 		this.publicWebClient = publicWebClient;
 		this.bidPublicInfoService = bidPublicInfoService;
-		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
 
 	@Operation(summary = "모든 입찰공고 정보 수집")
@@ -76,13 +73,13 @@ public class BidPublicInfoController {
 	}
 
 	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {
-		int startYear = 2025;
+		int startYear = 2026;
 		int endYear = 2026;
 		int startMonth = 1;
 		int endMonth = 12;
 
 		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if(startYear == LocalDate.now().getYear()) {
+		if (startYear == LocalDate.now().getYear()) {
 			endMonth = LocalDateTime.now().getMonthValue();
 		}
 
@@ -96,7 +93,7 @@ public class BidPublicInfoController {
 				int startPage;
 				int endPage;
 
-				BidPublicInfoRequestDto bidRequestDto = BidPublicInfoRequestDto.builder()
+				BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
 					.serviceId(serviceId)
 					.serviceDescription(serviceDescription)
@@ -108,57 +105,55 @@ public class BidPublicInfoController {
 					.type("json")
 					.build();
 
-				if (!bidSchdulHistManageService.colctCmplYn(bidRequestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/ad/BidPublicInfoService", bidRequestDto.getServiceId())
-						.queryParam("serviceKey", bidRequestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", bidRequestDto.getNumOfRows())
-						.queryParam("inqryDiv", bidRequestDto.getInqryDiv())
-						.queryParam("type", "json")
-						.queryParam("inqryBgnDt", bidRequestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", bidRequestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/ad/BidPublicInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("type", "json")
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					BidPublicInfoResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(BidPublicInfoResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				BidPublicInfoResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(BidPublicInfoResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					bidRequestDto.setTotalCount(totalCount);
-					bidRequestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(bidRequestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, bidRequestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

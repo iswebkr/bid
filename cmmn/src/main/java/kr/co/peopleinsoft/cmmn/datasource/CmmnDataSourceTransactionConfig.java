@@ -6,6 +6,7 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Role;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class CmmnDataSourceTransactionConfig {
 	/*** 트랜잭션 매니저 설정 */
 	@Bean
@@ -114,9 +116,7 @@ public class CmmnDataSourceTransactionConfig {
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	Advisor txAdviceAdvisor(TransactionInterceptor txAdvice) {
 		AspectJExpressionPointcut aspectJExpressionPointcut = new AspectJExpressionPointcut();
-		aspectJExpressionPointcut.setExpression("@within(org.springframework.stereotype.Service)  " +
-			"&& execution(public * *(..)) " +
-			"&& !@annotation(org.springframework.transaction.annotation.Transactional)");
+		aspectJExpressionPointcut.setExpression("@within(org.springframework.stereotype.Service) && execution(public * *(..)) ");
 
 		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor();
 		advisor.setPointcut(aspectJExpressionPointcut);

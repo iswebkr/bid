@@ -5,9 +5,6 @@ import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.dto.cmmn.BidRequestDto;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BAbstractBidService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
@@ -30,12 +27,6 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 	 * @param requestDto API 정보가 담긴 RequestDto
 	 * @param <T>        BidRequestDto 를 상속받아 구현된 Dto 객체
 	 */
-	@Transactional(
-		propagation = Propagation.REQUIRES_NEW,
-		isolation = Isolation.READ_COMMITTED,
-		timeout = 300,
-		rollbackFor = Exception.class
-	)
 	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, T requestDto) throws Exception {
 		int rowCnt = 0;
 

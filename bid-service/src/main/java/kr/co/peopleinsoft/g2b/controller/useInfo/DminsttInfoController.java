@@ -37,17 +37,12 @@ public class DminsttInfoController extends CmmnAbstractController {
 	private final G2BCmmnService g2BCmmnService;
 	private final WebClient publicWebClient;
 	private final DminsttInfoService dminsttInfoService;
-	private final BidSchdulHistManageService g2BSchdulHistManageService;
 
-	AtomicInteger atomicRowCnt = new AtomicInteger(0);
-
-	public DminsttInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, DminsttInfoService dminsttInfoService, BidSchdulHistManageService g2BSchdulHistManageService) {
+	public DminsttInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
 		this.publicWebClient = publicWebClient;
 		this.dminsttInfoService = dminsttInfoService;
-		this.g2BSchdulHistManageService = g2BSchdulHistManageService;
 	}
-
 
 	@Operation(summary = "모든 사용자 정보 저장")
 	@GetMapping("/saveStepDminsttInfo")
@@ -85,7 +80,7 @@ public class DminsttInfoController extends CmmnAbstractController {
 				int startPage;
 				int endPage;
 
-				BidPublicInfoRequestDto bidRequestDto = BidPublicInfoRequestDto.builder()
+				BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
 					.serviceId(serviceId)
 					.serviceDescription(serviceDescription)
@@ -96,59 +91,56 @@ public class DminsttInfoController extends CmmnAbstractController {
 					.type("json")
 					.build();
 
-				// serviceId 에 해당하는 해당 기간(inqryBgnDt ~ inqryEndDt) 에 수집완료된 데이터는 수집 대상에서 제외
-				if (!g2BSchdulHistManageService.colctCmplYn(bidRequestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/ao/UsrInfoService02", bidRequestDto.getServiceId())
-						.queryParam("serviceKey", bidRequestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", bidRequestDto.getNumOfRows())
-						.queryParam("inqryDiv", bidRequestDto.getInqryDiv())
-						.queryParam("type", "json")
-						.queryParam("inqryBgnDt", bidRequestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", bidRequestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/ao/UsrInfoService02", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("type", "json")
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					DminsttInfoResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(DminsttInfoResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				DminsttInfoResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(DminsttInfoResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					bidRequestDto.setTotalCount(totalCount);
-					bidRequestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(bidRequestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
 
-						dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, bidRequestDto);
+					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, requestDto);
 
-						// 10초
-						Thread.sleep(10000);
-					}
+					// 10초
+					Thread.sleep(10000);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

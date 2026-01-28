@@ -65,13 +65,13 @@
 
 	<update id="updateColctPageInfo" parameterType="kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistDto">
 		-- 수집이력관리 수정
-		update tb_colct_hist set
-				colct_id = #{colctId} -- 수집대상아이디
-				, colct_tot_page = #{colctTotPage} -- 수집대상페이지수
-				, colct_tot_cnt = #{colctTotCnt} -- 수집대상카운트수
-				, updated_dt = CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
-		where 	schdul_colct_id = #{schdulColctId}
-		and 	schdul_colct_begin_dt = #{schdulColctBeginDt}
-		and 	schdul_colct_end_dt = #{schdulColctEndDt}
+		UPDATE tb_colct_hist
+		SET
+				colct_tot_page = #{colctTotPage} -- 수집대상페이지수
+				,   colct_tot_cnt = #{colctTotCnt} -- 수집대상카운트수
+				,   updated_dt = CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
+		where 	colct_id = #{colctId} -- 수집대상아이디
+		and 	colct_bgn_dt = #{colctBgnDt} -- 수집시작일자
+		and 	colct_end_dt = #{colctEndDt} -- 수집종료일자
 	</update>
 </mapper>

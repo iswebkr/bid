@@ -2,8 +2,6 @@ package kr.co.peopleinsoft.g2b.controller.cntrctInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoRequestDto;
-import kr.co.peopleinsoft.g2b.dto.bidPublicInfo.BidPublicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.dto.cntrctInfo.CntrctInfoRequestDto;
@@ -33,13 +31,11 @@ public class CntrctInfoController {
 	private final G2BCmmnService g2BCmmnService;
 	private final WebClient publicWebClient;
 	private final CntrctInfoService cntrctInfoService;
-	private final BidSchdulHistManageService bidSchdulHistManageService;
 
-	public CntrctInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService, BidSchdulHistManageService bidSchdulHistManageService) {
+	public CntrctInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
 		this.publicWebClient = publicWebClient;
 		this.cntrctInfoService = cntrctInfoService;
-		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
 
 	@Operation(summary = "모든 나라장터 검색조건에 의한 계약현황 수집")
@@ -84,7 +80,7 @@ public class CntrctInfoController {
 		int endMonth = 12;
 
 		// 현재연도의 데이터를 조회하는 경우는 현재 월까지의 자료만 수집
-		if(startYear == LocalDate.now().getYear()) {
+		if (startYear == LocalDate.now().getYear()) {
 			endMonth = LocalDateTime.now().getMonthValue();
 		}
 
@@ -109,57 +105,55 @@ public class CntrctInfoController {
 					.type("json")
 					.build();
 
-				if (!bidSchdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("inqryDiv", requestDto.getInqryDiv())
-						.queryParam("type", "json")
-						.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
-						.queryParam("inqryEndDate", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("type", "json")
+					.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDate", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					CntrctInfoReponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(CntrctInfoReponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				CntrctInfoReponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(CntrctInfoReponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

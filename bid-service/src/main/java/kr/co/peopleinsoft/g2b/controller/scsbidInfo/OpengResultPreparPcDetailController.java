@@ -6,7 +6,6 @@ import kr.co.peopleinsoft.g2b.dto.cmmn.BidEnum;
 import kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailRequestDto;
 import kr.co.peopleinsoft.g2b.dto.scsbidInfo.opengResultPreparPcDetail.OpengResultPreparPcDetailResponseDto;
 import kr.co.peopleinsoft.g2b.service.cmmn.G2BCmmnService;
-import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
 import kr.co.peopleinsoft.g2b.service.scsbidInfo.OpengResultPreparPcDetailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,13 +30,11 @@ public class OpengResultPreparPcDetailController {
 	private final WebClient publicWebClient;
 	private final G2BCmmnService g2BCmmnService;
 	private final OpengResultPreparPcDetailService opengResultPreparPcDetailService;
-	private final BidSchdulHistManageService schdulHistManageService;
 
-	public OpengResultPreparPcDetailController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengResultPreparPcDetailService opengResultPreparPcDetailService, BidSchdulHistManageService schdulHistManageService) {
+	public OpengResultPreparPcDetailController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengResultPreparPcDetailService opengResultPreparPcDetailService) {
 		this.publicWebClient = publicWebClient;
 		this.g2BCmmnService = g2BCmmnService;
 		this.opengResultPreparPcDetailService = opengResultPreparPcDetailService;
-		this.schdulHistManageService = schdulHistManageService;
 	}
 
 	@Operation(summary = "개찰결과 예비가격상세 목록 정보 수집")
@@ -107,57 +104,55 @@ public class OpengResultPreparPcDetailController {
 					.type("json")
 					.build();
 
-				if (!schdulHistManageService.colctCmplYn(requestDto)) {
-					UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-						.scheme("https")
-						.host("apis.data.go.kr")
-						.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-						.queryParam("serviceKey", requestDto.getServiceKey())
-						.queryParam("pageNo", 1)
-						.queryParam("inqryDiv", requestDto.getInqryDiv())
-						.queryParam("numOfRows", requestDto.getNumOfRows())
-						.queryParam("type", requestDto.getType())
-						.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-						.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+					.scheme("https")
+					.host("apis.data.go.kr")
+					.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+					.queryParam("serviceKey", requestDto.getServiceKey())
+					.queryParam("pageNo", 1)
+					.queryParam("inqryDiv", requestDto.getInqryDiv())
+					.queryParam("numOfRows", requestDto.getNumOfRows())
+					.queryParam("type", requestDto.getType())
+					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 
-					URI firstPageUri = uriComponentsBuilder.build().toUri();
+				URI firstPageUri = uriComponentsBuilder.build().toUri();
 
-					// 1 페이지 API 호출
-					OpengResultPreparPcDetailResponseDto responseDto = publicWebClient.get()
-						.uri(firstPageUri)
-						.retrieve()
-						.bodyToMono(OpengResultPreparPcDetailResponseDto.class)
-						.block();
+				// 1 페이지 API 호출
+				OpengResultPreparPcDetailResponseDto responseDto = publicWebClient.get()
+					.uri(firstPageUri)
+					.retrieve()
+					.bodyToMono(OpengResultPreparPcDetailResponseDto.class)
+					.block();
 
-					if (responseDto == null) {
-						throw new Exception("API 호출 실패");
-					}
+				if (responseDto == null) {
+					throw new Exception("API 호출 실패");
+				}
 
-					int totalCount = responseDto.getResponse().getBody().getTotalCount();
-					int totalPage = (int) Math.ceil((double) totalCount / 100);
+				int totalCount = responseDto.getResponse().getBody().getTotalCount();
+				int totalPage = (int) Math.ceil((double) totalCount / 100);
 
-					requestDto.setTotalCount(totalCount);
-					requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(totalCount);
+				requestDto.setTotalPage(totalPage);
 
-					Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
 
-					startPage = (Integer) pageMap.get("startPage");
-					endPage = (Integer) pageMap.get("endPage");
+				startPage = (Integer) pageMap.get("startPage");
+				endPage = (Integer) pageMap.get("endPage");
 
-					for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-						URI uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-						opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, requestDto);
+				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
+					URI uri = uriComponentsBuilder.cloneBuilder()
+						.replaceQueryParam("pageNo", pageNo)
+						.build().toUri();
+					opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, requestDto);
 
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+					// 30초
+					Thread.sleep(10000 * 3);
+				}
 
-					if (startPage < endPage) {
-						// 30초
-						Thread.sleep(10000 * 3);
-					}
+				if (startPage < endPage) {
+					// 30초
+					Thread.sleep(10000 * 3);
 				}
 			}
 		}

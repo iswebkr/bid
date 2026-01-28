@@ -5,6 +5,9 @@ import kr.co.peopleinsoft.g2b.dto.cmmn.BidColctHistResultDto;
 import kr.co.peopleinsoft.g2b.dto.cmmn.BidRequestDto;
 import kr.co.peopleinsoft.g2b.service.schdul.BidSchdulHistManageService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +43,7 @@ public class G2BCmmnService {
 			startPage = 1;
 			endPage = requestDto.getTotalPage();
 		} else {
-			if (!Objects.equals(requestDto.getTotalPage(), resultDto.getMaxTotPage())) {
+			if (!Objects.equals(requestDto.getTotalCount(), resultDto.getMaxTotalCnt())) {
 				BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
 					.colctTotPage(requestDto.getTotalPage())
 					.colctTotCnt(requestDto.getTotalCount())
