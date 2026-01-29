@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StanOrgCdMapper">
+	<sql id="insertStanOrgCdQuery">
+		-- 행안부기관코드 등록
+		INSERT INTO tb_mois_organization (
+				org_cd -- 기관코드
+				,   full_nm -- 기관명전체
+				,   low_nm -- 기관명최하위
+				,   abbr_nm -- 기관명약어
+				,   gap_no -- 차수
+				,   rank_no -- 서열
+				,   sub_chasu -- 소속기관차수
+				,   high_cd -- 상위기관코드
+				,   highst_cd -- 최상위기관코
+				,   rep_cd -- 대표기관코드
+				,   typebig_nm -- 기관대분류
+				,   typemid_nm -- 기관중분류
+				,   typesml_nm -- 기관소분류
+				,   locatstd_cd -- 소재지코드
+				,   use_cd -- 현행기관코드
+				,   crt_de -- 생성일
+				,   cls_de -- 폐지일
+				,   stop_selt -- 폐지구분
+				,   chg_de -- 변경일
+				,   base_date -- 기초일자
+				,   adpt_date -- 적용일
+				,   preorg_cd -- 이전기관코드
+				,   created_dt -- 생성일시 (시스템 등록일시)
+				,   created_by -- 생성자 (시스템 등록자)
+				,   updated_dt -- 수정일시 (시스템 수정일시)
+				,   updated_by -- 수정자 (시스템 수정자)
+		) VALUES (
+				#{orgCd} -- 기관코드
+				,   #{fullNm} -- 기관명전체
+				,   #{lowNm} -- 기관명최하위
+				,   #{abbrNm} -- 기관명약어
+				,   #{gapNo} -- 차수
+				,   #{rankNo} -- 서열
+				,   #{subChasu} -- 소속기관차수
+				,   #{highCd} -- 상위기관코드
+				,   #{highstCd} -- 최상위기관코
+				,   #{repCd} -- 대표기관코드
+				,   #{typebigNm} -- 기관대분류
+				,   #{typemidNm} -- 기관중분류
+				,   #{typesmlNm} -- 기관소분류
+				,   #{locatstdCd} -- 소재지코드
+				,   #{useCd} -- 현행기관코드
+				,   #{crtDe} -- 생성일
+				,   #{clsDe} -- 폐지일
+				,   #{stopSelt} -- 폐지구분
+				,   #{chgDe} -- 변경일
+				,   #{baseDate} -- 기초일자
+				,   #{adptDate} -- 적용일
+				,   #{preorgCd} -- 이전기관코드
+				,   CURRENT_TIMESTAMP -- 생성일시 (시스템 등록일시)
+				,   #{createdBy} -- 생성자 (시스템 등록자)
+				,   CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
+				,   #{updatedBy} -- 수정자 (시스템 수정자)
+		)
+	</sql>
+
+	<sql id="selectStanOrgCd">
+		SELECT
+			a.org_cd -- 기관코드
+			,   a.full_nm -- 기관명전체
+			,   a.low_nm -- 기관명최하위
+			,   a.abbr_nm -- 기관명약어
+			,   a.gap_no -- 차수
+			,   a.rank_no -- 서열
+			,   a.sub_chasu -- 소속기관차수
+			,   a.high_cd -- 상위기관코드
+			,   a.highst_cd -- 최상위기관코
+			,   a.rep_cd -- 대표기관코드
+			,   a.typebig_nm -- 기관대분류
+			,   a.typemid_nm -- 기관중분류
+			,   a.typesml_nm -- 기관소분류
+			,   a.locatstd_cd -- 소재지코드
+			,   a.use_cd -- 현행기관코드
+			,   a.crt_de -- 생성일
+			,   a.cls_de -- 폐지일
+			,   a.stop_selt -- 폐지구분
+			,   a.chg_de -- 변경일
+			,   a.base_date -- 기초일자
+			,   a.adpt_date -- 적용일
+			,   a.preorg_cd -- 이전기관코드
+			,   a.created_dt -- 생성일시 (시스템 등록일시)
+			,   a.created_by -- 생성자 (시스템 등록자)
+			,   a.updated_dt -- 수정일시 (시스템 수정일시)
+			,   a.updated_by -- 수정자 (시스템 수정자)
+		FROM tb_mois_organization a -- 행안부기관코드
+	</sql>
+	
+	<select id="batchSelectStanOrgCd" parameterType="kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdDto" resultType="kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdDto">
+		<include refid="selectStanOrgCd" />
+		WHERE org_cd = #{orgCd}
+	</select>
+
+	<insert id="batchInsertStanOrgCd" parameterType="kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdDto">
+		<include refid="insertStanOrgCdQuery" />
+	</insert>
+
+	<update id="batchUpdateStanOrgCd" parameterType="kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdDto">
+		-- 행안부기관코드 수정
+		UPDATE tb_mois_organization SET
+					full_nm = #{fullNm} -- 기관명전체
+				,   low_nm = #{lowNm} -- 기관명최하위
+				,   abbr_nm = #{abbrNm} -- 기관명약어
+				,   gap_no = #{gapNo} -- 차수
+				,   rank_no = #{rankNo} -- 서열
+				,   sub_chasu = #{subChasu} -- 소속기관차수
+				,   high_cd = #{highCd} -- 상위기관코드
+				,   highst_cd = #{highstCd} -- 최상위기관코
+				,   rep_cd = #{repCd} -- 대표기관코드
+				,   typebig_nm = #{typebigNm} -- 기관대분류
+				,   typemid_nm = #{typemidNm} -- 기관중분류
+				,   typesml_nm = #{typesmlNm} -- 기관소분류
+				,   locatstd_cd = #{locatstdCd} -- 소재지코드
+				,   use_cd = #{useCd} -- 현행기관코드
+				,   crt_de = #{crtDe} -- 생성일
+				,   cls_de = #{clsDe} -- 폐지일
+				,   stop_selt = #{stopSelt} -- 폐지구분
+				,   chg_de = #{chgDe} -- 변경일
+				,   base_date = #{baseDate} -- 기초일자
+				,   adpt_date = #{adptDate} -- 적용일
+				,   preorg_cd = #{preorgCd} -- 이전기관코드
+				,   updated_dt = CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
+		WHERE org_cd = #{orgCd} -- 기관코드
+	</update>
+
+	<delete id="batchDeleteStanOrgCd" parameterType="kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdDto">
+		-- 행안부기관코드 삭제
+		DELETE FROM tb_mois_organization
+		WHERE org_cd = #{orgCd}
+	</delete>
+</mapper>

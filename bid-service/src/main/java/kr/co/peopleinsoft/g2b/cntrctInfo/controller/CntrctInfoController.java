@@ -158,15 +158,16 @@ public class CntrctInfoController {
 					URI uri = uriComponentsBuilder.cloneBuilder()
 						.replaceQueryParam("pageNo", pageNo)
 						.build().toUri();
+					
 					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 			}
 		}

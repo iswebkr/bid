@@ -1,9 +1,9 @@
 package kr.co.peopleinsoft.g2b.scsbidInfo.service;
 
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
+import kr.co.peopleinsoft.cmmn.service.G2BAbstractBidService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoResponseDto;
-import kr.co.peopleinsoft.cmmn.service.G2BAbstractBidService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -49,10 +49,6 @@ public class OpengResultListInfoService extends G2BAbstractBidService {
 			throw new Exception("API 호출 실패");
 		}
 
-		// api 결과 값의 총 데이터 갯수 및 페이지 계산
-		int totalCount = responseDto.getResponse().getBody().getTotalCount();
-		int totalPage = (int) Math.ceil((double) totalCount / requestDto.getNumOfRows());
-
 		List<OpengResultListInfoDto> items = responseDto.getResponse().getBody().getItems();
 
 		for (OpengResultListInfoDto item : items) {
@@ -61,7 +57,7 @@ public class OpengResultListInfoService extends G2BAbstractBidService {
 		}
 
 		// 스케줄러 로그기록
-		insertSchdulHistLog(uri, pageNo, requestDto, totalPage, totalCount, rowCnt);
+		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
 
 		return rowCnt;
 	}

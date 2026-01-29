@@ -98,6 +98,14 @@ public class CmmnSpringDocConfig {
 			.build();
 	}
 
+	@Bean
+	GroupedOpenApi moisServiceGroup() {
+		return GroupedOpenApi.builder()
+			.group("행정안전부 서비스")
+			.pathsToMatch("/mois/**")
+			.build();
+	}
+
 	/**
 	 * API 호출 시 기본으로 포함되어야 하는 파라메터의 전역 설정 (선택)
 	 * JWT 의 인증정보등을 Header 에 포함하여 호출하는 등 작업 시 설정하여 사용 가능

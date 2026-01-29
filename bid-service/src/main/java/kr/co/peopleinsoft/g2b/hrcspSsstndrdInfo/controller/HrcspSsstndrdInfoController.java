@@ -166,12 +166,12 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 			}
 		}

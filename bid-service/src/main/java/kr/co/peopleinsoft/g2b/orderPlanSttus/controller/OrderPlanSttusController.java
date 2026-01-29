@@ -165,12 +165,12 @@ public class OrderPlanSttusController {
 					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(10000 * 3);
+					Thread.sleep(1000 * 30);
 				}
 			}
 		}

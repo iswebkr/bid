@@ -30,15 +30,20 @@ public class G2BCmmnService {
 	 */
 	public <T extends BidRequestDto> Map<String, Object> initPageCorrection(T requestDto) {
 		Map<String, Object> map = new ConcurrentHashMap<>();
+		map.put("totalCountIsNotMatch", "N");
+
 		int startPage;
 		int endPage;
 
 		BidColctHistResultDto resultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
 
+		endPage = requestDto.getTotalPage();
+
 		if (resultDto == null) {
 			startPage = 1;
-			endPage = requestDto.getTotalPage();
 		} else {
+			// 전체 데이터가 변경된 경우 이력 정보를 변경하고 이어받기를 위한
+			// 시작페이지를 변경처리하고 재계산된 전체 페이지 수만큼 수집
 			if (!Objects.equals(requestDto.getTotalCount(), resultDto.getMaxTotalCnt())) {
 				BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
 					.colctTotPage(requestDto.getTotalPage())
@@ -49,10 +54,11 @@ public class G2BCmmnService {
 					.build();
 
 				bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
-			}
 
+				// 처음부터 재수집이 필요한 데이터가 존재하는 경우 사용
+				map.put("totalCountIsNotMatch", "Y");
+			}
 			startPage = resultDto.getCmplColctPage() + 1;
-			endPage = resultDto.getMaxTotPage();
 		}
 
 		map.put("startPage", startPage);
