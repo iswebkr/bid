@@ -11,6 +11,7 @@ import kr.co.peopleinsoft.g2b.bidPublicInfo.job.getBidPblancListInfoCnstwkPPSSrc
 import kr.co.peopleinsoft.g2b.bidPublicInfo.job.getBidPblancListInfoFrgcptPPSSrchJob;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.job.getBidPblancListInfoServcPPSSrchJob;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.job.getBidPblancListInfoThngPPSSrchJob;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.job.getThisYearBidPublicInfoDataJob;
 import kr.co.peopleinsoft.g2b.cntrctInfo.job.getCntrctInfoListCnstwkPPSSrchJob;
 import kr.co.peopleinsoft.g2b.cntrctInfo.job.getCntrctInfoListFrgcptPPSSrchJob;
 import kr.co.peopleinsoft.g2b.cntrctInfo.job.getCntrctInfoListServcPPSSrchJob;
@@ -19,10 +20,12 @@ import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.job.getPublicPrcureThngInfoCnstw
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.job.getPublicPrcureThngInfoFrgcptPPSSrchJob;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.job.getPublicPrcureThngInfoServcPPSSrchJob;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.job.getPublicPrcureThngInfoThngPPSSrchJob;
+import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.job.getThisYearHrcspSsstndrdInfoJob;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.job.getOrderPlanSttusListCnstwkPPSSrchJob;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.job.getOrderPlanSttusListFrgcptPPSSrchJob;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.job.getOrderPlanSttusListServcPPSSrchJob;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.job.getOrderPlanSttusListThngPPSSrchJob;
+import kr.co.peopleinsoft.g2b.orderPlanSttus.job.getThisYearOrderPlanSttusJob;
 import kr.co.peopleinsoft.g2b.scsbidInfo.job.opengResultListInfo.getOpengResultListInfoCnstwkPPSSrchJob;
 import kr.co.peopleinsoft.g2b.scsbidInfo.job.opengResultListInfo.getOpengResultListInfoFrgcptPPSSrchJob;
 import kr.co.peopleinsoft.g2b.scsbidInfo.job.opengResultListInfo.getOpengResultListInfoServcPPSSrchJob;
@@ -454,6 +457,21 @@ public class BidSchedulerController extends CmmnAbstractController {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 30 18 * * ?");
 		cmmnScheduleManager.deleteJob("getStanOrgCdList2", "mois"); // 이전에 등록된 job 삭제
 		cmmnScheduleManager.createCronJob(getStanOrgCdList2Job.class, "getStanOrgCdList2", "mois", "행정안전부_행정표준코드_기관코드", cronJobExpression, new HashMap<>());
+		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
+		return ResponseEntity.ok().body(jobList);
+	}
+
+
+	@Operation(summary = "이번년도 데이터만 수집 - 한시간 간격", description = "이번년도 데이터만 수집 - 한시간 간격", parameters = {
+		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
+	})
+	@GetMapping("/shcduler/thisYearData")
+	public ResponseEntity<String> thisYearData(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 */1 * * ?");
+		cmmnScheduleManager.deleteJob("thisYearData", "thisYearData"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(getThisYearBidPublicInfoDataJob.class, "getThisYearBidPublicInfoDataJob", "thisYearData", "입찰공고", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.createCronJob(getThisYearHrcspSsstndrdInfoJob.class, "getThisYearHrcspSsstndrdInfoJob", "thisYearData", "사전규격", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.createCronJob(getThisYearOrderPlanSttusJob.class, "getThisYearOrderPlanSttusJob", "thisYearData", "발주계획", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

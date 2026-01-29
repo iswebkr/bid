@@ -89,11 +89,34 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 		return ResponseEntity.ok().body("success");
 	}
 
+	@Operation(summary = "이번년도 나라장터 검색조건에 의한 사전규격 목록 조회")
+	@GetMapping("/colctThisYearData")
+	public ResponseEntity<String> colctThisYearData() throws Exception {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 사전규격 공사 목록 조회");
+				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServcPPSSrch", "나라장터 검색조건에 의한 사전규격 용역 목록 조회");
+				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 사전규격 외자 목록 조회");
+				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThngPPSSrch", "나라장터 검색조건에 의한 사전규격 물품 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	private void saveThisYearPublicPrcureThngInfo(String serviceId, String serviceDescription) throws Exception {
+		savePublicPrcureThngInfo(serviceId, serviceDescription, 2026, 2026, 12, 1);
+	}
+
 	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
+		savePublicPrcureThngInfo(serviceId, serviceDescription, 2026, 2020, 12, 1);
+	}
+
+	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		/*int startYear = 2026;
 		int endYear = 2020;
 		int startMonth = 12;
-		int endMonth = 1;
+		int endMonth = 1;*/
 
 		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 

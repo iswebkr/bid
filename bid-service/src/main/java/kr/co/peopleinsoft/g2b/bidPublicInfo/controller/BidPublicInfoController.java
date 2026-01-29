@@ -84,11 +84,34 @@ public class BidPublicInfoController {
 		return ResponseEntity.ok().body("success");
 	}
 
+	@Operation(summary = "입찰공고 이번 년도 데이터만 조회")
+	@GetMapping("/colctThisYearData")
+	public ResponseEntity<String> colctThisYearData() throws Exception {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회");
+				saveThisYearBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회");
+				saveThisYearBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회");
+				saveThisYearBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회");
+			} catch (Exception ignore) {
+			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
+
+	private void saveThisYearBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {
+		saveBidPblancListInfo(serviceId, bidType, serviceDescription, 2026, 2026, 12, 1);
+	}
+
 	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) throws Exception {
-		int startYear = 2026;
+		saveBidPblancListInfo(serviceId, bidType, serviceDescription, 2026, 2020, 12, 1);
+	}
+
+	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		/*int startYear = 2026;
 		int endYear = 2025;
 		int startMonth = 12;
-		int endMonth = 1;
+		int endMonth = 1;*/
 
 		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
 
