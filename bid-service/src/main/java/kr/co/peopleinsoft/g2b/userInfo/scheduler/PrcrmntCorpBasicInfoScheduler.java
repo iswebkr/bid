@@ -48,7 +48,7 @@ public class PrcrmntCorpBasicInfoScheduler {
 	@Operation(summary = "조달업체정보 최신데이터 수집", description = "조달업체정보 최신데이터 수집", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/colctLatestPrcrmntCorpBasicInfoJob")
+	@GetMapping("/latest/colctLatestPrcrmntCorpBasicInfoJob")
 	public ResponseEntity<String> colctLatestPrcrmntCorpBasicInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestPrcrmntCorpBasicInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제

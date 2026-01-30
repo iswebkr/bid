@@ -91,18 +91,34 @@ public class CmmnSpringDocConfig {
 	}
 
 	@Bean
+	GroupedOpenApi moisServiceGroup() {
+		return GroupedOpenApi.builder()
+			.group("행정안전부 서비스")
+			.pathsToMatch("/mois/**")
+			.build();
+	}
+
+	@Bean
 	GroupedOpenApi schedulerInfoServiceGroup() {
 		return GroupedOpenApi.builder()
-			.group("스케줄러 서비스")
+			.group("01. All Scheduler")
 			.pathsToMatch("/scheduler/**")
 			.build();
 	}
 
 	@Bean
-	GroupedOpenApi moisServiceGroup() {
+	GroupedOpenApi schedulerManageServiceGroup() {
 		return GroupedOpenApi.builder()
-			.group("행정안전부 서비스")
-			.pathsToMatch("/mois/**")
+			.group("02. Scheduler Management Service")
+			.pathsToMatch("/scheduler/manage/**")
+			.build();
+	}
+
+	@Bean
+	GroupedOpenApi latestSchedulerInfoServiceGroup() {
+		return GroupedOpenApi.builder()
+			.group("03. A collection of the latest data collection schedulers")
+			.pathsToMatch("/scheduler/**/latest/**")
 			.build();
 	}
 

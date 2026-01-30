@@ -55,9 +55,10 @@ public class G2BCmmnService {
 
 				bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
 
-				// 처음부터 재수집이 필요한 데이터가 존재하는 경우 사용
+				// 안전행정부 기관코드처럼 재수집이 필요한 경우 사용하기 위한 값 설정
 				map.put("totalCountIsNotMatch", "Y");
 			}
+
 			startPage = resultDto.getCmplColctPage() + 1;
 		}
 

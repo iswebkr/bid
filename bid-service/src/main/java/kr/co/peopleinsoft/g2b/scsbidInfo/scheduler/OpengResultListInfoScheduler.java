@@ -87,7 +87,7 @@ public class OpengResultListInfoScheduler {
 	@Operation(summary = "개찰결과 최신데이터 수집", description = "개찰결과 최신데이터 수집", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/opengResultListInfo/colctLatestOpengResultListInfoJob")
+	@GetMapping("/latest/opengResultListInfo/colctLatestOpengResultListInfoJob")
 	public ResponseEntity<String> colctLatestOpengResultListInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */10 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestOpengResultListInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제

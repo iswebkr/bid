@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/scheduler")
+@RequestMapping("/scheduler/manage")
 @Tag(name = "@Scheduler Management", description = "Scheduler 를 등록 관리하고, 특정 Scheduler 의 실행을 멈추거나 전체 Scheduler 를 실행하는 등 등록된 모든 Scheduler 에 대한 관리를 위한 API")
 public class BidSchedulerController extends CmmnAbstractController {
 

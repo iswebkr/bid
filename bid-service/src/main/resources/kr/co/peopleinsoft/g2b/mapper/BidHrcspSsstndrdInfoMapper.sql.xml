@@ -102,6 +102,7 @@
 
 	<insert id="batchInsertHrcspSsstndrdInfo" parameterType="kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoDto">
 		<include refid="insertHrcspSsstndrdInfoQuery" />
+		-- ON CONFLICT (bf_spec_rgst_no) DO NOTHING
 	</insert>
 
 </mapper>
