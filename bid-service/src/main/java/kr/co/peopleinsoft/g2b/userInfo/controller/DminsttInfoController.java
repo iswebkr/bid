@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -43,33 +44,42 @@ public class DminsttInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "모든 사용자 정보 저장")
 	@GetMapping("/saveStepDminsttInfo")
-	public ResponseEntity<String> saveStepDminsttInfo() throws Exception {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
+	public ResponseEntity<String> saveStepDminsttInfo() {
+		CompletableFuture.runAsync(() -> {
 			try {
 				saveDminsttInfo("getDminsttInfo02", "수요기관정보조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
 		});
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveDminsttInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2025;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "이번년도 모든 사용자 정보 저장")
+	@GetMapping("/colctThisYearDminsttInfo")
+	public ResponseEntity<String> colctThisYearDminsttInfo() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearDminsttInfo("getDminsttInfo02", "수요기관정보조회");
+			} catch (Exception ignore) {
 			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearDminsttInfo(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveDminsttInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void saveDminsttInfo(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveDminsttInfo(serviceId, serviceDescription, 2000, lastYear, 1, 12);
+	}
+
+	private void saveDminsttInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

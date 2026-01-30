@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -84,21 +85,32 @@ public class OpengResultListInfoController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2025;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "이번년도 나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
+	@GetMapping("/colctThisYearOpengResultListInfo")
+	public ResponseEntity<String> colctThisYearOpengResultListInfo() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회");
+			} catch (Exception ignore) {
 			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveOpengResultListInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void saveOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveOpengResultListInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
+	}
+
+	private void saveOpengResultListInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

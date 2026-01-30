@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class OpengResultPreparPcDetailController {
 
 	@Operation(summary = "개찰결과 공사 예비가격상세 목록 조회")
 	@GetMapping("/getOpengResultListInfoCnstwkPreparPcDetail")
-	public ResponseEntity<String> getOpengResultListInfoCnstwkPreparPcDetail() throws Exception {
+	public ResponseEntity<String> getOpengResultListInfoCnstwkPreparPcDetail() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveOpengResultPreparPcDetailInfo("getOpengResultListInfoCnstwkPreparPcDetail", "개찰결과 공사 예비가격상세 목록 조회");
@@ -50,7 +51,7 @@ public class OpengResultPreparPcDetailController {
 
 	@Operation(summary = "개찰결과 용역 예비가격상세 목록 조회")
 	@GetMapping("/getOpengResultListInfoServcPreparPcDetail")
-	public ResponseEntity<String> getOpengResultListInfoServcPreparPcDetail() throws Exception {
+	public ResponseEntity<String> getOpengResultListInfoServcPreparPcDetail() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveOpengResultPreparPcDetailInfo("getOpengResultListInfoServcPreparPcDetail", "개찰결과 용역 예비가격상세 목록 조회");
@@ -62,7 +63,7 @@ public class OpengResultPreparPcDetailController {
 
 	@Operation(summary = "개찰결과 외자 예비가격상세 목록 조회")
 	@GetMapping("/getOpengResultListInfoFrgcptPreparPcDetail")
-	public ResponseEntity<String> getOpengResultListInfoFrgcptPreparPcDetail() throws Exception {
+	public ResponseEntity<String> getOpengResultListInfoFrgcptPreparPcDetail() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveOpengResultPreparPcDetailInfo("getOpengResultListInfoFrgcptPreparPcDetail", "개찰결과 외자 예비가격상세 목록 조회");
@@ -74,7 +75,7 @@ public class OpengResultPreparPcDetailController {
 
 	@Operation(summary = "개찰결과 물품 예비가격상세 목록 조회")
 	@GetMapping("/getOpengResultListInfoThngPreparPcDetail")
-	public ResponseEntity<String> getOpengResultListInfoThngPreparPcDetail() throws Exception {
+	public ResponseEntity<String> getOpengResultListInfoThngPreparPcDetail() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveOpengResultPreparPcDetailInfo("getOpengResultListInfoThngPreparPcDetail", "개찰결과 물품 예비가격상세 목록 조회");
@@ -84,21 +85,32 @@ public class OpengResultPreparPcDetailController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2025;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "이번년도 개찰결과 물품 예비가격상세 목록 조회")
+	@GetMapping("/colctThisYearOpengResultPreparPcDetailInfo")
+	public ResponseEntity<String> colctThisYearOpengResultPreparPcDetailInfo() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultPreparPcDetailInfo("getOpengResultListInfoThngPreparPcDetail", "개찰결과 물품 예비가격상세 목록 조회");
+			} catch (Exception ignore) {
 			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveOpengResultPreparPcDetailInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void saveOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveOpengResultPreparPcDetailInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
+	}
+
+	private void saveOpengResultPreparPcDetailInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

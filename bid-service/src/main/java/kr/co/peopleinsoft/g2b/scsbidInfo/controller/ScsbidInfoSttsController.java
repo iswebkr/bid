@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class ScsbidInfoSttsController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 낙찰된 목록 현황 공사조회")
 	@GetMapping("/getScsbidListSttusCnstwkPPSSrch")
-	public ResponseEntity<String> getScsbidListSttusCnstwkPPSSrch() throws Exception {
+	public ResponseEntity<String> getScsbidListSttusCnstwkPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveScsbidInfoStts("getScsbidListSttusCnstwkPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 공사조회");
@@ -50,7 +51,7 @@ public class ScsbidInfoSttsController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 낙찰된 목록 현황 용역조회")
 	@GetMapping("/getScsbidListSttusServcPPSSrch")
-	public ResponseEntity<String> getScsbidListSttusServcPPSSrch() throws Exception {
+	public ResponseEntity<String> getScsbidListSttusServcPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveScsbidInfoStts("getScsbidListSttusServcPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 용역조회");
@@ -62,7 +63,7 @@ public class ScsbidInfoSttsController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 낙찰된 목록 현황 외자조회")
 	@GetMapping("/getScsbidListSttusFrgcptPPSSrch")
-	public ResponseEntity<String> getScsbidListSttusFrgcptPPSSrch() throws Exception {
+	public ResponseEntity<String> getScsbidListSttusFrgcptPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveScsbidInfoStts("getScsbidListSttusFrgcptPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 외자조회");
@@ -74,7 +75,7 @@ public class ScsbidInfoSttsController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 낙찰된 목록 현황 물품조회")
 	@GetMapping("/getScsbidListSttusThngPPSSrch")
-	public ResponseEntity<String> getScsbidListSttusThngPPSSrch() throws Exception {
+	public ResponseEntity<String> getScsbidListSttusThngPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveScsbidInfoStts("getScsbidListSttusThngPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 물품조회");
@@ -84,21 +85,32 @@ public class ScsbidInfoSttsController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveScsbidInfoStts(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2025;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "이번년도 나라장터 검색조건에 의한 낙찰된 목록 현황 조회")
+	@GetMapping("/colctThisYearScsbidInfoStts")
+	public ResponseEntity<String> colctThisYearScsbidInfoStts() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearScsbidInfoStts("getScsbidListSttusThngPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 물품조회");
+			} catch (Exception ignore) {
 			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearScsbidInfoStts(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveScsbidInfoStts(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void saveScsbidInfoStts(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveScsbidInfoStts(serviceId, serviceDescription, 2020, lastYear, 1, 12);
+	}
+
+	private void saveScsbidInfoStts(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

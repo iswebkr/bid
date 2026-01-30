@@ -3,10 +3,9 @@ package kr.co.peopleinsoft.g2b.userInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
+import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoResponseDto;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
-import kr.co.peopleinsoft.cmmn.service.BidSchdulHistManageService;
 import kr.co.peopleinsoft.g2b.userInfo.service.PrcrmntCorpBasicInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -30,44 +29,51 @@ public class PrcrmntCorpBasicInfoController {
 	private final G2BCmmnService g2BCmmnService;
 	private final WebClient publicWebClient;
 	private final PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService;
-	private final BidSchdulHistManageService g2BSchdulHistManageService;
 
-	public PrcrmntCorpBasicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService, BidSchdulHistManageService g2BSchdulHistManageService) {
+	public PrcrmntCorpBasicInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
 		this.publicWebClient = publicWebClient;
 		this.prcrmntCorpBasicInfoService = prcrmntCorpBasicInfoService;
-		this.g2BSchdulHistManageService = g2BSchdulHistManageService;
 	}
 
 	@Operation(summary = "조달업체 기본정보 / 업종정보 / 공급물품정보 수집")
 	@GetMapping("/saveStepPrcrmntCorpBasicInfo")
-	public ResponseEntity<String> saveStepPrcrmntCorpBasicInfo() throws Exception {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
+	public ResponseEntity<String> saveStepPrcrmntCorpBasicInfo() {
+		CompletableFuture.runAsync(() -> {
 			try {
 				savePrcrmntCorpBasicInfo("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회");
-			} catch (Exception e) {
-				return "failure";
+			} catch (Exception ignore) {
 			}
-			return "success";
 		});
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2025;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "이번년도 조달업체 기본정보 / 업종정보 / 공급물품정보 수집")
+	@GetMapping("/colctThisYearPrcrmntCorpBasicInfo")
+	public ResponseEntity<String> colctThisYearPrcrmntCorpBasicInfo() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearPrcrmntCorpBasicInfo("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회");
+			} catch (Exception ignore) {
 			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearPrcrmntCorpBasicInfo(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		savePrcrmntCorpBasicInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		savePrcrmntCorpBasicInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
+	}
+
+	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";

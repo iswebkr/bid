@@ -3,9 +3,9 @@ package kr.co.peopleinsoft.g2b.cntrctInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
+import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoRequestDto;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.cntrctInfo.service.CntrctInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -84,21 +84,50 @@ public class CntrctInfoController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	private void saveCntrctInfo(String serviceId, String serviceDescription) throws Exception {
-		int startYear = 2026;
-		int endYear = 2020;
-		int startMonth = 12;
-		int endMonth = 1;
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
+	@Operation(summary = "나라장터검색조건에 의한 계약현황 수집")
+	@GetMapping("/colctThisYearCntrctInfo")
+	public ResponseEntity<String> colctThisYearCntrctInfo() {
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회");
+			} catch (Exception ignore) {
 			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회");
+			} catch (Exception ignore) {
+			}
+		});
+		return ResponseEntity.ok().body("success");
+	}
 
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+	private void saveThisYearCntrctInfo(String serviceId, String serviceDescription) throws Exception {
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveCntrctInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+	}
+
+	private void saveCntrctInfo(String serviceId, String serviceDescription) throws Exception {
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveCntrctInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
+	}
+
+	private void saveCntrctInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "01";
@@ -158,7 +187,7 @@ public class CntrctInfoController {
 					URI uri = uriComponentsBuilder.cloneBuilder()
 						.replaceQueryParam("pageNo", pageNo)
 						.build().toUri();
-					
+
 					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 					// 30초

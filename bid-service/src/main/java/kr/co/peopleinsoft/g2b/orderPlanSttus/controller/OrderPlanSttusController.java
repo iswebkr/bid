@@ -3,9 +3,9 @@ package kr.co.peopleinsoft.g2b.orderPlanSttus.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
+import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusRequestDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusResponseDto;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.service.OrderPlanSttusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -85,13 +85,28 @@ public class OrderPlanSttusController {
 	}
 
 	@Operation(summary = "최신 발주계획현황 데이터 수집")
-	@GetMapping("/colctThisYearData")
-	public ResponseEntity<String> colctThisYearData() throws Exception {
+	@GetMapping("/colctThisYearOrderPlanSttus")
+	public ResponseEntity<String> colctThisYearOrderPlanSttus() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveThisYearOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회");
 			} catch (Exception ignore) {
 			}
@@ -100,28 +115,19 @@ public class OrderPlanSttusController {
 	}
 
 	private void saveThisYearOrderPlanSttus(String serviceId, String serviceDescription) throws Exception {
-		saveOrderPlanSttus(serviceId, serviceDescription, 2026, 2026, 12, 1);
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		saveOrderPlanSttus(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
 	private void saveOrderPlanSttus(String serviceId, String serviceDescription) throws Exception {
-		saveOrderPlanSttus(serviceId, serviceDescription, 2026, 2020, 12, 1);
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		saveOrderPlanSttus(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
 	private void saveOrderPlanSttus(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
-		/*int startYear = 2026;
-		int endYear = 2020;
-		int startMonth = 12;
-		int endMonth = 1;*/
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
-			}
-
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String orderBgnYm = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM"));

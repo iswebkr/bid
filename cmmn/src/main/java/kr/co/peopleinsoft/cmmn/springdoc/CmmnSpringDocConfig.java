@@ -94,7 +94,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi schedulerInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("스케줄러 서비스")
-			.pathsToMatch("/shcduler/**")
+			.pathsToMatch("/scheduler/**")
 			.build();
 	}
 

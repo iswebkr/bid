@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 사전규격 용역 목록 조회")
 	@GetMapping("/getPublicPrcureThngInfoServcPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoServcPPSSrch() throws Exception {
+	public ResponseEntity<String> getPublicPrcureThngInfoServcPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				savePublicPrcureThngInfo("getPublicPrcureThngInfoServcPPSSrch", "나라장터 검색조건에 의한 사전규격 용역 목록 조회");
@@ -67,7 +68,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 사전규격 외자 목록 조회")
 	@GetMapping("/getPublicPrcureThngInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoFrgcptPPSSrch() throws Exception {
+	public ResponseEntity<String> getPublicPrcureThngInfoFrgcptPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				savePublicPrcureThngInfo("getPublicPrcureThngInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 사전규격 외자 목록 조회");
@@ -79,7 +80,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 사전규격 물품 목록 조회")
 	@GetMapping("/getPublicPrcureThngInfoThngPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoThngPPSSrch() throws Exception {
+	public ResponseEntity<String> getPublicPrcureThngInfoThngPPSSrch() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				savePublicPrcureThngInfo("getPublicPrcureThngInfoThngPPSSrch", "나라장터 검색조건에 의한 사전규격 물품 목록 조회");
@@ -90,13 +91,28 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 	}
 
 	@Operation(summary = "이번년도 나라장터 검색조건에 의한 사전규격 목록 조회")
-	@GetMapping("/colctThisYearData")
-	public ResponseEntity<String> colctThisYearData() throws Exception {
+	@GetMapping("/colctThisYearPublicPrcureThngInfo")
+	public ResponseEntity<String> colctThisYearPublicPrcureThngInfo() {
 		CompletableFuture.runAsync(() -> {
 			try {
 				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 사전규격 공사 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServcPPSSrch", "나라장터 검색조건에 의한 사전규격 용역 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 사전규격 외자 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThngPPSSrch", "나라장터 검색조건에 의한 사전규격 물품 목록 조회");
 			} catch (Exception ignore) {
 			}
@@ -105,28 +121,19 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 	}
 
 	private void saveThisYearPublicPrcureThngInfo(String serviceId, String serviceDescription) throws Exception {
-		savePublicPrcureThngInfo(serviceId, serviceDescription, 2026, 2026, 12, 1);
+		int thisYear = LocalDateTime.now().getYear();
+		int thisMonth = LocalDateTime.now().getMonthValue();
+		savePublicPrcureThngInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
 	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription) throws Exception {
-		savePublicPrcureThngInfo(serviceId, serviceDescription, 2026, 2020, 12, 1);
+		int lastYear = LocalDateTime.now().minusYears(1).getYear();
+		savePublicPrcureThngInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
 	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
-		/*int startYear = 2026;
-		int endYear = 2020;
-		int startMonth = 12;
-		int endMonth = 1;*/
-
-		for (int targetYear = startYear; targetYear >= endYear; targetYear--) {
-
-			if (LocalDate.now().getYear() == targetYear) {
-				startMonth = LocalDate.now().getMonthValue();
-			} else {
-				startMonth = 12;
-			}
-
-			for (int targetMonth = startMonth; targetMonth >= endMonth; targetMonth--) {
+		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
