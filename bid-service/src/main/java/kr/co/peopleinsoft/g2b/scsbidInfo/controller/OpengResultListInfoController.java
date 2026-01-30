@@ -90,6 +90,24 @@ public class OpengResultListInfoController {
 	public ResponseEntity<String> colctThisYearOpengResultListInfo() {
 		CompletableFuture.runAsync(() -> {
 			try {
+				saveThisYearOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회");
 			} catch (Exception ignore) {
 			}

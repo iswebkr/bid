@@ -90,6 +90,24 @@ public class OpengResultPreparPcDetailController {
 	public ResponseEntity<String> colctThisYearOpengResultPreparPcDetailInfo() {
 		CompletableFuture.runAsync(() -> {
 			try {
+				saveThisYearOpengResultPreparPcDetailInfo("getOpengResultListInfoCnstwkPreparPcDetail", "개찰결과 공사 예비가격상세 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultPreparPcDetailInfo("getOpengResultListInfoServcPreparPcDetail", "개찰결과 용역 예비가격상세 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearOpengResultPreparPcDetailInfo("getOpengResultListInfoFrgcptPreparPcDetail", "개찰결과 외자 예비가격상세 목록 조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearOpengResultPreparPcDetailInfo("getOpengResultListInfoThngPreparPcDetail", "개찰결과 물품 예비가격상세 목록 조회");
 			} catch (Exception ignore) {
 			}

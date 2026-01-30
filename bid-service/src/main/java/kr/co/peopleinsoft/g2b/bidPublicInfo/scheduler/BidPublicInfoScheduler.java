@@ -93,7 +93,7 @@ public class BidPublicInfoScheduler extends CmmnAbstractController {
 	})
 	@GetMapping("/colctLatestBidPblancListInfoJob")
 	public ResponseEntity<String> colctLatestBidPblancListInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */30 * * * ?");
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */10 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestBidPblancListInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제
 		cmmnScheduleManager.createCronJob(ColctLatestBidPblancListInfoJob.class, "ColctLatestBidPblancListInfoJob", "최신자료수집", "최근 입찰공고 데이터 수집", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();

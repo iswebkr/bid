@@ -89,7 +89,7 @@ public class HrcspSsstndrdInfoScheduler {
 	})
 	@GetMapping("/colctLatestPublicPrcureThngInfoJob")
 	public ResponseEntity<String> colctLatestPublicPrcureThngInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 12 * * ?");
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */10 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestPublicPrcureThngInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제
 		cmmnScheduleManager.createCronJob(ColctLatestPublicPrcureThngInfoJob.class, "ColctLatestPublicPrcureThngInfoJob", "최신자료수집", "사전규격 최신데이터 수집", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();

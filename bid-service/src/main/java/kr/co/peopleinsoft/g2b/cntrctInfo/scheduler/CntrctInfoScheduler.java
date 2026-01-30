@@ -95,7 +95,7 @@ public class CntrctInfoScheduler extends CmmnAbstractController {
 	})
 	@GetMapping("/colctLatestCntrctInfoJob")
 	public ResponseEntity<String> colctLatestCntrctInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */30 * * * ?");
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */20 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestCntrctInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제
 		cmmnScheduleManager.createCronJob(ColctLatestCntrctInfoJob.class, "ColctLatestCntrctInfoJob", "최신자료수집", "계약현황 최신데이터 수집", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();

@@ -89,7 +89,7 @@ public class OpengResultPreparPcDetailScheduler {
 	})
 	@GetMapping("/opengResultPreparPcDetail/colctLatestOpengResultPreparPcDetailInfoJob")
 	public ResponseEntity<String> colctLatestOpengResultPreparPcDetailInfoJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 3 * * ?");
+		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */10 * * * ?");
 		cmmnScheduleManager.deleteJob("ColctLatestOpengResultPreparPcDetailInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제
 		cmmnScheduleManager.createCronJob(ColctLatestOpengResultPreparPcDetailInfoJob.class, "ColctLatestOpengResultPreparPcDetailInfoJob", "최신자료수집", "예비가격 최신데이터 수집", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();

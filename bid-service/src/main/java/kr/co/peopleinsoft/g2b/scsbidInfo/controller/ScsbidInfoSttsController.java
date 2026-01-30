@@ -90,6 +90,24 @@ public class ScsbidInfoSttsController {
 	public ResponseEntity<String> colctThisYearScsbidInfoStts() {
 		CompletableFuture.runAsync(() -> {
 			try {
+				saveThisYearScsbidInfoStts("getScsbidListSttusCnstwkPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 공사조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearScsbidInfoStts("getScsbidListSttusServcPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 용역조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				saveThisYearScsbidInfoStts("getScsbidListSttusFrgcptPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 외자조회");
+			} catch (Exception ignore) {
+			}
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
 				saveThisYearScsbidInfoStts("getScsbidListSttusThngPPSSrch", "나라장터 검색조건에 의한 낙찰된 목록 현황 물품조회");
 			} catch (Exception ignore) {
 			}
