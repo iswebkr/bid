@@ -207,6 +207,5 @@
 
 	<insert id="batchInsertOrderPlan" parameterType="kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusDto">
 		<include refid="insertOrderPlanQuery" />
-		--  ON CONFLICT (order_plan_unty_no, order_plan_sno) DO NOTHING
 	</insert>
 </mapper>

@@ -98,7 +98,6 @@
 
 	<insert id="batchInsertPrcrmntCorpBasicInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoDto">
 		<include refid="insertPrcrmntCorpBasicInfoQuery" />
-		-- ON CONFLICT (bizno) DO NOTHING
 	</insert>
 
 </mapper>

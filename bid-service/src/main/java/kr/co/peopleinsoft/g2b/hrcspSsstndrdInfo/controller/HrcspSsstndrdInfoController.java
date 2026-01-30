@@ -18,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -193,6 +192,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 					URI uri = uriComponentsBuilder.cloneBuilder()
 						.replaceQueryParam("pageNo", pageNo)
 						.build().toUri();
+
 					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 					// 30초

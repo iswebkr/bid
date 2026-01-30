@@ -32,34 +32,53 @@ public class G2BCmmnService {
 		Map<String, Object> map = new ConcurrentHashMap<>();
 		map.put("totalCountIsNotMatch", "N");
 
-		int startPage;
+		int startPage = 1;
 		int endPage;
 
 		BidColctHistResultDto resultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
 
 		endPage = requestDto.getTotalPage();
 
+		// 조회된 이력이 없는 경우 첫페이지부터 데이터 수집
 		if (resultDto == null) {
-			startPage = 1;
-		} else {
-			// 전체 데이터가 변경된 경우 이력 정보를 변경하고 이어받기를 위한
-			// 시작페이지를 변경처리하고 재계산된 전체 페이지 수만큼 수집
-			if (!Objects.equals(requestDto.getTotalCount(), resultDto.getMaxTotalCnt())) {
-				BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
-					.colctTotPage(requestDto.getTotalPage())
-					.colctTotCnt(requestDto.getTotalCount())
-					.colctId(requestDto.getServiceId())
-					.colctBgnDt(requestDto.getInqryBgnDt())
-					.colctEndDt(requestDto.getInqryEndDt())
-					.build();
+			map.put("startPage", startPage);
+			map.put("endPage", endPage);
+			return map;
+		}
 
-				bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
+		// 전체카운트가 변경된 경우(새로운 데이터가 등록된 경우) 변경된 정보를 이력정보에 저장
+		// 이력정보를 기반으로 새로운 수집 대상 페이지의 시작페이지 번호를 지정
+		if (!Objects.equals(requestDto.getTotalCount(), resultDto.getMaxTotalCnt())) {
+			BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
+				.colctTotPage(requestDto.getTotalPage())
+				.colctTotCnt(requestDto.getTotalCount())
+				.colctId(requestDto.getServiceId())
+				.colctBgnDt(requestDto.getInqryBgnDt())
+				.colctEndDt(requestDto.getInqryEndDt())
+				.build();
 
-				// 안전행정부 기관코드처럼 재수집이 필요한 경우 사용하기 위한 값 설정
-				map.put("totalCountIsNotMatch", "Y");
+			// 변경된 정보 업데이트
+			bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
+
+			// 변경된 정보 재조회
+			BidColctHistResultDto updatedResultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
+
+			// 재조회결과 페이지는 같고 데이터 카운트만 늘어난 경우 (같은 페이지에 데이터만 늘어난 경우)
+			// 마지막 조회 페이지 데이터 부터 재수집, 그렇지 않은 경우 다음 페이지 부터 데이터 수집
+			if (updatedResultDto != null) {
+				if (Objects.equals(updatedResultDto.getMaxTotPage(), updatedResultDto.getCmplColctPage())) {
+					startPage = updatedResultDto.getCmplColctPage();
+				} else {
+					startPage = updatedResultDto.getCmplColctPage() + 1;
+				}
 			}
-
-			startPage = resultDto.getCmplColctPage() + 1;
+		} else {
+			if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
+				// 페이지가 같은데 아직 남은 수집 데이터가 존재하는 경우 마지막 페이지부터 다시 재수집
+				startPage = resultDto.getCmplColctPage();
+			} else {
+				startPage = resultDto.getCmplColctPage() + 1;
+			}
 		}
 
 		map.put("startPage", startPage);

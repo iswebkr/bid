@@ -83,6 +83,5 @@
 
 	<insert id="batchInsertOpengResultListInfoPreparPcDetail" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailDto">
 		<include refid="insertOpengResultListInfoPreparPcDetailQuery" />
-		-- ON CONFLICT (bid_ntce_no, bid_ntce_ord, compno_rsrvtn_prce_sno, bid_clsfc_no) DO NOTHING
 	</insert>
 </mapper>

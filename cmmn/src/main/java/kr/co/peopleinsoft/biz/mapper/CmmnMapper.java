@@ -1,10 +1,13 @@
 package kr.co.peopleinsoft.biz.mapper;
 
+import lombok.Getter;
 import org.apache.ibatis.cursor.Cursor;
+import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.mybatis.spring.SqlSessionTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +15,9 @@ public class CmmnMapper {
 	private final SqlSessionTemplate sqlSessionTemplate;
 	private final SqlSessionTemplate batchSqlSessionTemplate;
 	private final SqlSessionTemplate reuseSqlSessionTemplate;
+
+	@Getter
+	private SqlSessionTemplate currentSqlSessionTemplate;
 
 	public CmmnMapper(SqlSessionTemplate sqlSessionTemplate, SqlSessionTemplate batchSqlSessionTemplate, SqlSessionTemplate reuseSqlSessionTemplate) {
 		this.sqlSessionTemplate = sqlSessionTemplate;
@@ -113,11 +119,26 @@ public class CmmnMapper {
 	 */
 	SqlSessionTemplate getSqlSessionTemplate(String statement) {
 		if (statement.toLowerCase().contains("batch")) {
-			return batchSqlSessionTemplate;
+			currentSqlSessionTemplate = batchSqlSessionTemplate;
 		} else if (statement.toLowerCase().contains("reuse")) {
-			return reuseSqlSessionTemplate;
+			currentSqlSessionTemplate = reuseSqlSessionTemplate;
 		} else {
-			return sqlSessionTemplate;
+			currentSqlSessionTemplate = sqlSessionTemplate;
 		}
+		return currentSqlSessionTemplate;
+	}
+
+	public int flushBatchStatementsCount() {
+		if (currentSqlSessionTemplate == null) {
+			return 0;
+		}
+		return flushBatchStatementsCount(currentSqlSessionTemplate);
+	}
+
+	public int flushBatchStatementsCount(SqlSessionTemplate sqlSessionTemplate) {
+		List<BatchResult> batchResults = sqlSessionTemplate.flushStatements();
+		return batchResults.stream()
+			.flatMapToInt(result -> Arrays.stream(result.getUpdateCounts()))
+			.sum();
 	}
 }

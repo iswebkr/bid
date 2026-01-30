@@ -113,6 +113,5 @@
 
 	<insert id="batchInsertDminsttInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoDto">
 		<include refid="insertDminsttInfoQuery" />
-		-- ON CONFLICT (dminstt_cd) DO NOTHING
 	</insert>
 </mapper>

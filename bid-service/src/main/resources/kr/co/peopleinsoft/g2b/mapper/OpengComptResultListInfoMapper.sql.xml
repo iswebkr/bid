@@ -89,6 +89,5 @@
 
 	<insert id="batchInsertOpengComptResultListInfo">
 		<include refid="insertOpengComptResultListInfoQuery" />
-		-- ON CONFLICT (bid_ntce_no, bid_ntce_ord, openg_rank, bid_clsfc_no) DO NOTHING
 	</insert>
 </mapper>

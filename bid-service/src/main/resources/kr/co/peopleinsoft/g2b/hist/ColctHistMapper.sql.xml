@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="BidColctHistMapper">
-	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
+	<sql id="insertBidColctHistQuery">
 		-- 수집이력관리 등록
 		INSERT INTO tb_colct_hist (
 				colct_id -- 수집대상아이디
@@ -33,25 +33,25 @@
 				, CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
 				, #{updatedBy} -- 수정자 (시스템 수정자)
 		)
-	</insert>
+	</sql>
 
 	<select id="selectColctHistResultByDate" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto" resultType="kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto">
 		select
-				colct_id
-				, colct_bgn_dt
-				, colct_end_dt
-				, max(colct_tot_page) max_tot_page
-				, count(distinct colct_cmpl_page) cmpl_colct_page
-				, max(colct_tot_cnt) max_total_cnt
-				, sum(colct_cmpl_cnt) sum_cmpl_cnt
-				, case
-				when max(colct_tot_cnt) = sum(colct_cmpl_cnt)
-				and min(colct_cmpl_page) = 1
-				and max(colct_tot_page) = count(distinct colct_cmpl_page)
-				then '수집완료'
-				end colct_state
-				, max(colct_tot_cnt) - sum(colct_cmpl_cnt) as diff_count
-				, max(colct_tot_page) - count(distinct colct_cmpl_page) as diff_page
+		colct_id
+		, colct_bgn_dt
+		, colct_end_dt
+		, max(colct_tot_page) max_tot_page
+		, count(distinct colct_cmpl_page) cmpl_colct_page
+		, max(colct_tot_cnt) max_total_cnt
+		, sum(colct_cmpl_cnt) sum_cmpl_cnt
+		, case
+		when max(colct_tot_cnt) = sum(colct_cmpl_cnt)
+		and min(colct_cmpl_page) = 1
+		and max(colct_tot_page) = count(distinct colct_cmpl_page)
+		then '수집완료'
+		end colct_state
+		, max(colct_tot_cnt) - sum(colct_cmpl_cnt) as diff_count
+		, max(colct_tot_page) - count(distinct colct_cmpl_page) as diff_page
 		from 	tb_colct_hist
 		where 	colct_id = #{colctId}
 		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(colctBgnDt)">
@@ -62,6 +62,11 @@
 		</if>
 		group by colct_id, colct_bgn_dt, colct_end_dt
 	</select>
+
+	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
+		<include refid="insertBidColctHistQuery" />
+		ON CONFLICT (colct_id, colct_uri) DO NOTHING
+	</insert>
 
 	<update id="updateColctPageInfo" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
 		-- 수집이력관리 수정

@@ -54,8 +54,9 @@ public class HrcspSsstndrdInfoService extends G2BAbstractBidService {
 
 		for (HrcspSsstndrdInfoDto item : items) {
 			cmmnMapper.insert("BidHrcspSsstndrdInfoMapper.batchInsertHrcspSsstndrdInfo", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

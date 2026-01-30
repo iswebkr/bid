@@ -544,7 +544,6 @@
 
 	<insert id="batchInsertPublicInfo" parameterType="kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoDto">
 		<include refid="insertPublicInfoQuery" />
-		-- ON CONFLICT (bid_ntce_no, bid_ntce_ord) DO NOTHING
 	</insert>
 
 </mapper>

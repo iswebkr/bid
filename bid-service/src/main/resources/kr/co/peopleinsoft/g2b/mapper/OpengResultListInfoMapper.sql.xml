@@ -78,7 +78,6 @@
 
 	<insert id="batchInsertOpengResultListInfo" parameterType="kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoDto">
 		<include refid="insertOpengResultListInfoQuery" />
-		-- ON CONFLICT (bid_ntce_no, bid_ntce_ord, bid_clsfc_no, rbid_no) DO NOTHING
 	</insert>
 
 </mapper>
