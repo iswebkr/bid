@@ -40,7 +40,7 @@ public class StanOrgCdService extends G2BAbstractBidService {
 		timeout = 300,
 		rollbackFor = Exception.class
 	)
-	public void batchInsertStanOrgCd(URI uri, int pageNo, BidRequestDto requestDto) throws InterruptedException {
+	public void batchInsertStanOrgCd(URI uri, int pageNo, BidRequestDto requestDto) {
 		int rowCnt = 0;
 
 		String orgCdJson = publicWebClient.get()

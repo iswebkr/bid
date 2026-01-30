@@ -2,11 +2,13 @@ package kr.co.peopleinsoft.g2b.orderPlanSttus.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusRequestDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusResponseDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.service.OrderPlanSttusService;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,114 +20,74 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/g2b/orderPlanSttusService")
 @Tag(name = "나라장터 발주계획현황서비스", description = "https://www.data.go.kr/data/15129462/openapi.do")
-public class OrderPlanSttusController {
+public class OrderPlanSttusController extends CmmnAbstractController {
 
 	private final WebClient publicWebClient;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final G2BCmmnService g2BCmmnService;
 	private final OrderPlanSttusService orderPlanSttusService;
 
-	public OrderPlanSttusController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OrderPlanSttusService orderPlanSttusService) {
+	public OrderPlanSttusController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OrderPlanSttusService orderPlanSttusService) {
 		this.publicWebClient = publicWebClient;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.g2BCmmnService = g2BCmmnService;
 		this.orderPlanSttusService = orderPlanSttusService;
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회")
 	@GetMapping("/getOrderPlanSttusListCnstwkPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListCnstwkPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOrderPlanSttusListCnstwkPPSSrch() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회")
 	@GetMapping("/getOrderPlanSttusListServcPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListServcPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOrderPlanSttusListServcPPSSrch() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회")
 	@GetMapping("/getOrderPlanSttusListFrgcptPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListFrgcptPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOrderPlanSttusListFrgcptPPSSrch() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회")
 	@GetMapping("/getOrderPlanSttusListThngPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListThngPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOrderPlanSttusListThngPPSSrch() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "최신 발주계획현황 데이터 수집")
 	@GetMapping("/colctThisYearOrderPlanSttus")
 	public ResponseEntity<String> colctThisYearOrderPlanSttus() {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+		List<Runnable> runnables = List.of(
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회")
+		);
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
-	private void saveThisYearOrderPlanSttus(String serviceId, String serviceDescription) throws Exception {
+	private void saveThisYearOrderPlanSttus(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
 		saveOrderPlanSttus(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
-	private void saveOrderPlanSttus(String serviceId, String serviceDescription) throws Exception {
+	private void saveOrderPlanSttus(String serviceId, String serviceDescription) {
 		int lastYear = LocalDateTime.now().minusYears(1).getYear();
 		saveOrderPlanSttus(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
-	private void saveOrderPlanSttus(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+	private void saveOrderPlanSttus(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -173,7 +135,7 @@ public class OrderPlanSttusController {
 					.block();
 
 				if (responseDto == null) {
-					throw new Exception("API 호출 실패");
+					throw new RuntimeException("API 호출 실패");
 				}
 
 				int totalCount = responseDto.getResponse().getBody().getTotalCount();
@@ -194,12 +156,20 @@ public class OrderPlanSttusController {
 					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}

@@ -2,11 +2,13 @@ package kr.co.peopleinsoft.g2b.scsbidInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
+import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoRequestDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultList.OpengResultListInfoResponseDto;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultListInfoService;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,118 +17,78 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Controller
 @RequestMapping("/g2b/scsbidInfoService")
 @Tag(name = "나라장터 낙찰정보서비스 - 나라장터 검색조건에 의한 개찰결과 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
-public class OpengResultListInfoController {
+public class OpengResultListInfoController extends CmmnAbstractController {
+
 	private final WebClient publicWebClient;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final G2BCmmnService g2BCmmnService;
 	private final OpengResultListInfoService opengResultListInfoService;
 
-	public OpengResultListInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengResultListInfoService opengResultListInfoService) {
+	public OpengResultListInfoController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OpengResultListInfoService opengResultListInfoService) {
 		this.publicWebClient = publicWebClient;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.g2BCmmnService = g2BCmmnService;
 		this.opengResultListInfoService = opengResultListInfoService;
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 공사 목록 조회")
 	@GetMapping("/getOpengResultListInfoCnstwkPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoCnstwkPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOpengResultListInfoCnstwkPPSSrch() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 용역 목록 조회")
 	@GetMapping("/getOpengResultListInfoServcPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoServcPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOpengResultListInfoServcPPSSrch() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 외자 목록 조회")
 	@GetMapping("/getOpengResultListInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoFrgcptPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOpengResultListInfoFrgcptPPSSrch() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
 	@GetMapping("/getOpengResultListInfoThngPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoThngPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getOpengResultListInfoThngPPSSrch() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "이번년도 나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
 	@GetMapping("/colctThisYearOpengResultListInfo")
 	public ResponseEntity<String> colctThisYearOpengResultListInfo() {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+		List<Runnable> runnables = List.of(
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
+		);
+
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
-	private void saveThisYearOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveThisYearOpengResultListInfo(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
 		saveOpengResultListInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
-	private void saveOpengResultListInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveOpengResultListInfo(String serviceId, String serviceDescription) {
 		int lastYear = LocalDateTime.now().minusYears(1).getYear();
 		saveOpengResultListInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
-	private void saveOpengResultListInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+	private void saveOpengResultListInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -170,7 +132,7 @@ public class OpengResultListInfoController {
 					.block();
 
 				if (responseDto == null) {
-					throw new Exception("API 호출 실패");
+					throw new RuntimeException("API 호출 실패");
 				}
 
 				int totalCount = responseDto.getResponse().getBody().getTotalCount();
@@ -191,12 +153,20 @@ public class OpengResultListInfoController {
 					opengResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}

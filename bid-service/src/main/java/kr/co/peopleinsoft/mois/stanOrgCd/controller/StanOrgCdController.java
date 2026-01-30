@@ -8,11 +8,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdHeadDto;
 import kr.co.peopleinsoft.mois.stanOrgCd.service.StanOrgCdService;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,36 +26,31 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/mois")
 @Tag(name = "행정안전부 행정표준기관코드", description = "https://www.data.go.kr/data/15129427/openapi.do")
-public class StanOrgCdController {
+public class StanOrgCdController extends CmmnAbstractController {
 
 	private final G2BCmmnService g2BCmmnService;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final WebClient publicWebClient;
 	private final StanOrgCdService stanOrgCdService;
 
-	public StanOrgCdController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, StanOrgCdService stanOrgCdService) {
+	public StanOrgCdController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, StanOrgCdService stanOrgCdService) {
 		this.g2BCmmnService = g2BCmmnService;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.publicWebClient = publicWebClient;
 		this.stanOrgCdService = stanOrgCdService;
 	}
 
 	@Operation(summary = "행정표준기관코드 수집")
 	@GetMapping("/getStanOrgCdList2")
-	public ResponseEntity<String> getStanOrgCdList2() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveStanOrgCdList("getStanOrgCdList2", "행정안전부_행정표준코드_기관코드");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getStanOrgCdList2() {
+		return asyncProcess(() -> saveStanOrgCdList("getStanOrgCdList2", "행정안전부_행정표준코드_기관코드"), asyncTaskExecutor);
 	}
 
-	public void saveStanOrgCdList(String serviceId, String serviceDescription) throws Exception {
+	public void saveStanOrgCdList(String serviceId, String serviceDescription) {
 		String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		BidRequestDto requestDto = BidRequestDto.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -136,7 +133,7 @@ public class StanOrgCdController {
 		totalCountIsNotMatch = (String) pageMap.get("totalCountIsNotMatch");
 
 		// 전체 카운트가 변한 경우 1페이지 부터 다시 받음
-		if("Y".equals(totalCountIsNotMatch)) {
+		if ("Y".equals(totalCountIsNotMatch)) {
 			startPage = 1;
 		}
 
@@ -146,13 +143,21 @@ public class StanOrgCdController {
 				.build().toUri();
 			stanOrgCdService.batchInsertStanOrgCd(uri, pageNo, requestDto);
 
-			// 10초 대기
-			Thread.sleep(1000 * 10);
+			// 30초
+			try {
+				Thread.sleep(1000 * 30);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		if (startPage < endPage) {
 			// 30초
-			Thread.sleep(1000 * 30);
+			try {
+				Thread.sleep(1000 * 30);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

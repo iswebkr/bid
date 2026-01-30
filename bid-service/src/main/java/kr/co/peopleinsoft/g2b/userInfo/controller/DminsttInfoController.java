@@ -3,13 +3,14 @@ package kr.co.peopleinsoft.g2b.userInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoResponseDto;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
+import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.DminsttInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +19,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/g2b/usrInfoService")
@@ -33,11 +32,13 @@ public class DminsttInfoController extends CmmnAbstractController {
 	private static final Logger logger = LoggerFactory.getLogger(DminsttInfoController.class);
 
 	private final G2BCmmnService g2BCmmnService;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final WebClient publicWebClient;
 	private final DminsttInfoService dminsttInfoService;
 
-	public DminsttInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
+	public DminsttInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.publicWebClient = publicWebClient;
 		this.dminsttInfoService = dminsttInfoService;
 	}
@@ -45,39 +46,27 @@ public class DminsttInfoController extends CmmnAbstractController {
 	@Operation(summary = "모든 사용자 정보 저장")
 	@GetMapping("/saveStepDminsttInfo")
 	public ResponseEntity<String> saveStepDminsttInfo() {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveDminsttInfo("getDminsttInfo02", "수요기관정보조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+		return asyncProcess(() -> saveDminsttInfo("getDminsttInfo02", "수요기관정보조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "이번년도 모든 사용자 정보 저장")
 	@GetMapping("/colctThisYearDminsttInfo")
 	public ResponseEntity<String> colctThisYearDminsttInfo() {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearDminsttInfo("getDminsttInfo02", "수요기관정보조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+		return asyncProcess(() -> saveThisYearDminsttInfo("getDminsttInfo02", "수요기관정보조회"), asyncTaskExecutor);
 	}
 
-	private void saveThisYearDminsttInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveThisYearDminsttInfo(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
 		saveDminsttInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
-	private void saveDminsttInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveDminsttInfo(String serviceId, String serviceDescription) {
 		int lastYear = LocalDateTime.now().minusYears(1).getYear();
 		saveDminsttInfo(serviceId, serviceDescription, 2000, lastYear, 1, 12);
 	}
 
-	private void saveDminsttInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+	private void saveDminsttInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -121,7 +110,7 @@ public class DminsttInfoController extends CmmnAbstractController {
 					.block();
 
 				if (responseDto == null) {
-					throw new Exception("API 호출 실패");
+					throw new RuntimeException("API 호출 실패");
 				}
 
 				int totalCount = responseDto.getResponse().getBody().getTotalCount();
@@ -142,13 +131,21 @@ public class DminsttInfoController extends CmmnAbstractController {
 
 					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, requestDto);
 
-					// 10초
-					Thread.sleep(10000);
+					// 30초
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}

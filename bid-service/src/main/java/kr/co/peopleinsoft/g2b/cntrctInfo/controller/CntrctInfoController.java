@@ -2,11 +2,13 @@ package kr.co.peopleinsoft.g2b.cntrctInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoRequestDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.service.CntrctInfoService;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,114 +20,75 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/g2b/cntrctInfoService")
 @Tag(name = "나라장터 계약정보서비스", description = "https://www.data.go.kr/data/15129427/openapi.do")
-public class CntrctInfoController {
+public class CntrctInfoController extends CmmnAbstractController {
 
 	private final G2BCmmnService g2BCmmnService;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final WebClient publicWebClient;
 	private final CntrctInfoService cntrctInfoService;
 
-	public CntrctInfoController(G2BCmmnService g2BCmmnService, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
+	public CntrctInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
 		this.g2BCmmnService = g2BCmmnService;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.publicWebClient = publicWebClient;
 		this.cntrctInfoService = cntrctInfoService;
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 공사조회")
 	@GetMapping("/getCntrctInfoListCnstwkPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListCnstwkPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getCntrctInfoListCnstwkPPSSrch() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 용역조회")
 	@GetMapping("/getCntrctInfoListServcPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListServcPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getCntrctInfoListServcPPSSrch() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 외자조회")
 	@GetMapping("/getCntrctInfoListFrgcptPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListFrgcptPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getCntrctInfoListFrgcptPPSSrch() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 물품조회")
 	@GetMapping("/getCntrctInfoListThngPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListThngPPSSrch() throws Exception {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> getCntrctInfoListThngPPSSrch() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 수집")
 	@GetMapping("/colctThisYearCntrctInfo")
 	public ResponseEntity<String> colctThisYearCntrctInfo() {
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회");
-			} catch (Exception ignore) {
-			}
-		});
-		CompletableFuture.runAsync(() -> {
-			try {
-				saveThisYearCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회");
-			} catch (Exception ignore) {
-			}
-		});
-		return ResponseEntity.ok().body("success");
+		List<Runnable> runnables = List.of(
+			() -> saveThisYearCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회")
+		);
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
-	private void saveThisYearCntrctInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveThisYearCntrctInfo(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
 		saveCntrctInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
-	private void saveCntrctInfo(String serviceId, String serviceDescription) throws Exception {
+	private void saveCntrctInfo(String serviceId, String serviceDescription) {
 		int lastYear = LocalDateTime.now().minusYears(1).getYear();
 		saveCntrctInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
-	private void saveCntrctInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+	private void saveCntrctInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -169,7 +132,7 @@ public class CntrctInfoController {
 					.block();
 
 				if (responseDto == null) {
-					throw new Exception("API 호출 실패");
+					throw new RuntimeException("API 호출 실패");
 				}
 
 				int totalCount = responseDto.getResponse().getBody().getTotalCount();
@@ -191,12 +154,20 @@ public class CntrctInfoController {
 					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}

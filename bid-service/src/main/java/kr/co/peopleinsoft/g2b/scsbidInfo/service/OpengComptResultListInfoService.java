@@ -36,7 +36,7 @@ public class OpengComptResultListInfoService extends G2BAbstractBidService {
 		timeout = 300,
 		rollbackFor = Exception.class
 	)
-	public <T extends BidRequestDto> int batchInsertOpengResultListInfo(URI uri, int pageNo, T requestDto) throws Exception {
+	public <T extends BidRequestDto> int batchInsertOpengResultListInfo(URI uri, int pageNo, T requestDto) {
 		int rowCnt = 0;
 
 		OpengComptResultListInfoResponseDto responseDto = publicWebClient.get()
@@ -46,7 +46,7 @@ public class OpengComptResultListInfoService extends G2BAbstractBidService {
 			.block();
 
 		if (responseDto == null) {
-			throw new Exception("API 호출 실패");
+			throw new RuntimeException("API 호출 실패");
 		}
 
 		List<OpengComptResultListInfoDto> items = responseDto.getResponse().getBody().getItems();

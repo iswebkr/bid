@@ -2,11 +2,13 @@ package kr.co.peopleinsoft.g2b.scsbidInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengComptList.OpengComptResultListInfoRequestDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengComptList.OpengComptResultListInfoResponseDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengComptResultListInfoService;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,63 +21,48 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Controller
 @RequestMapping("/g2b/scsbidInfoService")
 @Tag(name = "나라장터 낙찰정보서비스 - 개찰결과 개찰완료 목록 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
-public class OpengComptResultListInfoController {
+public class OpengComptResultListInfoController extends CmmnAbstractController {
+
 	private final WebClient publicWebClient;
+	private final AsyncTaskExecutor asyncTaskExecutor;
 	private final G2BCmmnService g2BCmmnService;
 	private final OpengComptResultListInfoService opengComptResultListInfoService;
 
-	public OpengComptResultListInfoController(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengComptResultListInfoService opengComptResultListInfoService) {
+	public OpengComptResultListInfoController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OpengComptResultListInfoService opengComptResultListInfoService) {
 		this.publicWebClient = publicWebClient;
+		this.asyncTaskExecutor = asyncTaskExecutor;
 		this.g2BCmmnService = g2BCmmnService;
 		this.opengComptResultListInfoService = opengComptResultListInfoService;
 	}
 
 	@Operation(summary = "입찰공고에 해당하는 모든 개찰결과 개찰완료 목록 정보 수집")
 	@GetMapping("/saveStepOpengResultListInfoOpengCompt")
-	public ResponseEntity<String> saveStepOpengResultListInfoOpengCompt() throws ExecutionException, InterruptedException {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
-			try {
-				saveOpengResultListInfoOpengCompt("getOpengResultListInfoOpengCompt", "개찰결과 개찰완료 목록 조회");
-			} catch (Exception e) {
-				return "failure";
-			}
-			return "success";
-		});
-		return ResponseEntity.ok().body("success");
+	public ResponseEntity<String> saveStepOpengResultListInfoOpengCompt() {
+		return asyncProcess(() -> saveOpengResultListInfoOpengCompt("getOpengResultListInfoOpengCompt", "개찰결과 개찰완료 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "이번년도 입찰공고에 해당하는 모든 개찰결과 개찰완료 목록 정보 수집")
 	@GetMapping("/colctThisYearOpengResultListInfoOpengCompt")
 	public ResponseEntity<String> colctThisYearOpengResultListInfoOpengCompt() {
-		CompletableFuture<String> stepResult = CompletableFuture.supplyAsync(() -> {
-			try {
-				saveThisYearOpengResultListInfoOpengCompt("getOpengResultListInfoOpengCompt", "개찰결과 개찰완료 목록 조회");
-			} catch (Exception e) {
-				return "failure";
-			}
-			return "success";
-		});
-		return ResponseEntity.ok().body("success");
+		return asyncProcess(() -> saveThisYearOpengResultListInfoOpengCompt("getOpengResultListInfoOpengCompt", "개찰결과 개찰완료 목록 조회"), asyncTaskExecutor);
 	}
 
-	private void saveThisYearOpengResultListInfoOpengCompt(String serviceId, String serviceDescription) throws Exception {
+	private void saveThisYearOpengResultListInfoOpengCompt(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
 		saveOpengResultListInfoOpengCompt(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
 	}
 
-	private void saveOpengResultListInfoOpengCompt(String serviceId, String serviceDescription) throws Exception {
+	private void saveOpengResultListInfoOpengCompt(String serviceId, String serviceDescription) {
 		int lastYear = LocalDateTime.now().minusYears(1).getYear();
 		saveOpengResultListInfoOpengCompt(serviceId, serviceDescription, 2020, lastYear, 1, 12);
 	}
 
-	private void saveOpengResultListInfoOpengCompt(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) throws Exception {
+	private void saveOpengResultListInfoOpengCompt(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -117,7 +104,7 @@ public class OpengComptResultListInfoController {
 					.block();
 
 				if (responseDto == null) {
-					throw new Exception("API 호출 실패");
+					throw new RuntimeException("API 호출 실패");
 				}
 
 				int totalCount = responseDto.getResponse().getBody().getTotalCount();
@@ -138,12 +125,20 @@ public class OpengComptResultListInfoController {
 					opengComptResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, requestDto);
 
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				if (startPage < endPage) {
 					// 30초
-					Thread.sleep(1000 * 30);
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}

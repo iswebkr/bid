@@ -1,9 +1,9 @@
 package kr.co.peopleinsoft.g2b.bidPublicInfo.service;
 
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoDto;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
 import kr.co.peopleinsoft.cmmn.service.G2BAbstractBidService;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoDto;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -27,7 +27,7 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 	 * @param requestDto API 정보가 담긴 RequestDto
 	 * @param <T>        BidRequestDto 를 상속받아 구현된 Dto 객체
 	 */
-	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, T requestDto) throws Exception {
+	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, T requestDto) {
 		int rowCnt = 0;
 
 		BidPublicInfoResponseDto responseDto = publicWebClient.get()
@@ -37,7 +37,7 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 			.block();
 
 		if (responseDto == null) {
-			throw new Exception("API 호출 실패");
+			throw new RuntimeException("API 호출 실패");
 		}
 
 		List<BidPublicInfoDto> items = responseDto.getResponse().getBody().getItems();

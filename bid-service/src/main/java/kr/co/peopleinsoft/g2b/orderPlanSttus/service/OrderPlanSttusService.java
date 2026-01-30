@@ -1,9 +1,9 @@
 package kr.co.peopleinsoft.g2b.orderPlanSttus.service;
 
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
+import kr.co.peopleinsoft.cmmn.service.G2BAbstractBidService;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusResponseDto;
-import kr.co.peopleinsoft.cmmn.service.G2BAbstractBidService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,7 +36,7 @@ public class OrderPlanSttusService extends G2BAbstractBidService {
 		timeout = 300,
 		rollbackFor = Exception.class
 	)
-	public <T extends BidRequestDto> int batchInsertBidOrderPlan(URI uri, int pageNo, T requestDto) throws Exception {
+	public <T extends BidRequestDto> int batchInsertBidOrderPlan(URI uri, int pageNo, T requestDto) {
 		int rowCnt = 0;
 
 		OrderPlanSttusResponseDto responseDto = publicWebClient.get()
@@ -46,7 +46,7 @@ public class OrderPlanSttusService extends G2BAbstractBidService {
 			.block();
 
 		if (responseDto == null) {
-			throw new Exception("API 호출 실패");
+			throw new RuntimeException("API 호출 실패");
 		}
 
 		List<OrderPlanSttusDto> items = responseDto.getResponse().getBody().getItems();
