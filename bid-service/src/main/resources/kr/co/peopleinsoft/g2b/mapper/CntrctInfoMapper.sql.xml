@@ -235,5 +235,6 @@
 
 	<insert id="batchInsertCntrctInfo" parameterType="kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoDto">
 		<include refid="insertCntrctInfoQuery"/>
+		OR CONFLICT (unty_cntrct_no, bsns_div_nm) DO NOTHING
 	</insert>
 </mapper>

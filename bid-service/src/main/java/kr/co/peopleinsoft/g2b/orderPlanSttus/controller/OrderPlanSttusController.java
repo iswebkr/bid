@@ -120,8 +120,8 @@ public class OrderPlanSttusController extends CmmnAbstractController {
 					.queryParam("pageNo", 1)
 					.queryParam("numOfRows", requestDto.getNumOfRows())
 					.queryParam("type", "json")
-					.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
-					.queryParam("orderEndYm", requestDto.getOrderEndYm())
+					//.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
+					//.queryParam("orderEndYm", requestDto.getOrderEndYm())
 					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
 					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 

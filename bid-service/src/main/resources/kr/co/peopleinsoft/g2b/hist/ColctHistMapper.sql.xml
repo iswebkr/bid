@@ -37,18 +37,18 @@
 
 	<select id="selectColctHistResultByDate" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto" resultType="kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto">
 		select
-		colct_id
-		, colct_bgn_dt
-		, colct_end_dt
-		, max(colct_tot_page) max_tot_page
-		, count(distinct colct_cmpl_page) cmpl_colct_page
-		, max(colct_tot_cnt) max_total_cnt
-		, sum(colct_cmpl_cnt) sum_cmpl_cnt
+				colct_id
+				, colct_bgn_dt
+				, colct_end_dt
+				, max(colct_tot_page) max_tot_page
+				, count(distinct colct_cmpl_page) cmpl_colct_page
+				, max(colct_tot_cnt) max_total_cnt
+				, sum(colct_cmpl_cnt) sum_cmpl_cnt
 		, case
-		when max(colct_tot_cnt) = sum(colct_cmpl_cnt)
-		and min(colct_cmpl_page) = 1
-		and max(colct_tot_page) = count(distinct colct_cmpl_page)
-		then '수집완료'
+				when max(colct_tot_cnt) = sum(colct_cmpl_cnt)
+				and min(colct_cmpl_page) = 1
+				and max(colct_tot_page) = count(distinct colct_cmpl_page)
+				then 'complete'
 		end colct_state
 		, max(colct_tot_cnt) - sum(colct_cmpl_cnt) as diff_count
 		, max(colct_tot_page) - count(distinct colct_cmpl_page) as diff_page

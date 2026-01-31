@@ -19,14 +19,6 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 		this.publicWebClient = publicWebClient;
 	}
 
-	/**
-	 * 페이지별 나라장터검색조건에 의한 입찰공고 수집 / 저장
-	 *
-	 * @param uri        페이지 수집 대상 URI
-	 * @param pageNo     페이지 수집 대상 페이지
-	 * @param requestDto API 정보가 담긴 RequestDto
-	 * @param <T>        BidRequestDto 를 상속받아 구현된 Dto 객체
-	 */
 	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, T requestDto) {
 		int rowCnt = 0;
 
