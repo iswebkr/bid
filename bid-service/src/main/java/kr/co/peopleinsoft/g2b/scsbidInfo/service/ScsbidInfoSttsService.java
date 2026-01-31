@@ -53,8 +53,9 @@ public class ScsbidInfoSttsService extends G2BAbstractBidService {
 
 		for (ScsbidListSttusDto item : items) {
 			cmmnMapper.insert("ScsbidListSttusMapper.batchInsertScsbidListSttus", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

@@ -44,8 +44,9 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 
 		for (BidPublicInfoDto item : items) {
 			cmmnMapper.insert("BidPublicInfoMapper.batchInsertPublicInfo", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

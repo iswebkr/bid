@@ -53,8 +53,9 @@ public class OpengResultPreparPcDetailService extends G2BAbstractBidService {
 
 		for (OpengResultPreparPcDetailDto item : items) {
 			cmmnMapper.insert("OpengResultListInfoPreparPcDetailMapper.batchInsertOpengResultListInfoPreparPcDetail", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

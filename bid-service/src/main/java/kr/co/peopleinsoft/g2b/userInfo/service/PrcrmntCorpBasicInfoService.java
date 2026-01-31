@@ -53,8 +53,9 @@ public class PrcrmntCorpBasicInfoService extends G2BAbstractBidService {
 
 		for (PrcrmntCorpBasicInfoDto item : items) {
 			cmmnMapper.insert("PrcrmntCorpBasicInfoMapper.batchInsertPrcrmntCorpBasicInfo", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

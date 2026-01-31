@@ -61,25 +61,37 @@ public class G2BCmmnService {
 			bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
 
 			// 변경된 정보 재조회
-			BidColctHistResultDto updatedResultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
+			resultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
 
-			// 재조회결과 페이지는 같고 데이터 카운트만 늘어난 경우 (같은 페이지에 데이터만 늘어난 경우)
-			// 마지막 조회 페이지 데이터 부터 재수집, 그렇지 않은 경우 다음 페이지 부터 데이터 수집
-			if (updatedResultDto != null) {
-				if (Objects.equals(updatedResultDto.getMaxTotPage(), updatedResultDto.getCmplColctPage())) {
-					startPage = updatedResultDto.getCmplColctPage();
-				} else {
-					startPage = updatedResultDto.getCmplColctPage() + 1;
-				}
-			}
-		} else {
-			if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
-				// 페이지가 같은데 아직 남은 수집 데이터가 존재하는 경우 마지막 페이지부터 다시 재수집
-				startPage = resultDto.getCmplColctPage();
-			} else {
-				startPage = resultDto.getCmplColctPage() + 1;
-			}
+
+			/**
+
+			 // 재조회결과 페이지는 같고 데이터 카운트만 늘어난 경우 (같은 페이지에 데이터만 늘어난 경우)
+			 // 마지막 조회 페이지 데이터 부터 재수집, 그렇지 않은 경우 다음 페이지 부터 데이터 수집
+			 if (updatedResultDto != null) {
+			 if (Objects.equals(updatedResultDto.getMaxTotPage(), updatedResultDto.getCmplColctPage())) {
+			 startPage = updatedResultDto.getCmplColctPage() - 5;
+			 } else {
+			 startPage = updatedResultDto.getCmplColctPage() + 1;
+			 }
+			 }
+			 } else {
+			 if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
+			 // 페이지가 같은데 아직 남은 수집 데이터가 존재하는 경우 마지막 페이지부터 다시 재수집
+			 startPage = resultDto.getCmplColctPage() - 5;
+			 } else {
+			 startPage = resultDto.getCmplColctPage() + 1;
+			 }
+			 }
+			 **/
+			// 여유롭게 이미 수집이 완료된 페이지에서 5페이지 정도 뒤의 데이터부터 재수집 (500개 데이터)
+			// 중복처리 필요
+			startPage = resultDto.getCmplColctPage() - 5;
+			endPage = resultDto.getMaxTotPage();
 		}
+
+		// 시작페이지는 무조건 1 부터 시작
+		startPage = startPage <= 0 ? 1 : startPage;
 
 		map.put("startPage", startPage);
 		map.put("endPage", endPage);

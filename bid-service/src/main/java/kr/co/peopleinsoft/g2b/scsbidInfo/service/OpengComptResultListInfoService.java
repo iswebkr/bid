@@ -53,8 +53,9 @@ public class OpengComptResultListInfoService extends G2BAbstractBidService {
 
 		for (OpengComptResultListInfoDto item : items) {
 			cmmnMapper.insert("OpengComptResultListInfoMapper.batchInsertOpengComptResultListInfo", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

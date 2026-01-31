@@ -68,8 +68,8 @@ public class BidPublicInfoController extends CmmnAbstractController {
 	@GetMapping("/colctThisYearBidPblancListInfo")
 	public ResponseEntity<String> colctThisYearBidPblancListInfo() {
 		List<Runnable> runnables = List.of(
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회"),
 			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회"),
+			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고용역조회"),
 			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회"),
 			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회")
 		);

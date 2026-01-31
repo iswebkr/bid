@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="C:/maven/bid-repository/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="C:/maven/bid-repository/org/springframework/boot/spring-boot-configuration-processor/4.1.0-M1/spring-boot-configuration-processor-4.1.0-M1.jar" />
+          <entry name="C:/maven/bid-repository/org/springframework/boot/spring-boot-configuration-processor/4.0.2/spring-boot-configuration-processor-4.0.2.jar" />
         </processorPath>
         <module name="cmmn" />
         <module name="bid-service" />

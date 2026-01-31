@@ -53,8 +53,9 @@ public class OrderPlanSttusService extends G2BAbstractBidService {
 
 		for (OrderPlanSttusDto item : items) {
 			cmmnMapper.insert("BidOrderPlanSttusMapper.batchInsertOrderPlan", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

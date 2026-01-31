@@ -53,8 +53,9 @@ public class DminsttInfoService extends G2BAbstractBidService {
 
 		for (DminsttInfoDto item : items) {
 			cmmnMapper.insert("DminsttInfoMapper.batchInsertDminsttInfo", item);
-			rowCnt++;
 		}
+
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);

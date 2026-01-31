@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0-M1</version>
+		<version>4.0.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -291,6 +291,18 @@
 		<dependency>
 			<groupId>tools.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-cbor</artifactId>
+		</dependency>
+
+		<!-- ====================================================== -->
+		<!-- Jackson-annotation -->
+		<!-- ====================================================== -->
+
+		<!-- Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.21</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- ====================================================== -->
@@ -996,6 +1008,9 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<configuration>
+						<jvmArguments>
+							--enable-native-access=ALL-UNNAMED
+						</jvmArguments>
 						<excludes>
 							<exclude>
 								<groupId>org.projectlombok</groupId>
@@ -1113,6 +1128,10 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>

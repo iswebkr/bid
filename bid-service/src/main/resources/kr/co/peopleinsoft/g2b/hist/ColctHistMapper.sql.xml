@@ -65,7 +65,6 @@
 
 	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
 		<include refid="insertBidColctHistQuery" />
-		ON CONFLICT (colct_id, colct_uri) DO NOTHING
 	</insert>
 
 	<update id="updateColctPageInfo" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">
