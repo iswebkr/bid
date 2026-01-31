@@ -46,7 +46,7 @@ public class HrcspSsstndrdInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "나라장터 검색조건에 의한 사전규격 공사 목록 조회")
 	@GetMapping("/getPublicPrcureThngInfoCnstwkPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoCnstwkPPSSrch() throws Exception {
+	public ResponseEntity<String> getPublicPrcureThngInfoCnstwkPPSSrch() {
 		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 사전규격 공사 목록 조회"), asyncTaskExecutor);
 	}
 

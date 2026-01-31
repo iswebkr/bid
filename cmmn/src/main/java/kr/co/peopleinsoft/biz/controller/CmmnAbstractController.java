@@ -31,14 +31,14 @@ public abstract class CmmnAbstractController {
 			completableFuture.get();
 			return ResponseEntity.ok().body("success");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
 
 	protected ResponseEntity<String> asyncParallelProcess(List<Runnable> runnables, TaskExecutor taskExecutor) {
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 		for (Runnable runnable : runnables) {
-			futures.add(CompletableFuture.runAsync(runnable, taskExecutor));
+			futures.add(CompletableFuture.runAsync(runnable, taskExecutor).orTimeout(3, TimeUnit.MINUTES));
 		}
 
 		CompletableFuture<Void> completableFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));

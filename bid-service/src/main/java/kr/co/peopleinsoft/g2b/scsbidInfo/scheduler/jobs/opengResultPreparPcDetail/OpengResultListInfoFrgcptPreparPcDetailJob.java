@@ -6,19 +6,17 @@ import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultPreparPcDetailServic
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class OpengResultListInfoFrgcptPreparPcDetailJob extends OpengResultPreparPcDetailController implements Job {
 
-	public OpengResultListInfoFrgcptPreparPcDetailJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengResultPreparPcDetailService opengResultPreparPcDetailService) {
-		super(publicWebClient, g2BCmmnService, opengResultPreparPcDetailService);
+	public OpengResultListInfoFrgcptPreparPcDetailJob(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OpengResultPreparPcDetailService opengResultPreparPcDetailService) {
+		super(publicWebClient, asyncTaskExecutor, g2BCmmnService, opengResultPreparPcDetailService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		try {
-			getOpengResultListInfoFrgcptPreparPcDetail();
-		} catch (Exception ignore) {
-		}
+		getOpengResultListInfoFrgcptPreparPcDetail();
 	}
 }

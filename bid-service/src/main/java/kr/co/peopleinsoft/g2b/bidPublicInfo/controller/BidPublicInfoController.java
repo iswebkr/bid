@@ -48,19 +48,19 @@ public class BidPublicInfoController extends CmmnAbstractController {
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회")
 	@GetMapping("/getBidPblancListInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoFrgcptPPSSrch() throws Exception {
+	public ResponseEntity<String> getBidPblancListInfoFrgcptPPSSrch() {
 		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고용역조회")
 	@GetMapping("/getBidPblancListInfoServcPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoServcPPSSrch() throws Exception {
+	public ResponseEntity<String> getBidPblancListInfoServcPPSSrch() {
 		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고물품조회")
 	@GetMapping("/getBidPblancListInfoThngPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoThngPPSSrch() throws Exception {
+	public ResponseEntity<String> getBidPblancListInfoThngPPSSrch() {
 		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회"), asyncTaskExecutor);
 	}
 

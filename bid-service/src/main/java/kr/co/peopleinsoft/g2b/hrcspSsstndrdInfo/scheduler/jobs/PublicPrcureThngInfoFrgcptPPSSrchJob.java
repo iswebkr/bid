@@ -6,19 +6,17 @@ import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.service.HrcspSsstndrdInfoService
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class PublicPrcureThngInfoFrgcptPPSSrchJob extends HrcspSsstndrdInfoController implements Job {
 
-	public PublicPrcureThngInfoFrgcptPPSSrchJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
-		super(publicWebClient, g2BCmmnService, hrcspSsstndrdInfoService);
+	public PublicPrcureThngInfoFrgcptPPSSrchJob(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
+		super(publicWebClient, asyncTaskExecutor, g2BCmmnService, hrcspSsstndrdInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		try {
-			getPublicPrcureThngInfoFrgcptPPSSrch();
-		} catch (Exception ignore) {
-		}
+		getPublicPrcureThngInfoFrgcptPPSSrch();
 	}
 }

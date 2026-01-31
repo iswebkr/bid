@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.2</version>
+		<version>4.1.0-M1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -60,7 +60,7 @@
 	<repositories>
 		<repository>
 			<id>localRepository</id>
-			<url>http://220.89.189.24:8081/repository/maven-public/</url>
+			<url>http://220.89.189.24:8881/repository/maven-public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -73,7 +73,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>pluginRepository</id>
-			<url>http://220.89.189.24:8081/repository/maven-public/</url>
+			<url>http://220.89.189.24:8881/repository/maven-public/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>

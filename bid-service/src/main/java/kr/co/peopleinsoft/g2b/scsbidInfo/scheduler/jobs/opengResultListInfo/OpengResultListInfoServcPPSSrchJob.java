@@ -6,19 +6,17 @@ import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultListInfoService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class OpengResultListInfoServcPPSSrchJob extends OpengResultListInfoController implements Job {
 
-	public OpengResultListInfoServcPPSSrchJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, OpengResultListInfoService opengResultListInfoService) {
-		super(publicWebClient, g2BCmmnService, opengResultListInfoService);
+	public OpengResultListInfoServcPPSSrchJob(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OpengResultListInfoService opengResultListInfoService) {
+		super(publicWebClient, asyncTaskExecutor, g2BCmmnService, opengResultListInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		try {
-			getOpengResultListInfoServcPPSSrch();
-		} catch (Exception ignore) {
-		}
+		getOpengResultListInfoServcPPSSrch();
 	}
 }

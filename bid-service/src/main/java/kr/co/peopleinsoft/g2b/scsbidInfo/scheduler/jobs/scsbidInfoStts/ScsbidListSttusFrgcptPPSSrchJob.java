@@ -6,19 +6,17 @@ import kr.co.peopleinsoft.g2b.scsbidInfo.service.ScsbidInfoSttsService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class ScsbidListSttusFrgcptPPSSrchJob extends ScsbidInfoSttsController implements Job {
 
-	public ScsbidListSttusFrgcptPPSSrchJob(WebClient publicWebClient, G2BCmmnService g2BCmmnService, ScsbidInfoSttsService scsbidInfoSttsService) {
-		super(publicWebClient, g2BCmmnService, scsbidInfoSttsService);
+	public ScsbidListSttusFrgcptPPSSrchJob(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, ScsbidInfoSttsService scsbidInfoSttsService) {
+		super(publicWebClient, asyncTaskExecutor, g2BCmmnService, scsbidInfoSttsService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		try {
-			getScsbidListSttusFrgcptPPSSrch();
-		} catch (Exception ignore) {
-		}
+		getScsbidListSttusFrgcptPPSSrch();
 	}
 }

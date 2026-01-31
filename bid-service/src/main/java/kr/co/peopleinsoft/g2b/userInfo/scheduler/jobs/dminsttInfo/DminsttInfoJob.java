@@ -6,12 +6,13 @@ import kr.co.peopleinsoft.g2b.userInfo.service.DminsttInfoService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class DminsttInfoJob extends DminsttInfoController implements Job {
 
-	public DminsttInfoJob(G2BCmmnService g2BCmmnService, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
-		super(g2BCmmnService, publicWebClient, dminsttInfoService);
+	public DminsttInfoJob(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
+		super(g2BCmmnService, asyncTaskExecutor, publicWebClient, dminsttInfoService);
 	}
 
 	@Override
