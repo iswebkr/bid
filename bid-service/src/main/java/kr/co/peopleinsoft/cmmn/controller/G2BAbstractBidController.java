@@ -3,6 +3,7 @@ package kr.co.peopleinsoft.cmmn.controller;
 import jakarta.annotation.Resource;
 import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.dto.BidResponseDto;
+import kr.co.peopleinsoft.cmmn.service.BidSchdulHistManageService;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ public class G2BAbstractBidController extends CmmnAbstractController {
 
 	@Resource(name = "publicWebClient")
 	protected WebClient publicWebClient;
+
+	@Resource(name = "bidSchdulHistManageService")
+	protected BidSchdulHistManageService bidSchdulHistManageService;
 
 	protected ResponseEntity<String> asyncProcess(Runnable runnable, TaskExecutor taskExecutor) {
 		CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(runnable, taskExecutor)

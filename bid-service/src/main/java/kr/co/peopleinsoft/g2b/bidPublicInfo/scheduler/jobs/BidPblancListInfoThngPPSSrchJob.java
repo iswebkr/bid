@@ -14,6 +14,6 @@ public class BidPblancListInfoThngPPSSrchJob extends BidPublicInfoController imp
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getBidPblancListInfoThngPPSSrch();
+		getBidPblancListInfoThng();
 	}
 }

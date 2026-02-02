@@ -13,6 +13,20 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 
 	private final Logger logger = LoggerFactory.getLogger(BidSchdulHistManageService.class);
 
+	public <T extends BidRequestDto> int getStartPage(T requestDto) {
+		int startPage = 1;
+		BidColctHistDto paramDto = BidColctHistDto.builder()
+			.colctId(requestDto.getServiceId())
+			.colctBgnDt(requestDto.getInqryBgnDt())
+			.colctEndDt(requestDto.getInqryEndDt())
+			.build();
+		BidColctHistResultDto resultDto = cmmnMapper.selectOne("BidColctHistMapper.selectColctHistResultByDate", paramDto);
+		if (resultDto != null) {
+			startPage = resultDto.getCmplColctPage();
+		}
+		return startPage;
+	}
+
 	public <T extends BidRequestDto> BidColctHistResultDto selectBidColctHistResultDto(T requestDto) {
 		BidColctHistDto paramDto = BidColctHistDto.builder()
 			.colctId(requestDto.getServiceId())
@@ -24,20 +38,5 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 
 	public void updateColctPageInfo(BidColctHistDto paramDto) {
 		cmmnMapper.update("BidColctHistMapper.updateColctPageInfo", paramDto);
-	}
-
-	public <T extends BidRequestDto> boolean colctCmplYn(T requestDto) {
-		BidColctHistDto paramDto = BidColctHistDto.builder()
-			.colctId(requestDto.getServiceId())
-			.colctBgnDt(requestDto.getInqryBgnDt())
-			.colctEndDt(requestDto.getInqryEndDt())
-			.build();
-
-		BidColctHistResultDto resultDto = cmmnMapper.selectOne("BidColctHistMapper.selectColctHistResultByDate", paramDto);
-
-		if (resultDto == null) {
-			return false;
-		}
-		return "수집완료".equals(resultDto.getColctState());
 	}
 }

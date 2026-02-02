@@ -32,37 +32,37 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고공사조회")
-	@GetMapping("/getBidPblancListInfoCnstwkPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoCnstwkPPSSrch() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회"), asyncTaskExecutor);
-	}
-
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회")
-	@GetMapping("/getBidPblancListInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoFrgcptPPSSrch() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회"), asyncTaskExecutor);
+	@GetMapping("/getBidPblancListInfoCnstwk")
+	public ResponseEntity<String> getBidPblancListInfoCnstwk() {
+		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoCnstwk", "공사", "나라장터검색조건에 의한 입찰공고공사조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고용역조회")
-	@GetMapping("/getBidPblancListInfoServcPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoServcPPSSrch() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회"), asyncTaskExecutor);
+	@GetMapping("/getBidPblancListInfoServc")
+	public ResponseEntity<String> getBidPblancListInfoServc() {
+		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoServc", "용역", "나라장터검색조건에 의한 입찰공고용역조회"), asyncTaskExecutor);
+	}
+
+	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회")
+	@GetMapping("/getBidPblancListInfoFrgcpt")
+	public ResponseEntity<String> getBidPblancListInfoFrgcpt() {
+		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoFrgcpt", "외자", "나라장터검색조건에 의한 입찰공고외자조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 입찰공고물품조회")
-	@GetMapping("/getBidPblancListInfoThngPPSSrch")
-	public ResponseEntity<String> getBidPblancListInfoThngPPSSrch() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회"), asyncTaskExecutor);
+	@GetMapping("/getBidPblancListInfoThng")
+	public ResponseEntity<String> getBidPblancListInfoThng() {
+		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoThng", "물품", "나라장터검색조건에 의한 입찰공고물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "입찰공고 이번 년도 데이터만 조회")
 	@GetMapping("/colctThisYearBidPblancListInfo")
 	public ResponseEntity<String> colctThisYearBidPblancListInfo() {
 		List<Runnable> runnables = List.of(
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoCnstwkPPSSrch", "공사", "나라장터검색조건에 의한 입찰공고공사조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoServcPPSSrch", "용역", "나라장터검색조건에 의한 입찰공고용역조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoFrgcptPPSSrch", "외자", "나라장터검색조건에 의한 입찰공고외자조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoThngPPSSrch", "물품", "나라장터검색조건에 의한 입찰공고물품조회")
+			// () -> saveThisYearBidPblancListInfo("getBidPblancListInfoCnstwk", "공사", "나라장터검색조건에 의한 입찰공고공사조회"),
+			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoServc", "용역", "나라장터검색조건에 의한 입찰공고용역조회")
+			//() -> saveThisYearBidPblancListInfo("getBidPblancListInfoFrgcpt", "외자", "나라장터검색조건에 의한 입찰공고외자조회"),
+			//() -> saveThisYearBidPblancListInfo("getBidPblancListInfoThng", "물품", "나라장터검색조건에 의한 입찰공고물품조회")
 		);
 		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}

@@ -14,6 +14,6 @@ public class PublicPrcureThngInfoFrgcptPPSSrchJob extends HrcspSsstndrdInfoContr
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getPublicPrcureThngInfoFrgcptPPSSrch();
+		getPublicPrcureThngInfoFrgcpt();
 	}
 }

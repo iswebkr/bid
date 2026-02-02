@@ -3,19 +3,18 @@ package kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
+import kr.co.peopleinsoft.cmmn.dto.BidColctHistDto;
+import kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoRequestDto;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoResponseDto;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.service.HrcspSsstndrdInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/g2b/hrcspSsstndrdInfoService")
@@ -38,38 +37,38 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 		this.hrcspSsstndrdInfoService = hrcspSsstndrdInfoService;
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 사전규격 공사 목록 조회")
-	@GetMapping("/getPublicPrcureThngInfoCnstwkPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoCnstwkPPSSrch() {
-		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 사전규격 공사 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "사전규격 공사 목록 조회")
+	@GetMapping("/getBidPblancListInfoCnstwk")
+	public ResponseEntity<String> getPublicPrcureThngInfoCnstwk() {
+		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoCnstwk", "사전규격 공사 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 사전규격 용역 목록 조회")
-	@GetMapping("/getPublicPrcureThngInfoServcPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoServcPPSSrch() {
-		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoServcPPSSrch", "나라장터 검색조건에 의한 사전규격 용역 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "사전규격 용역 목록 조회")
+	@GetMapping("/getBidPblancListInfoServc")
+	public ResponseEntity<String> getPublicPrcureThngInfoServc() {
+		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoServc", "사전규격 용역 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 사전규격 외자 목록 조회")
-	@GetMapping("/getPublicPrcureThngInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoFrgcptPPSSrch() {
-		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 사전규격 외자 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "사전규격 외자 목록 조회")
+	@GetMapping("/getBidPblancListInfoFrgcpt")
+	public ResponseEntity<String> getPublicPrcureThngInfoFrgcpt() {
+		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoFrgcpt", "사전규격 외자 목록 조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 사전규격 물품 목록 조회")
-	@GetMapping("/getPublicPrcureThngInfoThngPPSSrch")
-	public ResponseEntity<String> getPublicPrcureThngInfoThngPPSSrch() {
-		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoThngPPSSrch", "나라장터 검색조건에 의한 사전규격 물품 목록 조회"), asyncTaskExecutor);
+	@GetMapping("/getBidPblancListInfoThng")
+	public ResponseEntity<String> getPublicPrcureThngInfoThng() {
+		return asyncProcess(() -> savePublicPrcureThngInfo("getPublicPrcureThngInfoThng", "입찰공고목록 정보에 대한 물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "이번년도 나라장터 검색조건에 의한 사전규격 목록 조회")
 	@GetMapping("/colctThisYearPublicPrcureThngInfo")
 	public ResponseEntity<String> colctThisYearPublicPrcureThngInfo() {
 		List<Runnable> colcList = List.of(
-			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 사전규격 공사 목록 조회"),
-			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServcPPSSrch", "나라장터 검색조건에 의한 사전규격 용역 목록 조회"),
-			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 사전규격 외자 목록 조회"),
-			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThngPPSSrch", "나라장터 검색조건에 의한 사전규격 물품 목록 조회")
+			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwk", "사전규격 공사 목록 조회"),
+			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServc", "사전규격 용역 목록 조회")
+			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcpt", "사전규격 외자 목록 조회"),
+			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThng", "사전규격 물품 목록 조회")
 		);
 		return asyncParallelProcess(colcList, asyncTaskExecutor);
 	}
@@ -77,7 +76,7 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 	private void saveThisYearPublicPrcureThngInfo(String serviceId, String serviceDescription) {
 		int thisYear = LocalDateTime.now().getYear();
 		int thisMonth = LocalDateTime.now().getMonthValue();
-		savePublicPrcureThngInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
+		savePublicPrcureThngInfo(serviceId, serviceDescription, thisYear, thisYear, thisMonth, thisMonth);
 	}
 
 	private void savePublicPrcureThngInfo(String serviceId, String serviceDescription) {
@@ -94,9 +93,10 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				int startPage;
-				int endPage;
+				int totalPage;
 
-				HrcspSsstndrdInfoRequestDto requestDto = HrcspSsstndrdInfoRequestDto.builder()
+				HrcspSsstndrdInfoRequestDto requestDto = HrcspSsstndrdInfoRequestDto
+					.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
 					.serviceId(serviceId)
 					.serviceDescription(serviceDescription)
@@ -107,59 +107,60 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 					.type("json")
 					.build();
 
-				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-					.scheme("https")
-					.host("apis.data.go.kr")
-					.pathSegment("1230000/ao/HrcspSsstndrdInfoService", requestDto.getServiceId())
-					.queryParam("serviceKey", requestDto.getServiceKey())
-					.queryParam("pageNo", 1)
-					.queryParam("numOfRows", requestDto.getNumOfRows())
-					.queryParam("inqryDiv", requestDto.getInqryDiv())
-					.queryParam("type", "json")
-					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				// URI 를 빌드하고
+				UriComponentsBuilder firstUriBuilder = getUriComponentsBuilder(requestDto);
+				URI firstPageUri = firstUriBuilder.build().toUri();
 
-				URI firstPageUri = uriComponentsBuilder.build().toUri();
+				// URI 호출 결과값을 기반으로
+				HrcspSsstndrdInfoResponseDto responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, firstPageUri);
 
-				// 1 페이지 API 호출
-				HrcspSsstndrdInfoResponseDto responseDto = publicWebClient.get()
-					.uri(firstPageUri)
-					.retrieve()
-					.bodyToMono(HrcspSsstndrdInfoResponseDto.class)
-					.block();
-
+				// 첫페이지 데이터 없으면 이후 작업 진행 없음
 				if (responseDto == null) {
-					throw new RuntimeException("API 호출 실패");
+					return;
 				}
 
-				int totalCount = responseDto.getResponse().getBody().getTotalCount();
-				int totalPage = (int) Math.ceil((double) totalCount / 100);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				totalPage = responseDto.getTotalPage();
 
-				requestDto.setTotalCount(totalCount);
-				requestDto.setTotalPage(totalPage);
+				// 첫 페이지부터 전체 페이지수 만큼 루프를 돌며 데이터 저장
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(firstPageUri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						URI pagedUri = getUriComponentsBuilder(requestDto).cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
 
-				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+						// 페이지별 uri 호출
+						HrcspSsstndrdInfoResponseDto pageResponseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, pagedUri);
 
-				startPage = (Integer) pageMap.get("startPage");
-				endPage = (Integer) pageMap.get("endPage");
+						// 이전에 기록된 수집정보 조회
+						BidColctHistResultDto bidColctHistResultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
+						/*
+						기존에 수집된 데이터가 존재하는 경우 api 의 총 카운트와 최종 수집된 데이터의 총 카운트가 다르면 데이터의
+						변경이 일어난 것으로 간주하고 수집 대상 카운트수와 페이지수를 변경 적용
+						 */
+						if(bidColctHistResultDto != null) {
+							if (!Objects.equals(bidColctHistResultDto.getMaxTotalCnt(), pageResponseDto.getTotalCount())) {
+								// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+								BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
+									.colctTotPage(pageResponseDto.getTotalPage())
+									.colctTotCnt(pageResponseDto.getTotalCount())
+									.colctId(requestDto.getServiceId())
+									.colctBgnDt(requestDto.getInqryBgnDt())
+									.colctEndDt(requestDto.getInqryEndDt())
+									.build();
 
-				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-					URI uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
+								// 변경된 데이터 및 페이지 정보 변경 적용
+								bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
+							}
+						}
 
-					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
-
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
+						// 페이지별 수집 데이터 저장 (100건씩)
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(pagedUri, pageNo, pageResponseDto.getItems(), requestDto);
 					}
-				}
 
-				if (startPage < endPage) {
-					// 30초
 					try {
 						Thread.sleep(1000 * 30);
 					} catch (InterruptedException e) {
@@ -168,5 +169,19 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 				}
 			}
 		}
+	}
+
+	private UriComponentsBuilder getUriComponentsBuilder(HrcspSsstndrdInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/HrcspSsstndrdInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("type", "json")
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

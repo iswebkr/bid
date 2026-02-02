@@ -17,7 +17,6 @@ public class G2BCmmnService {
 	public G2BCmmnService(BidSchdulHistManageService bidSchdulHistManageService) {
 		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
-
 	/**
 	 * 페이지 보정
 	 * <p>
@@ -64,7 +63,7 @@ public class G2BCmmnService {
 			resultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
 		}
 
-		if(Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
+		if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
 			// 아직 수집해야 할 데이터가 남아있음 여유롭게 3페이지 전 부터 재수집
 			// 배치가 등록한 데이터가 제대로 카운트 된다면 수집 카운트는 맞아야겠지..
 			startPage = resultDto.getCmplColctPage() - 3;
