@@ -2,18 +2,15 @@ package kr.co.peopleinsoft.g2b.bidPublicInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.service.BidPublicInfoService;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -26,17 +23,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/bidPublicInfoService")
 @Tag(name = "조달청_나라장터 입찰공고정보서비스", description = "https://www.data.go.kr/data/15129394/openapi.do")
-public class BidPublicInfoController extends CmmnAbstractController {
+public class BidPublicInfoController extends G2BAbstractBidController {
 
-	private final G2BCmmnService g2BCmmnService;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final WebClient publicWebClient;
 	private final BidPublicInfoService bidPublicInfoService;
 
-	public BidPublicInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, BidPublicInfoService bidPublicInfoService) {
-		this.g2BCmmnService = g2BCmmnService;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.publicWebClient = publicWebClient;
+	public BidPublicInfoController(BidPublicInfoService bidPublicInfoService) {
 		this.bidPublicInfoService = bidPublicInfoService;
 	}
 

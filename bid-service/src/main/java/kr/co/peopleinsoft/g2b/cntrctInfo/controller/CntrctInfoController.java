@@ -2,7 +2,7 @@ package kr.co.peopleinsoft.g2b.cntrctInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoReponseDto;
@@ -26,17 +26,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/cntrctInfoService")
 @Tag(name = "나라장터 계약정보서비스", description = "https://www.data.go.kr/data/15129427/openapi.do")
-public class CntrctInfoController extends CmmnAbstractController {
+public class CntrctInfoController extends G2BAbstractBidController {
 
-	private final G2BCmmnService g2BCmmnService;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final WebClient publicWebClient;
 	private final CntrctInfoService cntrctInfoService;
 
-	public CntrctInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, CntrctInfoService cntrctInfoService) {
-		this.g2BCmmnService = g2BCmmnService;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.publicWebClient = publicWebClient;
+	public CntrctInfoController(CntrctInfoService cntrctInfoService) {
 		this.cntrctInfoService = cntrctInfoService;
 	}
 

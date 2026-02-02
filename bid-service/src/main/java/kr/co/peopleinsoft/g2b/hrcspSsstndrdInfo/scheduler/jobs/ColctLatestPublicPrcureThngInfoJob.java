@@ -1,18 +1,15 @@
 package kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.scheduler.jobs;
 
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.controller.HrcspSsstndrdInfoController;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.service.HrcspSsstndrdInfoService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.web.reactive.function.client.WebClient;
 
 public class ColctLatestPublicPrcureThngInfoJob extends HrcspSsstndrdInfoController implements Job {
 
-	public ColctLatestPublicPrcureThngInfoJob(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
-		super(publicWebClient, asyncTaskExecutor, g2BCmmnService, hrcspSsstndrdInfoService);
+	public ColctLatestPublicPrcureThngInfoJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
+		super(hrcspSsstndrdInfoService);
 	}
 
 	@Override

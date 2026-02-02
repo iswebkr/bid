@@ -2,20 +2,15 @@ package kr.co.peopleinsoft.g2b.userInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.DminsttInfoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -27,19 +22,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/usrInfoService")
 @Tag(name = "조달청_나라장터 사용자정보 서비스 - 수요기관정보조회", description = "https://www.data.go.kr/data/15129466/openapi.do")
-public class DminsttInfoController extends CmmnAbstractController {
+public class DminsttInfoController extends G2BAbstractBidController {
 
-	private static final Logger logger = LoggerFactory.getLogger(DminsttInfoController.class);
-
-	private final G2BCmmnService g2BCmmnService;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final WebClient publicWebClient;
 	private final DminsttInfoService dminsttInfoService;
 
-	public DminsttInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, DminsttInfoService dminsttInfoService) {
-		this.g2BCmmnService = g2BCmmnService;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.publicWebClient = publicWebClient;
+	public DminsttInfoController(DminsttInfoService dminsttInfoService) {
 		this.dminsttInfoService = dminsttInfoService;
 	}
 

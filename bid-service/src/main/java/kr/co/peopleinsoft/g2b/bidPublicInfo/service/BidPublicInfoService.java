@@ -20,7 +20,7 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 	}
 
 	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, T requestDto) {
-		int rowCnt = 0;
+		int rowCnt;
 
 		BidPublicInfoResponseDto responseDto = publicWebClient.get()
 			.uri(uri)

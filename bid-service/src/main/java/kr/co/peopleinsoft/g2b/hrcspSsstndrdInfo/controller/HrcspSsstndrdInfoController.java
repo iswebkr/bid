@@ -2,7 +2,7 @@ package kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoRequestDto;
@@ -28,19 +28,13 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/hrcspSsstndrdInfoService")
 @Tag(name = "나라장터 사전규격정보서비스", description = "https://www.data.go.kr/data/15129437/openapi.do")
-public class HrcspSsstndrdInfoController extends CmmnAbstractController {
+public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 
 	private static final Logger logger = LoggerFactory.getLogger(HrcspSsstndrdInfoController.class);
 
-	private final WebClient publicWebClient;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final G2BCmmnService g2BCmmnService;
 	private final HrcspSsstndrdInfoService hrcspSsstndrdInfoService;
 
-	public HrcspSsstndrdInfoController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
-		this.publicWebClient = publicWebClient;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.g2BCmmnService = g2BCmmnService;
+	public HrcspSsstndrdInfoController(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
 		this.hrcspSsstndrdInfoService = hrcspSsstndrdInfoService;
 	}
 

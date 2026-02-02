@@ -8,18 +8,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.mois.stanOrgCd.dto.StanOrgCdHeadDto;
 import kr.co.peopleinsoft.mois.stanOrgCd.service.StanOrgCdService;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -30,17 +27,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/mois")
 @Tag(name = "행정안전부 행정표준기관코드", description = "https://www.data.go.kr/data/15129427/openapi.do")
-public class StanOrgCdController extends CmmnAbstractController {
+public class StanOrgCdController extends G2BAbstractBidController {
 
-	private final G2BCmmnService g2BCmmnService;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final WebClient publicWebClient;
 	private final StanOrgCdService stanOrgCdService;
 
-	public StanOrgCdController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, StanOrgCdService stanOrgCdService) {
-		this.g2BCmmnService = g2BCmmnService;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.publicWebClient = publicWebClient;
+	public StanOrgCdController(StanOrgCdService stanOrgCdService) {
 		this.stanOrgCdService = stanOrgCdService;
 	}
 

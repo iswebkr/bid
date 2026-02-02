@@ -2,18 +2,15 @@ package kr.co.peopleinsoft.g2b.scsbidInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailRequestDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailResponseDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultPreparPcDetailService;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -26,17 +23,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/scsbidInfoService")
 @Tag(name = "나라장터 낙찰정보서비스 - 개찰결과 예비가격상세 목록 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
-public class OpengResultPreparPcDetailController extends CmmnAbstractController {
+public class OpengResultPreparPcDetailController extends G2BAbstractBidController {
 
-	private final WebClient publicWebClient;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final G2BCmmnService g2BCmmnService;
 	private final OpengResultPreparPcDetailService opengResultPreparPcDetailService;
 
-	public OpengResultPreparPcDetailController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, OpengResultPreparPcDetailService opengResultPreparPcDetailService) {
-		this.publicWebClient = publicWebClient;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.g2BCmmnService = g2BCmmnService;
+	public OpengResultPreparPcDetailController(OpengResultPreparPcDetailService opengResultPreparPcDetailService) {
 		this.opengResultPreparPcDetailService = opengResultPreparPcDetailService;
 	}
 

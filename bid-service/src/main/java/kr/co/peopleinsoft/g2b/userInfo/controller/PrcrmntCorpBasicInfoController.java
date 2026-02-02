@@ -2,18 +2,15 @@ package kr.co.peopleinsoft.g2b.userInfo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.PrcrmntCorpBasicInfoService;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -25,17 +22,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/usrInfoService")
 @Tag(name = "조달청_나라장터 사용자정보 서비스 - 조달업체 기본정보 조회", description = "https://www.data.go.kr/data/15129466/openapi.do")
-public class PrcrmntCorpBasicInfoController extends CmmnAbstractController {
+public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 
-	private final G2BCmmnService g2BCmmnService;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final WebClient publicWebClient;
 	private final PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService;
 
-	public PrcrmntCorpBasicInfoController(G2BCmmnService g2BCmmnService, AsyncTaskExecutor asyncTaskExecutor, WebClient publicWebClient, PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService) {
-		this.g2BCmmnService = g2BCmmnService;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.publicWebClient = publicWebClient;
+	public PrcrmntCorpBasicInfoController(PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService) {
 		this.prcrmntCorpBasicInfoService = prcrmntCorpBasicInfoService;
 	}
 

@@ -3,6 +3,7 @@ package kr.co.peopleinsoft.g2b.scsbidInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
+import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.scsbidListSttus.ScsbidListSttusRequestDto;
@@ -26,17 +27,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/g2b/scsbidInfoService")
 @Tag(name = "나라장터 낙찰정보서비스 - 나라장터 검색조건에 의한 낙찰된 목록 현황 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
-public class ScsbidInfoSttsController extends CmmnAbstractController {
+public class ScsbidInfoSttsController extends G2BAbstractBidController {
 
-	private final WebClient publicWebClient;
-	private final AsyncTaskExecutor asyncTaskExecutor;
-	private final G2BCmmnService g2BCmmnService;
 	private final ScsbidInfoSttsService ScsbidInfoSttsService;
 
-	public ScsbidInfoSttsController(WebClient publicWebClient, AsyncTaskExecutor asyncTaskExecutor, G2BCmmnService g2BCmmnService, ScsbidInfoSttsService scsbidInfoSttsService) {
-		this.publicWebClient = publicWebClient;
-		this.asyncTaskExecutor = asyncTaskExecutor;
-		this.g2BCmmnService = g2BCmmnService;
+	public ScsbidInfoSttsController(ScsbidInfoSttsService scsbidInfoSttsService) {
 		ScsbidInfoSttsService = scsbidInfoSttsService;
 	}
 
