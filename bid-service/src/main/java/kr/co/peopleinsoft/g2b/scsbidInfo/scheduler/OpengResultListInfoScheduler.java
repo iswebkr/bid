@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.quartz.manager.CmmnScheduleManager;
 import kr.co.peopleinsoft.cmmn.quartz.service.CmmnSchedulerInfoService;
 import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.ColctLatestOpengResultListInfoJob;
-import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoCnstwkPPSSrchJob;
-import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoFrgcptPPSSrchJob;
-import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoServcPPSSrchJob;
-import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoThngPPSSrchJob;
+import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoCnstwkJob;
+import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoFrgcptJob;
+import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoServcJob;
+import kr.co.peopleinsoft.g2b.scsbidInfo.scheduler.jobs.opengResultListInfo.OpengResultListInfoThngJob;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.springframework.http.ResponseEntity;
@@ -34,50 +34,50 @@ public class OpengResultListInfoScheduler {
 		this.cmmnSchedulerInfoService = cmmnSchedulerInfoService;
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 공사 목록 조회", description = "나라장터 검색조건에 의한 개찰결과 공사 목록 조회", parameters = {
+	@Operation(summary = "개찰결과 공사 목록 조회", description = "개찰결과 공사 목록 조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/opengResultListInfo/opengResultListInfoCnstwkPPSSrchJob")
-	public ResponseEntity<String> opengResultListInfoCnstwkPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/opengResultListInfo/OpengResultListInfoCnstwkJob")
+	public ResponseEntity<String> OpengResultListInfoCnstwkJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 2 * * ?");
-		cmmnScheduleManager.deleteJob("OpengResultListInfoCnstwkPPSSrchJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OpengResultListInfoCnstwkPPSSrchJob.class, "OpengResultListInfoCnstwkPPSSrchJob", "낙찰정보", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("OpengResultListInfoCnstwkJob", "낙찰정보"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(OpengResultListInfoCnstwkJob.class, "OpengResultListInfoCnstwkJob", "낙찰정보", "개찰결과 공사 목록 조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 용역 조회", description = "나라장터 검색조건에 의한 개찰결과 용역 목록 조회", parameters = {
+	@Operation(summary = "개찰결과 용역 조회", description = "개찰결과 용역 목록 조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/opengResultListInfo/opengResultListInfoServcPPSSrchJob")
-	public ResponseEntity<String> opengResultListInfoServcPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/opengResultListInfo/OpengResultListInfoServcJob")
+	public ResponseEntity<String> OpengResultListInfoServcJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 2 * * ?");
-		cmmnScheduleManager.deleteJob("OpengResultListInfoServcPPSSrchJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OpengResultListInfoServcPPSSrchJob.class, "OpengResultListInfoServcPPSSrchJob", "낙찰정보", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("OpengResultListInfoServcJob", "낙찰정보"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(OpengResultListInfoServcJob.class, "OpengResultListInfoServcJob", "낙찰정보", "개찰결과 용역 목록 조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 외자 조회", description = "나라장터 검색조건에 의한 개찰결과 외자 목록 조회", parameters = {
+	@Operation(summary = "개찰결과 외자 조회", description = "개찰결과 외자 목록 조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/opengResultListInfo/opengResultListInfoFrgcptPPSSrchJob")
-	public ResponseEntity<String> opengResultListInfoFrgcptPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/opengResultListInfo/OpengResultListInfoFrgcptJob")
+	public ResponseEntity<String> OpengResultListInfoFrgcptJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 2 * * ?");
-		cmmnScheduleManager.deleteJob("OpengResultListInfoFrgcptPPSSrchJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OpengResultListInfoFrgcptPPSSrchJob.class, "OpengResultListInfoFrgcptPPSSrchJob", "낙찰정보", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("OpengResultListInfoFrgcptJob", "낙찰정보"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(OpengResultListInfoFrgcptJob.class, "OpengResultListInfoFrgcptJob", "낙찰정보", "개찰결과 외자 목록 조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 물품 조회", description = "나라장터 검색조건에 의한 개찰결과 물품 목록 조회", parameters = {
+	@Operation(summary = "개찰결과 물품 조회", description = "개찰결과 물품 목록 조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/opengResultListInfo/opengResultListInfoThngPPSSrchJob")
-	public ResponseEntity<String> opengResultListInfoThngPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/opengResultListInfo/OpengResultListInfoThngJob")
+	public ResponseEntity<String> OpengResultListInfoThngJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 2 * * ?");
-		cmmnScheduleManager.deleteJob("OpengResultListInfoThngPPSSrchJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OpengResultListInfoThngPPSSrchJob.class, "OpengResultListInfoThngPPSSrchJob", "낙찰정보", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("OpengResultListInfoThngJob", "낙찰정보"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(OpengResultListInfoThngJob.class, "OpengResultListInfoThngJob", "낙찰정보", "개찰결과 물품 목록 조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

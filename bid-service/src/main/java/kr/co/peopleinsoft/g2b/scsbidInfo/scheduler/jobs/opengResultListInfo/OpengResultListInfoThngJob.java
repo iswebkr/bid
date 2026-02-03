@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class OpengResultListInfoFrgcptPPSSrchJob extends OpengResultListInfoController implements Job {
+public class OpengResultListInfoThngJob extends OpengResultListInfoController implements Job {
 
-	public OpengResultListInfoFrgcptPPSSrchJob(OpengResultListInfoService opengResultListInfoService) {
+	public OpengResultListInfoThngJob(OpengResultListInfoService opengResultListInfoService) {
 		super(opengResultListInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getOpengResultListInfoFrgcpt();
+		getOpengResultListInfoThng();
 	}
 }

@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class BidPblancListInfoCnstwkPPSSrchJob extends BidPublicInfoController implements Job {
+public class BidPblancListInfoThngJob extends BidPublicInfoController implements Job {
 
-	public BidPblancListInfoCnstwkPPSSrchJob(BidPublicInfoService bidPublicInfoService) {
+	public BidPblancListInfoThngJob(BidPublicInfoService bidPublicInfoService) {
 		super(bidPublicInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getBidPblancListInfoCnstwk();
+		getBidPblancListInfoThng();
 	}
 }

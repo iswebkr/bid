@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class PublicPrcureThngInfoFrgcptPPSSrchJob extends HrcspSsstndrdInfoController implements Job {
+public class PublicPrcureThngInfoThngJob extends HrcspSsstndrdInfoController implements Job {
 
-	public PublicPrcureThngInfoFrgcptPPSSrchJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
+	public PublicPrcureThngInfoThngJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
 		super(hrcspSsstndrdInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getPublicPrcureThngInfoFrgcpt();
+		getPublicPrcureThngInfoThng();
 	}
 }

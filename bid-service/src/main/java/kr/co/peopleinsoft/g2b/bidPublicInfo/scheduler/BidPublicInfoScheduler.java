@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.biz.controller.CmmnAbstractController;
 import kr.co.peopleinsoft.cmmn.quartz.manager.CmmnScheduleManager;
 import kr.co.peopleinsoft.cmmn.quartz.service.CmmnSchedulerInfoService;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoCnstwkPPSSrchJob;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoFrgcptPPSSrchJob;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoServcPPSSrchJob;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoThngPPSSrchJob;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoCnstwkJob;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoFrgcptJob;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoServcJob;
+import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.BidPblancListInfoThngJob;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.scheduler.jobs.ColctLatestBidPblancListInfoJob;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
@@ -38,50 +38,50 @@ public class BidPublicInfoScheduler extends CmmnAbstractController {
 		this.cmmnSchedulerInfoService = cmmnSchedulerInfoService;
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고공사조회", description = "나라장터검색조건에 의한 입찰공고공사조회", parameters = {
+	@Operation(summary = "입찰공고공사조회", description = "입찰공고공사조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/bidPblancListInfoCnstwkPPSSrchJob")
-	public ResponseEntity<String> bidPblancListInfoCnstwkPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/BidPblancListInfoCnstwkJob")
+	public ResponseEntity<String> BidPblancListInfoCnstwkJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 12 * * ?");
-		cmmnScheduleManager.deleteJob("BidPblancListInfoCnstwkPPSSrchJob", "입찰공고"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(BidPblancListInfoCnstwkPPSSrchJob.class, "BidPblancListInfoCnstwkPPSSrchJob", "입찰공고", "나라장터검색조건에 의한 입찰공고공사조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("BidPblancListInfoCnstwkJob", "입찰공고"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(BidPblancListInfoCnstwkJob.class, "BidPblancListInfoCnstwkJob", "입찰공고", "입찰공고공사조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회", description = "나라장터검색조건에 의한 입찰공고외자조회", parameters = {
+	@Operation(summary = "입찰공고외자조회", description = "입찰공고외자조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/bidPblancListInfoFrgcptPPSSrchJob")
-	public ResponseEntity<String> bidPblancListInfoFrgcptPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/BidPblancListInfoFrgcptJob")
+	public ResponseEntity<String> BidPblancListInfoFrgcptJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 12 * * ?");
-		cmmnScheduleManager.deleteJob("BidPblancListInfoFrgcptPPSSrchJob", "입찰공고"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(BidPblancListInfoFrgcptPPSSrchJob.class, "BidPblancListInfoFrgcptPPSSrchJob", "입찰공고", "나라장터검색조건에 의한 입찰공고외자조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("BidPblancListInfoFrgcptJob", "입찰공고"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(BidPblancListInfoFrgcptJob.class, "BidPblancListInfoFrgcptJob", "입찰공고", "입찰공고외자조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고용역조회", description = "나라장터검색조건에 의한 입찰공고용역조회", parameters = {
+	@Operation(summary = "입찰공고용역조회", description = "입찰공고용역조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/bidPblancListInfoServcPPSSrchJob")
-	public ResponseEntity<String> bidPblancListInfoServcPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/BidPblancListInfoServcJob")
+	public ResponseEntity<String> BidPblancListInfoServcJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 12 * * ?");
-		cmmnScheduleManager.deleteJob("BidPblancListInfoServcPPSSrchJob", "입찰공고"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(BidPblancListInfoServcPPSSrchJob.class, "BidPblancListInfoServcPPSSrchJob", "입찰공고", "나라장터검색조건에 의한 입찰공고용역조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("BidPblancListInfoServcJob", "입찰공고"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(BidPblancListInfoServcJob.class, "BidPblancListInfoServcJob", "입찰공고", "입찰공고용역조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고물품조회", description = "나라장터검색조건에 의한 입찰공고물품조회", parameters = {
+	@Operation(summary = "입찰공고물품조회", description = "입찰공고물품조회", parameters = {
 		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
 	})
-	@GetMapping("/bidPblancListInfoThngPPSSrchJob")
-	public ResponseEntity<String> bidPblancListInfoThngPPSSrchJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
+	@GetMapping("/BidPblancListInfoThngJob")
+	public ResponseEntity<String> BidPblancListInfoThngJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
 		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 12 * * ?");
-		cmmnScheduleManager.deleteJob("BidPblancListInfoThngPPSSrchJob", "입찰공고"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(BidPblancListInfoThngPPSSrchJob.class, "BidPblancListInfoThngPPSSrchJob", "입찰공고", "나라장터검색조건에 의한 입찰공고물품조회", cronJobExpression, new HashMap<>());
+		cmmnScheduleManager.deleteJob("BidPblancListInfoThngJob", "입찰공고"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(BidPblancListInfoThngJob.class, "BidPblancListInfoThngJob", "입찰공고", "입찰공고물품조회", cronJobExpression, new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

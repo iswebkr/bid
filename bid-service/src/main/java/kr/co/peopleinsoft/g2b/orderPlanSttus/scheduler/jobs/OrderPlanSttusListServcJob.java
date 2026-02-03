@@ -6,9 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class OrderPlanSttusListServcPPSSrchJob extends OrderPlanSttusController implements Job {
+public class OrderPlanSttusListServcJob extends OrderPlanSttusController implements Job {
 
-	public OrderPlanSttusListServcPPSSrchJob(OrderPlanSttusService orderPlanSttusService) {
+	public OrderPlanSttusListServcJob(OrderPlanSttusService orderPlanSttusService) {
 		super(orderPlanSttusService);
 	}
 

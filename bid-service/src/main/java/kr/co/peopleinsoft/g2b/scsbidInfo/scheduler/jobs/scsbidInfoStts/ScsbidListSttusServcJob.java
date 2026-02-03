@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class ScsbidListSttusFrgcptPPSSrchJob extends ScsbidInfoSttsController implements Job {
+public class ScsbidListSttusServcJob extends ScsbidInfoSttsController implements Job {
 
-	public ScsbidListSttusFrgcptPPSSrchJob(ScsbidInfoSttsService scsbidInfoSttsService) {
+	public ScsbidListSttusServcJob(ScsbidInfoSttsService scsbidInfoSttsService) {
 		super(scsbidInfoSttsService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getScsbidListSttusFrgcpt();
+		getScsbidListSttusServc();
 	}
 }

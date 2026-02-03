@@ -6,9 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class OpengResultListInfoCnstwkPPSSrchJob extends OpengResultListInfoController implements Job {
+public class OpengResultListInfoCnstwkJob extends OpengResultListInfoController implements Job {
 
-	public OpengResultListInfoCnstwkPPSSrchJob(OpengResultListInfoService opengResultListInfoService) {
+	public OpengResultListInfoCnstwkJob(OpengResultListInfoService opengResultListInfoService) {
 		super(opengResultListInfoService);
 	}
 

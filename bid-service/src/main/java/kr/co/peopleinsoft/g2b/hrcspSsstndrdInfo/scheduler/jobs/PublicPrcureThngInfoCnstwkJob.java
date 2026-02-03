@@ -6,9 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class PublicPrcureThngInfoCnstwkPPSSrchJob extends HrcspSsstndrdInfoController implements Job {
+public class PublicPrcureThngInfoCnstwkJob extends HrcspSsstndrdInfoController implements Job {
 
-	public PublicPrcureThngInfoCnstwkPPSSrchJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
+	public PublicPrcureThngInfoCnstwkJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
 		super(hrcspSsstndrdInfoService);
 	}
 

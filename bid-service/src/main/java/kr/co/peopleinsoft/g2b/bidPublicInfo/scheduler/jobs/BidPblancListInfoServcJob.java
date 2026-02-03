@@ -6,9 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class BidPblancListInfoServcPPSSrchJob extends BidPublicInfoController implements Job {
+public class BidPblancListInfoServcJob extends BidPublicInfoController implements Job {
 
-	public BidPblancListInfoServcPPSSrchJob(BidPublicInfoService bidPublicInfoService) {
+	public BidPblancListInfoServcJob(BidPublicInfoService bidPublicInfoService) {
 		super(bidPublicInfoService);
 	}
 
