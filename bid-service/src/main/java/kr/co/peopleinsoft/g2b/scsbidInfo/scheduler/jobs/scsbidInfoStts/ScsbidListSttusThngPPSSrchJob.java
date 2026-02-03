@@ -14,6 +14,6 @@ public class ScsbidListSttusThngPPSSrchJob extends ScsbidInfoSttsController impl
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getScsbidListSttusThngPPSSrch();
+		getScsbidListSttusThng();
 	}
 }

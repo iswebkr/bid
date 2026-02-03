@@ -14,6 +14,6 @@ public class OrderPlanSttusListServcPPSSrchJob extends OrderPlanSttusController 
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getOrderPlanSttusListServcPPSSrch();
+		getOrderPlanSttusListServc();
 	}
 }

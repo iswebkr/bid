@@ -27,6 +27,9 @@ public class BidRequestDto implements Serializable {
 	private String inqryBgnDt; // 조회기준시작일시 (yyyyMMddHHmm)
 	private String inqryEndDt; // 조회기준종료일시 (yyyyMMddHHmm)
 
+	private String orderBgnYm;
+	private String orderEndYm;
+
 	private int totalPage;
 	private int totalCount;
 }

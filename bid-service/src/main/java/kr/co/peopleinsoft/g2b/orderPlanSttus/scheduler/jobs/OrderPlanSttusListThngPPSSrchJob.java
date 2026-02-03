@@ -14,6 +14,6 @@ public class OrderPlanSttusListThngPPSSrchJob extends OrderPlanSttusController i
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getOrderPlanSttusListThngPPSSrch();
+		getOrderPlanSttusListThng();
 	}
 }

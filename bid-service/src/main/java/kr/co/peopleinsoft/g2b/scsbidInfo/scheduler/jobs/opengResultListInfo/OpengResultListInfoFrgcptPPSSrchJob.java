@@ -14,6 +14,6 @@ public class OpengResultListInfoFrgcptPPSSrchJob extends OpengResultListInfoCont
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getOpengResultListInfoFrgcptPPSSrch();
+		getOpengResultListInfoFrgcpt();
 	}
 }

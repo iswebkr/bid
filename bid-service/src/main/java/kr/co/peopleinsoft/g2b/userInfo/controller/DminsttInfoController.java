@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
+import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.DminsttInfoService;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/usrInfoService")
@@ -62,9 +61,9 @@ public class DminsttInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				int startPage;
-				int endPage;
+				int totalPage;
 
-				BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
+				DminsttInfoRequestDto requestDto = DminsttInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
 					.serviceId(serviceId)
 					.serviceDescription(serviceDescription)
@@ -75,66 +74,59 @@ public class DminsttInfoController extends G2BAbstractBidController {
 					.type("json")
 					.build();
 
-				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-					.scheme("https")
-					.host("apis.data.go.kr")
-					.pathSegment("1230000/ao/UsrInfoService02", requestDto.getServiceId())
-					.queryParam("serviceKey", requestDto.getServiceKey())
-					.queryParam("pageNo", 1)
-					.queryParam("numOfRows", requestDto.getNumOfRows())
-					.queryParam("inqryDiv", requestDto.getInqryDiv())
-					.queryParam("type", "json")
-					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-				URI firstPageUri = uriComponentsBuilder.build().toUri();
-
-				// 1 페이지 API 호출
-				DminsttInfoResponseDto responseDto = publicWebClient.get()
-					.uri(firstPageUri)
-					.retrieve()
-					.bodyToMono(DminsttInfoResponseDto.class)
-					.block();
+				DminsttInfoResponseDto responseDto = getResponse(DminsttInfoResponseDto.class, uri);
 
 				if (responseDto == null) {
-					throw new RuntimeException("API 호출 실패");
+					return;
 				}
 
-				int totalCount = responseDto.getResponse().getBody().getTotalCount();
-				int totalPage = (int) Math.ceil((double) totalCount / 100);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				totalPage = responseDto.getTotalPage();
 
-				requestDto.setTotalCount(totalCount);
-				requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
 
-				startPage = (Integer) pageMap.get("startPage");
-				endPage = (Integer) pageMap.get("endPage");
+						responseDto = getResponse(DminsttInfoResponseDto.class, uri);
 
-				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-					URI uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
 
-					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, requestDto);
-
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
+						dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
 					}
-				}
 
-				if (startPage < endPage) {
-					// 30초
 					try {
-						Thread.sleep(1000 * 30);
+						Thread.sleep(1000 * 20);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
 		}
+	}
+
+	private UriComponentsBuilder getUriComponentsBuilder(DminsttInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/UsrInfoService02", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("type", "json")
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

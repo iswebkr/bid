@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidColctHistDto;
-import kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoRequestDto;
 import kr.co.peopleinsoft.g2b.hrcspSsstndrdInfo.dto.HrcspSsstndrdInfoResponseDto;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/g2b/hrcspSsstndrdInfoService")
@@ -65,10 +63,10 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 	@GetMapping("/colctThisYearPublicPrcureThngInfo")
 	public ResponseEntity<String> colctThisYearPublicPrcureThngInfo() {
 		List<Runnable> colcList = List.of(
-			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwk", "사전규격 공사 목록 조회"),
-			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServc", "사전규격 용역 목록 조회")
-			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcpt", "사전규격 외자 목록 조회"),
-			// () -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThng", "사전규격 물품 목록 조회")
+			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoCnstwk", "사전규격 공사 목록 조회"),
+			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoServc", "사전규격 용역 목록 조회"),
+			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoFrgcpt", "사전규격 외자 목록 조회"),
+			() -> saveThisYearPublicPrcureThngInfo("getPublicPrcureThngInfoThng", "사전규격 물품 목록 조회")
 		);
 		return asyncParallelProcess(colcList, asyncTaskExecutor);
 	}
@@ -108,11 +106,11 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 					.build();
 
 				// URI 를 빌드하고
-				UriComponentsBuilder firstUriBuilder = getUriComponentsBuilder(requestDto);
-				URI firstPageUri = firstUriBuilder.build().toUri();
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
 				// URI 호출 결과값을 기반으로
-				HrcspSsstndrdInfoResponseDto responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, firstPageUri);
+				HrcspSsstndrdInfoResponseDto responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
 
 				// 첫페이지 데이터 없으면 이후 작업 진행 없음
 				if (responseDto == null) {
@@ -123,42 +121,29 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 				startPage = bidSchdulHistManageService.getStartPage(requestDto);
 				totalPage = responseDto.getTotalPage();
 
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
+
 				// 첫 페이지부터 전체 페이지수 만큼 루프를 돌며 데이터 저장
 				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
 					if (pageNo == 1) {
-						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(firstPageUri, pageNo, responseDto.getItems(), requestDto);
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 					} else {
-						URI pagedUri = getUriComponentsBuilder(requestDto).cloneBuilder()
+						uri = uriComponentsBuilder.cloneBuilder()
 							.replaceQueryParam("pageNo", pageNo)
 							.build().toUri();
 
 						// 페이지별 uri 호출
-						HrcspSsstndrdInfoResponseDto pageResponseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, pagedUri);
+						responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
 
-						// 이전에 기록된 수집정보 조회
-						BidColctHistResultDto bidColctHistResultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
-						/*
-						기존에 수집된 데이터가 존재하는 경우 api 의 총 카운트와 최종 수집된 데이터의 총 카운트가 다르면 데이터의
-						변경이 일어난 것으로 간주하고 수집 대상 카운트수와 페이지수를 변경 적용
-						 */
-						if(bidColctHistResultDto != null) {
-							if (!Objects.equals(bidColctHistResultDto.getMaxTotalCnt(), pageResponseDto.getTotalCount())) {
-								// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-								BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
-									.colctTotPage(pageResponseDto.getTotalPage())
-									.colctTotCnt(pageResponseDto.getTotalCount())
-									.colctId(requestDto.getServiceId())
-									.colctBgnDt(requestDto.getInqryBgnDt())
-									.colctEndDt(requestDto.getInqryEndDt())
-									.build();
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
 
-								// 변경된 데이터 및 페이지 정보 변경 적용
-								bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
-							}
-						}
+						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+						updateColctPageInfo(requestDto);
 
 						// 페이지별 수집 데이터 저장 (100건씩)
-						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(pagedUri, pageNo, pageResponseDto.getItems(), requestDto);
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 					}
 
 					try {

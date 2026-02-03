@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +17,19 @@ public class BidPublicInfoResponseDto extends BidResponseDto implements Serializ
 	private static final long serialVersionUID = 1L;
 
 	private BidResponse<BidPublicInfoDto> response;
+
+	public List<BidPublicInfoDto> getItems() {
+		if (response != null) {
+			return response.getBody().getItems();
+		}
+		return new ArrayList<>();
+	}
+
+	public int getTotalCount() {
+		return response.getBody().getTotalCount();
+	}
+
+	public int getTotalPage() {
+		return (int) Math.ceil((double) response.getBody().getTotalCount() / 100);
+	}
 }

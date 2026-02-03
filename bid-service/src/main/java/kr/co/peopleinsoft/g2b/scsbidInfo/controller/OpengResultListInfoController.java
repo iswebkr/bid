@@ -18,11 +18,10 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/scsbidInfoService")
-@Tag(name = "나라장터 낙찰정보서비스 - 나라장터 검색조건에 의한 개찰결과 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
+@Tag(name = "나라장터 낙찰정보서비스 - 개찰결과 목록 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
 public class OpengResultListInfoController extends G2BAbstractBidController {
 
 	private final OpengResultListInfoService opengResultListInfoService;
@@ -31,38 +30,38 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 		this.opengResultListInfoService = opengResultListInfoService;
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 공사 목록 조회")
-	@GetMapping("/getOpengResultListInfoCnstwkPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoCnstwkPPSSrch() {
-		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "개찰결과 공사 목록 조회 ")
+	@GetMapping("/getOpengResultListInfoCnstwk")
+	public ResponseEntity<String> getOpengResultListInfoCnstwk() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoCnstwk", "개찰결과 공사 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 용역 목록 조회")
-	@GetMapping("/getOpengResultListInfoServcPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoServcPPSSrch() {
-		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "개찰결과 용역 목록 조회")
+	@GetMapping("/getOpengResultListInfoServc")
+	public ResponseEntity<String> getOpengResultListInfoServc() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoServc", "개찰결과 용역 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 외자 목록 조회")
-	@GetMapping("/getOpengResultListInfoFrgcptPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoFrgcptPPSSrch() {
-		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "개찰결과 외자 목록 조회")
+	@GetMapping("/getOpengResultListInfoFrgcpt")
+	public ResponseEntity<String> getOpengResultListInfoFrgcpt() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoFrgcpt", "개찰결과 외자 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
-	@GetMapping("/getOpengResultListInfoThngPPSSrch")
-	public ResponseEntity<String> getOpengResultListInfoThngPPSSrch() {
-		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회"), asyncTaskExecutor);
+	@Operation(summary = "개찰결과 물품 목록 조회")
+	@GetMapping("/getOpengResultListInfoThng")
+	public ResponseEntity<String> getOpengResultListInfoThng() {
+		return asyncProcess(() -> saveOpengResultListInfo("getOpengResultListInfoThng", "개찰결과 물품 목록 조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "이번년도 나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
+	@Operation(summary = "최신 낙찰 목록 현황 목록 조회")
 	@GetMapping("/colctThisYearOpengResultListInfo")
 	public ResponseEntity<String> colctThisYearOpengResultListInfo() {
 		List<Runnable> runnables = List.of(
-			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoCnstwkPPSSrch", "나라장터 검색조건에 의한 개찰결과 공사 목록 조회"),
-			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoServcPPSSrch", "나라장터 검색조건에 의한 개찰결과 용역 목록 조회"),
-			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoFrgcptPPSSrch", "나라장터 검색조건에 의한 개찰결과 외자 목록 조회"),
-			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoThngPPSSrch", "나라장터 검색조건에 의한 개찰결과 물품 목록 조회")
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoCnstwk", "개찰결과 공사 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoServc", "개찰결과 용역 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoFrgcpt", "개찰결과 외자 목록 조회"),
+			() -> saveThisYearOpengResultListInfo("getOpengResultListInfoThng", "개찰결과 물품 목록 조회")
 		);
 
 		return asyncParallelProcess(runnables, asyncTaskExecutor);
@@ -88,7 +87,7 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				int startPage;
-				int endPage;
+				int totalPage;
 
 				OpengResultListInfoRequestDto requestDto = OpengResultListInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -101,65 +100,62 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 					.type("json")
 					.build();
 
-				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-					.scheme("https")
-					.host("apis.data.go.kr")
-					.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-					.queryParam("serviceKey", requestDto.getServiceKey())
-					.queryParam("pageNo", 1)
-					.queryParam("numOfRows", requestDto.getNumOfRows())
-					.queryParam("inqryDiv", requestDto.getInqryDiv())
-					.queryParam("type", "json")
-					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-				URI firstPageUri = uriComponentsBuilder.build().toUri();
-
-				// 1 페이지 API 호출
-				OpengResultListInfoResponseDto responseDto = publicWebClient.get()
-					.uri(firstPageUri)
-					.retrieve()
-					.bodyToMono(OpengResultListInfoResponseDto.class)
-					.block();
+				OpengResultListInfoResponseDto responseDto = getResponse(OpengResultListInfoResponseDto.class, uri);
 
 				if (responseDto == null) {
-					throw new RuntimeException("API 호출 실패");
+					return;
 				}
 
-				int totalCount = responseDto.getResponse().getBody().getTotalCount();
-				int totalPage = (int) Math.ceil((double) totalCount / 100);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				totalPage = responseDto.getTotalPage();
 
-				requestDto.setTotalCount(totalCount);
-				requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						opengResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
 
-				startPage = (Integer) pageMap.get("startPage");
-				endPage = (Integer) pageMap.get("endPage");
+						responseDto = getResponse(OpengResultListInfoResponseDto.class, uri);
 
-				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-					URI uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
-					opengResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, requestDto);
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
 
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
+						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+						updateColctPageInfo(requestDto);
+
+						opengResultListInfoService.batchInsertOpengResultListInfo(uri, pageNo, responseDto.getItems(), requestDto);
 					}
-				}
 
-				if (startPage < endPage) {
-					// 30초
 					try {
-						Thread.sleep(1000 * 30);
+						Thread.sleep(1000 * 20);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
 		}
+	}
+
+	private UriComponentsBuilder getUriComponentsBuilder(OpengResultListInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("type", "json")
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

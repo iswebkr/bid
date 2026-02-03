@@ -14,6 +14,6 @@ public class CntrctInfoListFrgcptPPSSrchJob extends CntrctInfoController impleme
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getCntrctInfoListFrgcptPPSSrch();
+		getCntrctInfoListFrgcpt();
 	}
 }

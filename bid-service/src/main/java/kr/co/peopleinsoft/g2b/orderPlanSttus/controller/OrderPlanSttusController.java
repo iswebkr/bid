@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/orderPlanSttusService")
@@ -32,37 +31,37 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회")
-	@GetMapping("/getOrderPlanSttusListCnstwkPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListCnstwkPPSSrch() {
-		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회"), asyncTaskExecutor);
+	@GetMapping("/getOrderPlanSttusListCnstwk")
+	public ResponseEntity<String> getOrderPlanSttusListCnstwk() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListCnstwk", "발주계획현황에 대한 공사조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회")
-	@GetMapping("/getOrderPlanSttusListServcPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListServcPPSSrch() {
-		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회"), asyncTaskExecutor);
+	@GetMapping("/getOrderPlanSttusListServc")
+	public ResponseEntity<String> getOrderPlanSttusListServc() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListServc", "발주계획현황에 대한 용역조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회")
-	@GetMapping("/getOrderPlanSttusListFrgcptPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListFrgcptPPSSrch() {
-		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회"), asyncTaskExecutor);
+	@GetMapping("/getOrderPlanSttusListFrgcpt")
+	public ResponseEntity<String> getOrderPlanSttusListFrgcpt() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListFrgcpt", "발주계획현황에 대한 외자조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회")
-	@GetMapping("/getOrderPlanSttusListThngPPSSrch")
-	public ResponseEntity<String> getOrderPlanSttusListThngPPSSrch() {
-		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회"), asyncTaskExecutor);
+	@GetMapping("/getOrderPlanSttusListThng")
+	public ResponseEntity<String> getOrderPlanSttusListThng() {
+		return asyncProcess(() -> saveOrderPlanSttus("getOrderPlanSttusListThng", "발주계획현황에 대한 물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "최신 발주계획현황 데이터 수집")
 	@GetMapping("/colctThisYearOrderPlanSttus")
 	public ResponseEntity<String> colctThisYearOrderPlanSttus() {
 		List<Runnable> runnables = List.of(
-			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListCnstwkPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 공사조회"),
-			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListServcPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 용역조회"),
-			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListFrgcptPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 외자조회"),
-			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListThngPPSSrch", "나라장터 검색조건에 의한 발주계획현황에 대한 물품조회")
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListCnstwk", "발주계획현황에 대한 공사조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListServc", "발주계획현황에 대한 용역조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListFrgcpt", "발주계획현황에 대한 외자조회"),
+			() -> saveThisYearOrderPlanSttus("getOrderPlanSttusListThng", "발주계획현황에 대한 물품조회")
 		);
 		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
@@ -89,7 +88,7 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				int startPage;
-				int endPage;
+				int totalPage;
 
 				OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -103,66 +102,63 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 					.type("json")
 					.build();
 
-				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-					.scheme("https")
-					.host("apis.data.go.kr")
-					.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
-					.queryParam("serviceKey", requestDto.getServiceKey())
-					.queryParam("pageNo", 1)
-					.queryParam("numOfRows", requestDto.getNumOfRows())
-					.queryParam("type", "json")
-					//.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
-					//.queryParam("orderEndYm", requestDto.getOrderEndYm())
-					.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-					.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-				URI firstPageUri = uriComponentsBuilder.build().toUri();
-
-				// 1 페이지 API 호출
-				OrderPlanSttusResponseDto responseDto = publicWebClient.get()
-					.uri(firstPageUri)
-					.retrieve()
-					.bodyToMono(OrderPlanSttusResponseDto.class)
-					.block();
+				OrderPlanSttusResponseDto responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
 
 				if (responseDto == null) {
-					throw new RuntimeException("API 호출 실패");
+					return;
 				}
 
-				int totalCount = responseDto.getResponse().getBody().getTotalCount();
-				int totalPage = (int) Math.ceil((double) totalCount / 100);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				totalPage = responseDto.getTotalPage();
 
-				requestDto.setTotalCount(totalCount);
-				requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
 
-				startPage = (Integer) pageMap.get("startPage");
-				endPage = (Integer) pageMap.get("endPage");
+						responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
 
-				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-					URI uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
-					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, requestDto);
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
 
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
+						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+						updateColctPageInfo(requestDto);
+
+						orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
 					}
-				}
 
-				if (startPage < endPage) {
-					// 30초
 					try {
-						Thread.sleep(1000 * 30);
+						Thread.sleep(1000 * 20);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
 		}
+	}
+
+	private UriComponentsBuilder getUriComponentsBuilder(OrderPlanSttusRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("type", "json")
+			.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
+			.queryParam("orderEndYm", requestDto.getOrderEndYm())
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

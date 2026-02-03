@@ -4,16 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
-import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoRequestDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.service.CntrctInfoService;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -21,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/cntrctInfoService")
@@ -34,38 +30,38 @@ public class CntrctInfoController extends G2BAbstractBidController {
 		this.cntrctInfoService = cntrctInfoService;
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 계약현황 공사조회")
+	@Operation(summary = "계약현황에 대한 공사조회")
 	@GetMapping("/getCntrctInfoListCnstwkPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListCnstwkPPSSrch() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회"), asyncTaskExecutor);
+	public ResponseEntity<String> getCntrctInfoListCnstwk() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListCnstwk", "계약현황에 대한 공사조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 계약현황 용역조회")
-	@GetMapping("/getCntrctInfoListServcPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListServcPPSSrch() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회"), asyncTaskExecutor);
+	@Operation(summary = "계약현황에 대한 용역조회")
+	@GetMapping("/getCntrctInfoListServc")
+	public ResponseEntity<String> getCntrctInfoListServc() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListServc", "계약현황에 대한 용역조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 계약현황 외자조회")
-	@GetMapping("/getCntrctInfoListFrgcptPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListFrgcptPPSSrch() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회"), asyncTaskExecutor);
+	@Operation(summary = "계약현황에 대한 외자조회")
+	@GetMapping("/getCntrctInfoListFrgcpt")
+	public ResponseEntity<String> getCntrctInfoListFrgcpt() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListFrgcpt", "계약현황에 대한 외자조회"), asyncTaskExecutor);
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 계약현황 물품조회")
-	@GetMapping("/getCntrctInfoListThngPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListThngPPSSrch() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회"), asyncTaskExecutor);
+	@Operation(summary = "계약현황에 대한 물품조회")
+	@GetMapping("/getCntrctInfoListThng")
+	public ResponseEntity<String> getCntrctInfoListThng() {
+		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListThng", "계약현황에 대한 물품조회"), asyncTaskExecutor);
 	}
 
 	@Operation(summary = "나라장터검색조건에 의한 계약현황 수집")
 	@GetMapping("/colctThisYearCntrctInfo")
 	public ResponseEntity<String> colctThisYearCntrctInfo() {
 		List<Runnable> runnables = List.of(
-			() -> saveThisYearCntrctInfo("getCntrctInfoListCnstwkPPSSrch", "나라장터검색조건에 의한 계약현황 공사조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListServcPPSSrch", "나라장터검색조건에 의한 계약현황 용역조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListFrgcptPPSSrch", "나라장터검색조건에 의한 계약현황 외자조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListThngPPSSrch", "나라장터검색조건에 의한 계약현황 물품조회")
+			() -> saveThisYearCntrctInfo("getCntrctInfoListCnstwk", "계약현황에 대한 공사조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListServc", "계약현황에 대한 용역조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListFrgcpt", "계약현황에 대한 외자조회"),
+			() -> saveThisYearCntrctInfo("getCntrctInfoListThng", "계약현황에 대한 물품조회")
 		);
 		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
@@ -90,7 +86,7 @@ public class CntrctInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 				int startPage;
-				int endPage;
+				int totalPage;
 
 				CntrctInfoRequestDto requestDto = CntrctInfoRequestDto.builder()
 					.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -103,66 +99,59 @@ public class CntrctInfoController extends G2BAbstractBidController {
 					.type("json")
 					.build();
 
-				UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
-					.scheme("https")
-					.host("apis.data.go.kr")
-					.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
-					.queryParam("serviceKey", requestDto.getServiceKey())
-					.queryParam("pageNo", 1)
-					.queryParam("numOfRows", requestDto.getNumOfRows())
-					.queryParam("inqryDiv", requestDto.getInqryDiv())
-					.queryParam("type", "json")
-					.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
-					.queryParam("inqryEndDate", requestDto.getInqryEndDt());
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-				URI firstPageUri = uriComponentsBuilder.build().toUri();
-
-				// 1 페이지 API 호출
-				CntrctInfoReponseDto responseDto = publicWebClient.get()
-					.uri(firstPageUri)
-					.retrieve()
-					.bodyToMono(CntrctInfoReponseDto.class)
-					.block();
+				CntrctInfoReponseDto responseDto = getResponse(CntrctInfoReponseDto.class, uri);
 
 				if (responseDto == null) {
-					throw new RuntimeException("API 호출 실패");
+					return;
 				}
 
-				int totalCount = responseDto.getResponse().getBody().getTotalCount();
-				int totalPage = (int) Math.ceil((double) totalCount / 100);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				totalPage = responseDto.getTotalPage();
 
-				requestDto.setTotalCount(totalCount);
-				requestDto.setTotalPage(totalPage);
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder()
+							.replaceQueryParam("pageNo", pageNo)
+							.build().toUri();
 
-				startPage = (Integer) pageMap.get("startPage");
-				endPage = (Integer) pageMap.get("endPage");
+						responseDto = getResponse(CntrctInfoReponseDto.class, uri);
 
-				for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-					URI uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
 
-					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, requestDto);
-
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
+						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 					}
-				}
 
-				if (startPage < endPage) {
-					// 30초
 					try {
-						Thread.sleep(1000 * 30);
+						Thread.sleep(1000 * 20);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
 		}
+	}
+
+	private UriComponentsBuilder getUriComponentsBuilder(CntrctInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("type", "json")
+			.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDate", requestDto.getInqryEndDt());
 	}
 }
