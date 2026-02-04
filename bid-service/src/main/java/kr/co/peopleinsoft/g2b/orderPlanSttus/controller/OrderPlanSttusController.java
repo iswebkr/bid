@@ -7,6 +7,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusRequestDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.dto.OrderPlanSttusResponseDto;
 import kr.co.peopleinsoft.g2b.orderPlanSttus.service.OrderPlanSttusService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,15 +19,15 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/orderPlanSttusService")
 @Tag(name = "나라장터 발주계획현황서비스", description = "https://www.data.go.kr/data/15129462/openapi.do")
 public class OrderPlanSttusController extends G2BAbstractBidController {
+
+	private static final Logger logger = LoggerFactory.getLogger(OrderPlanSttusController.class);
 
 	private final OrderPlanSttusService orderPlanSttusService;
 
@@ -63,7 +65,7 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				getUriMap().forEach((serviceId, serviceDescription) -> {
-					asyncProcess(() -> collectionData(serviceId, serviceDescription, orderBgnYm, orderEndYm, inqryBgnDt, inqryEndDt, 1), asyncTaskExecutor);
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, orderBgnYm, orderEndYm, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
 				});
 			}
 		}
@@ -91,17 +93,56 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 		String yesterdayOrderBgnYm = yesterdayMonth.format(DateTimeFormatter.ofPattern("yyyy")) + "01";
 		String yesterdayOrderEndYm = yesterdayMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy")) + "12";
 
-		List<Runnable> runnables = new ArrayList<>();
-
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			runnables.add(() -> collectionData(serviceId, serviceDescription, todayOrderBgnYm, todayOrderEndYm, todayStart, todayEnd, 1));
-			runnables.add(() -> collectionData(serviceId, serviceDescription, yesterdayOrderBgnYm, yesterdayOrderEndYm, yesterdayStart, yesterdayEnd, 1));
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayOrderBgnYm, todayOrderEndYm, todayStart, todayEnd), asyncTaskExecutor);
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayOrderBgnYm, yesterdayOrderEndYm, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
 		});
 
-		return asyncParallelProcess(runnables, asyncTaskExecutor);
+		return ResponseEntity.ok().body("success");
 	}
 
-	private void collectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt, int startPage) {
+	private void todayCollectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
+		int startPage = 1;
+		int totalPage;
+
+		OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.orderBgnYm(orderBgnYm)
+			.orderEndYm(orderEndYm)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.inqryDiv(1)
+			.numOfRows(100)
+			.type("json")
+			.build();
+
+		try {
+			UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+			URI uri = uriComponentsBuilder.build().toUri();
+
+			OrderPlanSttusResponseDto responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			totalPage = responseDto.getTotalPage();
+
+			for (int pageNo = totalPage; pageNo >= startPage; pageNo--) {
+				orderPlanSttusService.batchInsertBidOrderPlan(responseDto.getItems());
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
+
+	private void collectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
+		int startPage = 1;
 		int totalPage;
 
 		OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
@@ -122,15 +163,12 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 
 		OrderPlanSttusResponseDto responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
 
-		if (responseDto == null) {
+		if (responseDto == null || responseDto.getTotalCount() <= 0) {
 			return;
 		}
 
-		if (startPage <= 0) {
-			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-			startPage = bidSchdulHistManageService.getStartPage(requestDto);
-		}
-
+		// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+		startPage = bidSchdulHistManageService.getStartPage(requestDto);
 		totalPage = responseDto.getTotalPage();
 
 		requestDto.setTotalCount(responseDto.getTotalCount());

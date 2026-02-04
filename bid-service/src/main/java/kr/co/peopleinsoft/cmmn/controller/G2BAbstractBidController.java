@@ -66,6 +66,9 @@ public class G2BAbstractBidController extends CmmnAbstractController {
 			.uri(uri)
 			.retrieve()
 			.bodyToMono(clazz)
+			.doOnError(ex -> {
+				throw new CompletionException(ex);
+			})
 			.block();
 	}
 

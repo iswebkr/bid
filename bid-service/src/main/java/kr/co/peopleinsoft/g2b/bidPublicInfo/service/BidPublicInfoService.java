@@ -10,18 +10,23 @@ import java.util.List;
 
 @Service
 public class BidPublicInfoService extends G2BAbstractBidService {
-	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, List<BidPublicInfoDto> items, T requestDto) {
+	public int batchInsertPublicInfo(List<BidPublicInfoDto> items) {
 		int rowCnt;
-
 		for (BidPublicInfoDto item : items) {
 			cmmnMapper.insert("BidPublicInfoMapper.batchInsertPublicInfo", item);
 		}
-
 		rowCnt = cmmnMapper.flushBatchStatementsCount();
+		return rowCnt;
+	}
 
+	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, List<BidPublicInfoDto> items, T requestDto) {
+		int rowCnt;
+		for (BidPublicInfoDto item : items) {
+			cmmnMapper.insert("BidPublicInfoMapper.batchInsertPublicInfo", item);
+		}
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
-
 		return rowCnt;
 	}
 }

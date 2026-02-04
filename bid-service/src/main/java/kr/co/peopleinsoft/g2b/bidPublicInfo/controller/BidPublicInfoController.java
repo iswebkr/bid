@@ -7,6 +7,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.service.BidPublicInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,15 +19,15 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/bidPublicInfoService")
 @Tag(name = "조달청_나라장터 입찰공고정보서비스", description = "https://www.data.go.kr/data/15129394/openapi.do")
 public class BidPublicInfoController extends G2BAbstractBidController {
+
+	private static final Logger logger = LoggerFactory.getLogger(BidPublicInfoController.class);
 
 	private final BidPublicInfoService bidPublicInfoService;
 
@@ -61,7 +63,7 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				getUriMap().forEach((serviceId, serviceDescription) -> {
-					asyncProcess(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, inqryBgnDt, inqryEndDt, 0), asyncTaskExecutor);
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt, 0), asyncTaskExecutor);
 				});
 			}
 		}
@@ -81,17 +83,16 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		String yesterdayStart = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
 		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-		List<Runnable> runnables = new ArrayList<>();
-
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			runnables.add(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, todayStart, todayEnd, 1));
-			runnables.add(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, yesterdayStart, yesterdayEnd, 1));
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd), asyncTaskExecutor);
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
 		});
 
-		return asyncParallelProcess(runnables, asyncTaskExecutor);
+		return ResponseEntity.ok().body("success");
 	}
 
-	private void bidPublicInfoDataCollection(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt, int startPage) {
+	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		int startPage = 1;
 		int totalPage;
 
 		BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
@@ -109,37 +110,63 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
 		URI uri = uriComponentsBuilder.build().toUri();
 
-		BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+		try {
+			BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
 
-		if (responseDto == null) {
-			return;
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			totalPage = responseDto.getTotalPage();
+
+			for (int pageNo = totalPage; pageNo >= startPage; pageNo--) {
+				bidPublicInfoService.batchInsertPublicInfo(responseDto.getItems());
+				Thread.sleep(1000 * 30);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
+			}
 		}
+	}
 
-		// 조회된 데이터가 없으면 이후로직 처리 안함
-		if (responseDto.getTotalCount() == 0) {
-			return;
-		}
+	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt, int startPage) {
+		int totalPage;
 
-		// 파라미터의 startPage 번호가 없으면
-		if (startPage <= 0) {
+		BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		try {
+			// URI 를 빌드하고
+			UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+			URI uri = uriComponentsBuilder.build().toUri();
+
+			BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
 			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
 			startPage = bidSchdulHistManageService.getStartPage(requestDto);
-		}
+			totalPage = responseDto.getTotalPage();
 
-		totalPage = responseDto.getTotalPage();
+			requestDto.setTotalCount(responseDto.getTotalCount());
+			requestDto.setTotalPage(responseDto.getTotalPage());
 
-		requestDto.setTotalCount(responseDto.getTotalCount());
-		requestDto.setTotalPage(responseDto.getTotalPage());
-
-		for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-			if (pageNo == 1) {
-				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-			} else {
-				uri = uriComponentsBuilder.cloneBuilder()
-					.replaceQueryParam("pageNo", pageNo)
-					.build().toUri();
-
-				responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+				}
 
 				requestDto.setTotalCount(responseDto.getTotalCount());
 				requestDto.setTotalPage(responseDto.getTotalPage());
@@ -149,13 +176,17 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 
 				// 수집 데이터 정보 저장
 				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-			}
 
-			// 30초
-			try {
-				Thread.sleep(1000 * 30);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+				// 30초
+				try {
+					Thread.sleep(1000 * 30);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
 			}
 		}
 	}
