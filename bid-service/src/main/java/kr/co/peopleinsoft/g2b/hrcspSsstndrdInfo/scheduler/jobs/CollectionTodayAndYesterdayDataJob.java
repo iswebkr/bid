@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class PublicPrcureThngInfoCnstwkJob extends HrcspSsstndrdInfoController implements Job {
+public class CollectionTodayAndYesterdayDataJob extends HrcspSsstndrdInfoController implements Job {
 
-	public PublicPrcureThngInfoCnstwkJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
+	public CollectionTodayAndYesterdayDataJob(HrcspSsstndrdInfoService hrcspSsstndrdInfoService) {
 		super(hrcspSsstndrdInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getPublicPrcureThngInfoCnstwk();
+		collectionTodayAndYesterdayData();
 	}
 }

@@ -1,12 +1,14 @@
 package kr.co.peopleinsoft.cmmn.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class BidBody<T> implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;

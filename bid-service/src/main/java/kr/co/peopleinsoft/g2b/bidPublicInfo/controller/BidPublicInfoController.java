@@ -3,7 +3,6 @@ package kr.co.peopleinsoft.g2b.bidPublicInfo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.controller.G2BAbstractBidController;
-import kr.co.peopleinsoft.cmmn.dto.BidColctHistDto;
 import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
@@ -18,7 +17,10 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/bidPublicInfoService")
@@ -31,54 +33,26 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		this.bidPublicInfoService = bidPublicInfoService;
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고공사조회")
-	@GetMapping("/getBidPblancListInfoCnstwk")
-	public ResponseEntity<String> getBidPblancListInfoCnstwk() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoCnstwk", "공사", "입찰공고목록 정보에 대한 공사조회"), asyncTaskExecutor);
+	private Map<String, String> getUriMap() {
+		Map<String, String> uriMap = new HashMap<>();
+		uriMap.put("getBidPblancListInfoCnstwk", "입찰공고목록 정보에 대한 공사조회");
+		uriMap.put("getBidPblancListInfoServc", "입찰공고목록 정보에 대한 용역조회");
+		uriMap.put("getBidPblancListInfoFrgcpt", "입찰공고목록 정보에 대한 외자조회");
+		uriMap.put("getBidPblancListInfoThng", "입찰공고목록 정보에 대한 물품조회");
+		return uriMap;
 	}
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고용역조회")
-	@GetMapping("/getBidPblancListInfoServc")
-	public ResponseEntity<String> getBidPblancListInfoServc() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoServc", "용역", "입찰공고목록 정보에 대한 용역조회"), asyncTaskExecutor);
-	}
+	@Operation(summary = "5년전 데이터까지 수집")
+	@GetMapping("/collectionLastFiveYearData")
+	public ResponseEntity<String> collectionLastFiveYearData() {
+		LocalDateTime today = LocalDateTime.now();
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고외자조회")
-	@GetMapping("/getBidPblancListInfoFrgcpt")
-	public ResponseEntity<String> getBidPblancListInfoFrgcpt() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoFrgcpt", "외자", "입찰공고목록 정보에 대한 외자조회"), asyncTaskExecutor);
-	}
+		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		int startYear = today.getYear();
+		int startMonth = 1;
+		int endYear = today.getYear();
+		int endMonth = 12;
 
-	@Operation(summary = "나라장터검색조건에 의한 입찰공고물품조회")
-	@GetMapping("/getBidPblancListInfoThng")
-	public ResponseEntity<String> getBidPblancListInfoThng() {
-		return asyncProcess(() -> saveBidPblancListInfo("getBidPblancListInfoThng", "물품", "입찰공고목록 정보에 대한 물품조회"), asyncTaskExecutor);
-	}
-
-	@Operation(summary = "입찰공고 이번 년도 데이터만 조회")
-	@GetMapping("/colctThisYearBidPblancListInfo")
-	public ResponseEntity<String> colctThisYearBidPblancListInfo() {
-		List<Runnable> runnables = List.of(
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoCnstwk", "공사", "입찰공고목록 정보에 대한 공사조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoServc", "용역", "입찰공고목록 정보에 대한 용역조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoFrgcpt", "외자", "입찰공고목록 정보에 대한 외자조회"),
-			() -> saveThisYearBidPblancListInfo("getBidPblancListInfoThng", "물품", "입찰공고목록 정보에 대한 물품조회")
-		);
-		return asyncParallelProcess(runnables, asyncTaskExecutor);
-	}
-
-	private void saveThisYearBidPblancListInfo(String serviceId, String bidType, String serviceDescription) {
-		int thisYear = LocalDateTime.now().getYear();
-		int thisMonth = LocalDateTime.now().getMonthValue();
-		saveBidPblancListInfo(serviceId, bidType, serviceDescription, thisYear, thisYear, 1, thisMonth);
-	}
-
-	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription) {
-		int lastYear = LocalDateTime.now().minusYears(1).getYear();
-		saveBidPblancListInfo(serviceId, bidType, serviceDescription, 2020, lastYear, 1, 12);
-	}
-
-	private void saveBidPblancListInfo(String serviceId, String bidType, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -86,65 +60,102 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				int startPage;
-				int totalPage;
+				getUriMap().forEach((serviceId, serviceDescription) -> {
+					asyncProcess(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, inqryBgnDt, inqryEndDt, 0), asyncTaskExecutor);
+				});
+			}
+		}
 
-				BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
-					.serviceKey(BidEnum.SERIAL_KEY.getKey())
-					.serviceId(serviceId)
-					.serviceDescription(serviceDescription)
-					.bidType(bidType)
-					.inqryBgnDt(inqryBgnDt)
-					.inqryEndDt(inqryEndDt)
-					.numOfRows(100)
-					.inqryDiv(1)
-					.type("json")
-					.build();
+		return ResponseEntity.ok().body("success");
+	}
 
-				// URI 를 빌드하고
-				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-				URI uri = uriComponentsBuilder.build().toUri();
+	@Operation(summary = "어제/오늘 데이터 수집")
+	@GetMapping("/collectionTodayAndYesterdayData")
+	public ResponseEntity<String> collectionTodayAndYesterdayData() {
+		LocalDateTime today = LocalDateTime.now(); // 오늘
+		LocalDateTime yesterday = today.minusDays(1); // 어제
 
-				BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+		String todayStart = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String todayEnd = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				if (responseDto == null) {
-					return;
-				}
+		String yesterdayStart = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-				startPage = bidSchdulHistManageService.getStartPage(requestDto);
-				totalPage = responseDto.getTotalPage();
+		List<Runnable> runnables = new ArrayList<>();
+
+		getUriMap().forEach((serviceId, serviceDescription) -> {
+			runnables.add(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, todayStart, todayEnd, 1));
+			runnables.add(() -> bidPublicInfoDataCollection(serviceId, serviceDescription, yesterdayStart, yesterdayEnd, 1));
+		});
+
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
+	}
+
+	private void bidPublicInfoDataCollection(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt, int startPage) {
+		int totalPage;
+
+		BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		// URI 를 빌드하고
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+
+		if (responseDto == null) {
+			return;
+		}
+
+		// 조회된 데이터가 없으면 이후로직 처리 안함
+		if (responseDto.getTotalCount() == 0) {
+			return;
+		}
+
+		// 파라미터의 startPage 번호가 없으면
+		if (startPage <= 0) {
+			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+			startPage = bidSchdulHistManageService.getStartPage(requestDto);
+		}
+
+		totalPage = responseDto.getTotalPage();
+
+		requestDto.setTotalCount(responseDto.getTotalCount());
+		requestDto.setTotalPage(responseDto.getTotalPage());
+
+		for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+			if (pageNo == 1) {
+				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
+			} else {
+				uri = uriComponentsBuilder.cloneBuilder()
+					.replaceQueryParam("pageNo", pageNo)
+					.build().toUri();
+
+				responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
 
 				requestDto.setTotalCount(responseDto.getTotalCount());
 				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-					if (pageNo == 1) {
-						bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					} else {
-						uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
+				// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+				updateColctPageInfo(requestDto);
 
-						responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+				// 수집 데이터 정보 저장
+				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
+			}
 
-						requestDto.setTotalCount(responseDto.getTotalCount());
-						requestDto.setTotalPage(responseDto.getTotalPage());
-
-						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-						updateColctPageInfo(requestDto);
-
-						// 수집 데이터 정보 저장
-						bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					}
-
-					// 30초
-					try {
-						Thread.sleep(1000 * 30);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
+			// 30초
+			try {
+				Thread.sleep(1000 * 30);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}

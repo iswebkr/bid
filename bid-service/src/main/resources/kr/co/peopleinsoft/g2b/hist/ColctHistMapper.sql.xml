@@ -41,7 +41,7 @@
 				, colct_bgn_dt
 				, colct_end_dt
 				, max(colct_tot_page) max_tot_page
-				, count(distinct colct_cmpl_page) cmpl_colct_page
+				, count(distinct colct_cmpl_page) colct_cmpl_page
 				, max(colct_tot_cnt) max_total_cnt
 				, sum(colct_cmpl_cnt) sum_cmpl_cnt
 		, case
@@ -61,6 +61,23 @@
 			and 	colct_end_dt = #{colctEndDt}
 		</if>
 		group by colct_id, colct_bgn_dt, colct_end_dt
+	</select>
+
+	<select id="selectLatestColctHistResult" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto" resultType="kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto">
+		select
+		*
+		from (select colct_id
+		, colct_bgn_dt
+		, colct_end_dt
+		, colct_cmpl_page
+		, sum(colct_cmpl_cnt) sum_cmpl_cnt
+		from tb_colct_hist
+		where colct_id = #{colctId}
+		and 	colct_bgn_dt = #{colctBgnDt}
+		and 	colct_end_dt = #{colctEndDt}
+		group by colct_id, colct_bgn_dt, colct_end_dt, colct_cmpl_page
+		order by colct_cmpl_page desc) a
+		limit 1
 	</select>
 
 	<insert id="batchInsertColctHist" parameterType="kr.co.peopleinsoft.cmmn.dto.BidColctHistDto">

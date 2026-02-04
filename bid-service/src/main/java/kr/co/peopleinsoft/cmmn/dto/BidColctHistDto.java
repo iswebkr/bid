@@ -1,6 +1,5 @@
 package kr.co.peopleinsoft.cmmn.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 public class BidColctHistDto implements Serializable {
 
 	@Serial

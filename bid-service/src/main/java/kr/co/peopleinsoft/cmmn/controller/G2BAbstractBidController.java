@@ -7,8 +7,6 @@ import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
 import kr.co.peopleinsoft.cmmn.dto.BidResponseDto;
 import kr.co.peopleinsoft.cmmn.service.BidSchdulHistManageService;
 import kr.co.peopleinsoft.cmmn.service.G2BCmmnService;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoRequestDto;
-import kr.co.peopleinsoft.g2b.bidPublicInfo.dto.BidPublicInfoResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -73,13 +71,12 @@ public class G2BAbstractBidController extends CmmnAbstractController {
 
 	protected <T extends BidRequestDto> void updateColctPageInfo(T requestDto) {
 		// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-		BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
-			.colctTotPage(requestDto.getTotalPage())
-			.colctTotCnt(requestDto.getTotalCount())
-			.colctId(requestDto.getServiceId())
-			.colctBgnDt(requestDto.getInqryBgnDt())
-			.colctEndDt(requestDto.getInqryEndDt())
-			.build();
+		BidColctHistDto bidColctHistDto = new BidColctHistDto();
+		bidColctHistDto.setColctTotPage(requestDto.getTotalPage());
+		bidColctHistDto.setColctTotCnt(requestDto.getTotalCount());
+		bidColctHistDto.setColctId(requestDto.getServiceId());
+		bidColctHistDto.setColctBgnDt(requestDto.getInqryBgnDt());
+		bidColctHistDto.setColctEndDt(requestDto.getInqryEndDt());
 
 		// 변경된 데이터 및 페이지 정보 변경 적용
 		bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);

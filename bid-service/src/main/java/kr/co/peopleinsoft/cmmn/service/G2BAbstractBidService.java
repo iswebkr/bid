@@ -10,17 +10,16 @@ public class G2BAbstractBidService extends CmmnAbstractService {
 	protected <T extends BidRequestDto> void insertSchdulHistLog(URI uri, int pageNo, T requestDto, int rowCnt) {
 		if (rowCnt > 0) {
 			// 스케줄러 로그 기록
-			BidColctHistDto bidSchdulHistManageDto = BidColctHistDto.builder()
-				.colctId(requestDto.getServiceId())
-				.colctUri(uri.toString())
-				.colctDesc(requestDto.getServiceDescription())
-				.colctBgnDt(requestDto.getInqryBgnDt())
-				.colctEndDt(requestDto.getInqryEndDt())
-				.colctTotPage(requestDto.getTotalPage())
-				.colctCmplPage(pageNo)
-				.colctTotCnt(requestDto.getTotalCount())
-				.colctCmplCnt(rowCnt)
-				.build();
+			BidColctHistDto bidSchdulHistManageDto = new BidColctHistDto();
+			bidSchdulHistManageDto.setColctId(requestDto.getServiceId());
+			bidSchdulHistManageDto.setColctUri(uri.toString());
+			bidSchdulHistManageDto.setColctDesc(requestDto.getServiceDescription());
+			bidSchdulHistManageDto.setColctBgnDt(requestDto.getInqryBgnDt());
+			bidSchdulHistManageDto.setColctEndDt(requestDto.getInqryEndDt());
+			bidSchdulHistManageDto.setColctTotPage(requestDto.getTotalPage());
+			bidSchdulHistManageDto.setColctCmplPage(pageNo);
+			bidSchdulHistManageDto.setColctTotCnt(requestDto.getTotalCount());
+			bidSchdulHistManageDto.setColctCmplCnt(rowCnt);
 			cmmnMapper.insert("BidColctHistMapper.batchInsertColctHist", bidSchdulHistManageDto);
 		}
 	}

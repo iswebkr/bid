@@ -1,6 +1,5 @@
 package kr.co.peopleinsoft.cmmn.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +8,6 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@Builder
 public class BidColctHistResultDto implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -37,7 +35,7 @@ public class BidColctHistResultDto implements Serializable {
 	/**
 	 * 수집 완료 페이지수
 	 */
-	private Integer cmplColctPage;
+	private Integer colctCmplPage;
 
 	/**
 	 * 전체 카운트

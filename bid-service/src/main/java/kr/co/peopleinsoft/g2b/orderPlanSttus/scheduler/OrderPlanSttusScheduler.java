@@ -2,22 +2,16 @@ package kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.peopleinsoft.cmmn.quartz.manager.CmmnScheduleManager;
 import kr.co.peopleinsoft.cmmn.quartz.service.CmmnSchedulerInfoService;
-import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.ColctLatestOrderPlanSttusJob;
-import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.OrderPlanSttusListCnstwkJob;
-import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.OrderPlanSttusListFrgcptJob;
-import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.OrderPlanSttusListServcJob;
-import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.OrderPlanSttusListThngJob;
-import org.apache.commons.lang3.StringUtils;
+import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.CollectionLastFiveYearDataJob;
+import kr.co.peopleinsoft.g2b.orderPlanSttus.scheduler.jobs.CollectionTodayAndYesterdayDataJob;
 import org.quartz.SchedulerException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 
@@ -34,64 +28,20 @@ public class OrderPlanSttusScheduler {
 		this.cmmnSchedulerInfoService = cmmnSchedulerInfoService;
 	}
 
-	@Operation(summary = "발주계획현황에 대한 공사조회", description = "발주계획현황에 대한 공사조회", parameters = {
-		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
-	})
-	@GetMapping("/OrderPlanSttusListCnstwkJob")
-	public ResponseEntity<String> OrderPlanSttusListCnstwkJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 11 * * ?");
-		cmmnScheduleManager.deleteJob("OrderPlanSttusListCnstwkJob", "발주계획"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OrderPlanSttusListCnstwkJob.class, "OrderPlanSttusListCnstwkJob", "발주계획", "발주계획현황에 대한 공사조회", cronJobExpression, new HashMap<>());
+	@Operation(summary = "최근 5년치 데이터 수집 (매일 저녁 9시)", description = "최근 5년치 데이터 수집")
+	@GetMapping("/CollectionLastFiveYearDataJob")
+	public ResponseEntity<String> CollectionLastFiveYearDataJob() throws SchedulerException, JsonProcessingException {
+		cmmnScheduleManager.deleteJob("CollectionLastFiveYearDataJob", "발주계획"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "발주계획", "최근 5년치 데이터 수집", "0 0 21 * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "발주계획현황에 대한 용역조회", description = "발주계획현황에 대한 용역조회", parameters = {
-		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
-	})
-	@GetMapping("/OrderPlanSttusListServcJob")
-	public ResponseEntity<String> OrderPlanSttusListServcJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 11 * * ?");
-		cmmnScheduleManager.deleteJob("OrderPlanSttusListServcJob", "발주계획"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OrderPlanSttusListServcJob.class, "OrderPlanSttusListServcJob", "발주계획", "발주계획현황에 대한 용역조회", cronJobExpression, new HashMap<>());
-		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
-		return ResponseEntity.ok().body(jobList);
-	}
-
-	@Operation(summary = "발주계획현황에 대한 외자조회", description = "발주계획현황에 대한 외자조회", parameters = {
-		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
-	})
-	@GetMapping("/OrderPlanSttusListFrgcptJob")
-	public ResponseEntity<String> OrderPlanSttusListFrgcptJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 11 * * ?");
-		cmmnScheduleManager.deleteJob("OrderPlanSttusListFrgcptJob", "발주계획"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OrderPlanSttusListFrgcptJob.class, "OrderPlanSttusListFrgcptJob", "발주계획", "발주계획현황에 대한 외자조회", cronJobExpression, new HashMap<>());
-		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
-		return ResponseEntity.ok().body(jobList);
-	}
-
-	@Operation(summary = "발주계획현황에 대한 물품조회", description = "발주계획현황에 대한 물품조회", parameters = {
-		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
-	})
-	@GetMapping("/OrderPlanSttusListThngJob")
-	public ResponseEntity<String> OrderPlanSttusListThngJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 0 11 * * ?");
-		cmmnScheduleManager.deleteJob("OrderPlanSttusListThngJob", "발주계획"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(OrderPlanSttusListThngJob.class, "OrderPlanSttusListThngJob", "발주계획", "발주계획현황에 대한 물품조회", cronJobExpression, new HashMap<>());
-		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
-		return ResponseEntity.ok().body(jobList);
-	}
-
-	/***************************** 발주계획(최신데이터) *****************************/
-
-	@Operation(summary = "최신 발주계획 자료 수집", description = "최신 발주계획 자료 수집", parameters = {
-		@Parameter(name = "jobExpression", description = "Quartz 크론표현식 (ex : * 0 * * * ?) [초, 분, 시, 일, 월, 주, 년]", allowEmptyValue = true)
-	})
-	@GetMapping("/latest/colctLatestOrderPlanSttusJob")
-	public ResponseEntity<String> colctLatestOrderPlanSttusJob(@RequestParam(required = false) String jobExpression) throws SchedulerException, JsonProcessingException {
-		String cronJobExpression = StringUtils.defaultIfBlank(jobExpression, "0 */10 * * * ?");
-		cmmnScheduleManager.deleteJob("ColctLatestOrderPlanSttusJob", "최신자료수집"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(ColctLatestOrderPlanSttusJob.class, "ColctLatestOrderPlanSttusJob", "최신자료수집", "최신 발주계획 자료 수집", cronJobExpression, new HashMap<>());
+	@Operation(summary = "어제,오늘 데이터만 수집 (5분 단위 수집)", description = "어제/오늘 데이터 수집")
+	@GetMapping("/CollectionTodayAndYesterdayDataJob")
+	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
+		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "발주계획"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "발주계획", "어제/오늘 데이터 수집", "0 */5 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

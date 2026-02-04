@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class OrderPlanSttusListThngJob extends OrderPlanSttusController implements Job {
+public class CollectionLastFiveYearDataJob extends OrderPlanSttusController implements Job {
 
-	public OrderPlanSttusListThngJob(OrderPlanSttusService orderPlanSttusService) {
+	public CollectionLastFiveYearDataJob(OrderPlanSttusService orderPlanSttusService) {
 		super(orderPlanSttusService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		getOrderPlanSttusListThng();
+		collectionLastFiveYearData();
 	}
 }

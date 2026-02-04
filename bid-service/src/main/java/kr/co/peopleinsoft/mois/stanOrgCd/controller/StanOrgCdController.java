@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -117,7 +118,8 @@ public class StanOrgCdController extends G2BAbstractBidController {
 		requestDto.setTotalPage(totalPage);
 		requestDto.setTotalCount(totalCount);
 
-		Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+		//Map<String, Object> pageMap = g2BCmmnService.initPageCorrection(requestDto);
+		Map<String, Object> pageMap = new HashMap<>();
 
 		startPage = (Integer) pageMap.get("startPage");
 		endPage = (Integer) pageMap.get("endPage");

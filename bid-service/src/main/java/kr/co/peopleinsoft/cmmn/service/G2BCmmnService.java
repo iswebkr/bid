@@ -17,6 +17,7 @@ public class G2BCmmnService {
 	public G2BCmmnService(BidSchdulHistManageService bidSchdulHistManageService) {
 		this.bidSchdulHistManageService = bidSchdulHistManageService;
 	}
+
 	/**
 	 * 페이지 보정
 	 * <p>
@@ -48,13 +49,12 @@ public class G2BCmmnService {
 		// 전체카운트가 변경된 경우(새로운 데이터가 등록된 경우) 변경된 정보를 이력정보에 저장
 		// 이력정보를 기반으로 새로운 수집 대상 페이지의 시작페이지 번호를 지정
 		if (!Objects.equals(requestDto.getTotalCount(), resultDto.getMaxTotalCnt())) {
-			BidColctHistDto bidColctHistDto = BidColctHistDto.builder()
-				.colctTotPage(requestDto.getTotalPage())
-				.colctTotCnt(requestDto.getTotalCount())
-				.colctId(requestDto.getServiceId())
-				.colctBgnDt(requestDto.getInqryBgnDt())
-				.colctEndDt(requestDto.getInqryEndDt())
-				.build();
+			BidColctHistDto bidColctHistDto = new BidColctHistDto();
+			bidColctHistDto.setColctTotPage(requestDto.getTotalPage());
+			bidColctHistDto.setColctTotCnt(requestDto.getTotalCount());
+			bidColctHistDto.setColctId(requestDto.getServiceId());
+			bidColctHistDto.setColctBgnDt(requestDto.getInqryBgnDt());
+			bidColctHistDto.setColctEndDt(requestDto.getInqryEndDt());
 
 			// 변경된 정보 업데이트
 			bidSchdulHistManageService.updateColctPageInfo(bidColctHistDto);
@@ -63,14 +63,14 @@ public class G2BCmmnService {
 			resultDto = bidSchdulHistManageService.selectBidColctHistResultDto(requestDto);
 		}
 
-		if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getCmplColctPage()) && resultDto.getDiffCount() > 0) {
-			// 아직 수집해야 할 데이터가 남아있음 여유롭게 3페이지 전 부터 재수집
+		if (Objects.equals(resultDto.getMaxTotPage(), resultDto.getColctCmplPage()) && resultDto.getDiffCount() > 0) {
+			// 아직 수집해야 할 데이터가 남아있음 여유롭게 1페이지 전 부터 재수집
 			// 배치가 등록한 데이터가 제대로 카운트 된다면 수집 카운트는 맞아야겠지..
-			startPage = resultDto.getCmplColctPage() - 3;
+			startPage = resultDto.getColctCmplPage() - 1;
 		} else {
 			// 그렇지 않은 경우 마지막 수집 페이지에서 1 페이지 다음 것 부터 수집 시작
 			// 없음 수집 안하고 있으면 하겠지..
-			startPage = resultDto.getCmplColctPage() + 1;
+			startPage = resultDto.getColctCmplPage() + 1;
 		}
 
 		// 시작페이지는 무조건 1 부터 시작
