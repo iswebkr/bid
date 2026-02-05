@@ -19,7 +19,9 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -84,12 +86,14 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 		String yesterdayStart = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
 		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
+		List<Runnable> runnables = new ArrayList<>();
+
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd), asyncTaskExecutor);
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
 		});
 
-		return ResponseEntity.ok().body("success");
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {

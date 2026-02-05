@@ -19,7 +19,9 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -87,18 +89,20 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 		YearMonth yesterdayMonth = YearMonth.from(yesterday);
 
-		String todayOrderBgnYm = todayMonth.format(DateTimeFormatter.ofPattern("yyyy")) + "01";
+		String todayOrderBgnYm = todayMonth.minusYears(1).format(DateTimeFormatter.ofPattern("yyyy")) + "01";
 		String todayOrderEndYm = todayMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy")) + "12";
 
 		String yesterdayOrderBgnYm = yesterdayMonth.format(DateTimeFormatter.ofPattern("yyyy")) + "01";
 		String yesterdayOrderEndYm = yesterdayMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy")) + "12";
 
+		List<Runnable> runnables = new ArrayList<>();
+
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayOrderBgnYm, todayOrderEndYm, todayStart, todayEnd), asyncTaskExecutor);
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayOrderBgnYm, yesterdayOrderEndYm, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayOrderBgnYm, todayOrderEndYm, todayStart, todayEnd));
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayOrderBgnYm, yesterdayOrderEndYm, yesterdayStart, yesterdayEnd));
 		});
 
-		return ResponseEntity.ok().body("success");
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
@@ -142,7 +146,7 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 	}
 
 	private void collectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
-		int startPage = 1;
+		int startPage;
 		int totalPage;
 
 		OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
