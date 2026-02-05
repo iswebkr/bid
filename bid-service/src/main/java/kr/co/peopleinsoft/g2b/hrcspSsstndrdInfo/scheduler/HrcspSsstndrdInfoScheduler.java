@@ -37,11 +37,11 @@ public class HrcspSsstndrdInfoScheduler {
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "어제,오늘 데이터만 수집 (5분 단위 수집)", description = "어제/오늘 데이터 수집")
+	@Operation(summary = "어제,오늘 데이터만 수집 (30분 단위 수집)", description = "어제/오늘 데이터 수집")
 	@GetMapping("/CollectionTodayAndYesterdayDataJob")
 	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "사전규격"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "사전규격", "어제/오늘 데이터 수집", "0 */5 * * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "사전규격", "어제/오늘 데이터 수집", "0 */30 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
