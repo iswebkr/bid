@@ -129,7 +129,7 @@ public class ScsbidInfoSttsController extends G2BAbstractBidController {
 					break;
 				}
 
-				scsbidInfoSttsService.batchInsertScsbidListSttus(uri, pageNo, responseDto.getItems(), requestDto);
+				scsbidInfoSttsService.batchInsertScsbidListSttus(responseDto.getItems());
 				Thread.sleep(1000 * 20);
 			}
 		} catch (Exception e) {

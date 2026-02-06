@@ -20,12 +20,7 @@ public class OrderPlanSttusService extends G2BAbstractBidService {
 	}
 
 	public <T extends BidRequestDto> int batchInsertBidOrderPlan(URI uri, int pageNo, List<OrderPlanSttusDto> items, T requestDto) {
-		int rowCnt;
-		for (OrderPlanSttusDto item : items) {
-			cmmnMapper.insert("BidOrderPlanSttusMapper.batchInsertOrderPlan", item);
-		}
-		rowCnt = cmmnMapper.flushBatchStatementsCount();
-		// 스케줄러 로그기록
+		int rowCnt = batchInsertBidOrderPlan(items);
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
 		return rowCnt;
 	}

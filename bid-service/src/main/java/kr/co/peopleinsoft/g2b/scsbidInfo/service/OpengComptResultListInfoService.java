@@ -21,7 +21,6 @@ public class OpengComptResultListInfoService extends G2BAbstractBidService {
 
 	public <T extends BidRequestDto> int batchInsertOpengResultListInfo(URI uri, int pageNo, List<OpengComptResultListInfoDto> items, T requestDto) {
 		int rowCnt = batchInsertOpengResultListInfo(items);
-		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
 		return rowCnt;
 	}

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class OpengResultListInfoService extends G2BAbstractBidService {
-	public <T extends BidRequestDto> int batchInsertOpengResultListInfo(List<OpengResultListInfoDto> items) {
+	public int batchInsertOpengResultListInfo(List<OpengResultListInfoDto> items) {
 		int rowCnt;
 		for (OpengResultListInfoDto item : items) {
 			cmmnMapper.insert("OpengResultListInfoMapper.batchInsertOpengResultListInfo", item);

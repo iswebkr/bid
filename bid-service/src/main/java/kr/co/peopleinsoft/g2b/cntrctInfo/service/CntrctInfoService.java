@@ -20,12 +20,7 @@ public class CntrctInfoService extends G2BAbstractBidService {
 	}
 
 	public <T extends BidRequestDto> int batchInsertHrcspSsstndrdInfo(URI uri, int pageNo, List<CntrctInfoDto> items, T requestDto) {
-		int rowCnt = 0;
-		for (CntrctInfoDto item : items) {
-			cmmnMapper.insert("CntrctInfoMapper.batchInsertCntrctInfo", item);
-			rowCnt++;
-		}
-		// 스케줄러 로그기록
+		int rowCnt = batchInsertHrcspSsstndrdInfo(items);
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
 		return rowCnt;
 	}

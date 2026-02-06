@@ -20,12 +20,7 @@ public class BidPublicInfoService extends G2BAbstractBidService {
 	}
 
 	public <T extends BidRequestDto> int batchInsertPublicInfo(URI uri, int pageNo, List<BidPublicInfoDto> items, T requestDto) {
-		int rowCnt;
-		for (BidPublicInfoDto item : items) {
-			cmmnMapper.insert("BidPublicInfoMapper.batchInsertPublicInfo", item);
-		}
-		rowCnt = cmmnMapper.flushBatchStatementsCount();
-		// 스케줄러 로그기록
+		int rowCnt = batchInsertPublicInfo(items);
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
 		return rowCnt;
 	}

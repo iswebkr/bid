@@ -10,18 +10,18 @@ import java.util.List;
 
 @Service
 public class ScsbidInfoSttsService extends G2BAbstractBidService {
-	public <T extends BidRequestDto> int batchInsertScsbidListSttus(URI uri, int pageNo, List<ScsbidListSttusDto> items, T requestDto) {
+	public int batchInsertScsbidListSttus(List<ScsbidListSttusDto> items) {
 		int rowCnt;
-
 		for (ScsbidListSttusDto item : items) {
 			cmmnMapper.insert("ScsbidListSttusMapper.batchInsertScsbidListSttus", item);
 		}
-
 		rowCnt = cmmnMapper.flushBatchStatementsCount();
+		return rowCnt;
+	}
 
-		// 스케줄러 로그기록
+	public <T extends BidRequestDto> int batchInsertScsbidListSttus(URI uri, int pageNo, List<ScsbidListSttusDto> items, T requestDto) {
+		int rowCnt = batchInsertScsbidListSttus(items);
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
-
 		return rowCnt;
 	}
 }
