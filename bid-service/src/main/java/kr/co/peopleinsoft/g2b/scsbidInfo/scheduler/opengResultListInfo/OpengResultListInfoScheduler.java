@@ -41,7 +41,7 @@ public class OpengResultListInfoScheduler {
 	@GetMapping("/CollectionTodayAndYesterdayDataJob")
 	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "최신자료수집"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "개찰결과 공사 목록 조회", "0 */5 * * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "개찰결과 공사 목록 조회", "0 */10 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

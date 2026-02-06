@@ -47,7 +47,7 @@ public class CntrctInfoScheduler extends CmmnAbstractController {
 	@GetMapping("/CollectionTodayAndYesterdayDataJob")
 	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "계약현황"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "계약현황", "어제/오늘 데이터 수집", "0 */5 * * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "계약현황", "어제/오늘 데이터 수집", "0 */10 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
