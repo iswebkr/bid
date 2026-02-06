@@ -32,7 +32,7 @@ public class OpengComptResultListInfoScheduler {
 	@GetMapping("/CollectionLastFiveYearDataJob")
 	public ResponseEntity<String> CollectionLastFiveYearDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionLastFiveYearDataJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "낙찰정보", "개찰결과 개찰완료", "0 0 21 * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "낙찰정보", "낙찰정보 - 개찰결과 개찰완료 데이터 수집", "0 0 21 * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
@@ -40,8 +40,8 @@ public class OpengComptResultListInfoScheduler {
 	@Operation(summary = "어제,오늘 데이터만 수집 (5분 단위 수집)", description = "어제/오늘 데이터 수집")
 	@GetMapping("/CollectionTodayAndYesterdayDataJob")
 	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
-		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "최신자료수집"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "낙찰정보 - 개찰결과 개찰완료 최신데이터 수집", "0 */10 * * * ?", new HashMap<>());
+		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "낙찰정보"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "낙찰정보 - 개찰결과 개찰완료 데이터 수집", "0 */10 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

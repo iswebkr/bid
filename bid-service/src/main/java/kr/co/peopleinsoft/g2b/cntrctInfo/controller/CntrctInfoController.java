@@ -52,7 +52,7 @@ public class CntrctInfoController extends G2BAbstractBidController {
 		LocalDateTime today = LocalDateTime.now();
 
 		// int startYear = today.getYear() - 10; // 5년전 데이터까지 수집
-		int startYear = 2020;
+		int startYear = today.getYear();
 		int startMonth = 1;
 		int endYear = today.getYear();
 		int endMonth = 12;

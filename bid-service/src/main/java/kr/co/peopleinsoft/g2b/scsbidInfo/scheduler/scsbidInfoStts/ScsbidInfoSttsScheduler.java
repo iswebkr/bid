@@ -32,7 +32,7 @@ public class ScsbidInfoSttsScheduler {
 	@GetMapping("/CollectionLastFiveYearDataJob")
 	public ResponseEntity<String> CollectionLastFiveYearDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionLastFiveYearDataJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "낙찰정보", "낙찰목록 현황 공사 정보 수집", "0 0 21 * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "낙찰정보", "낙찰목록 현황 수집", "0 0 21 * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
@@ -41,7 +41,7 @@ public class ScsbidInfoSttsScheduler {
 	@GetMapping("/CollectionTodayAndYesterdayDataJob")
 	public ResponseEntity<String> CollectionTodayAndYesterdayDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterdayDataJob", "낙찰정보"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "낙찰목록 현황 공사 정보 수집", "0 */10 * * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterdayDataJob.class, "CollectionTodayAndYesterdayDataJob", "낙찰정보", "낙찰목록 현황 수집", "0 */10 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}
