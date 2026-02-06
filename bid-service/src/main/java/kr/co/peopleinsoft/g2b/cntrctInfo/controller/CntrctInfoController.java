@@ -7,6 +7,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoReponseDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.dto.CntrctInfoRequestDto;
 import kr.co.peopleinsoft.g2b.cntrctInfo.service.CntrctInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +19,17 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/g2b/cntrctInfoService")
 @Tag(name = "나라장터 계약정보서비스", description = "https://www.data.go.kr/data/15129427/openapi.do")
 public class CntrctInfoController extends G2BAbstractBidController {
+
+	private static final Logger logger = LoggerFactory.getLogger(CntrctInfoController.class);
 
 	private final CntrctInfoService cntrctInfoService;
 
@@ -30,54 +37,26 @@ public class CntrctInfoController extends G2BAbstractBidController {
 		this.cntrctInfoService = cntrctInfoService;
 	}
 
-	@Operation(summary = "계약현황에 대한 공사조회")
-	@GetMapping("/getCntrctInfoListCnstwkPPSSrch")
-	public ResponseEntity<String> getCntrctInfoListCnstwk() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListCnstwk", "계약현황에 대한 공사조회"), asyncTaskExecutor);
+	private Map<String, String> getUriMap() {
+		Map<String, String> uriMap = new HashMap<>();
+		uriMap.put("getCntrctInfoListCnstwk", "계약현황에 대한 공사조회");
+		uriMap.put("getCntrctInfoListServc", "계약현황에 대한 용역조회");
+		uriMap.put("getCntrctInfoListFrgcpt", "계약현황에 대한 외자조회");
+		uriMap.put("getCntrctInfoListThng", "계약현황에 대한 물품조회");
+		return uriMap;
 	}
 
-	@Operation(summary = "계약현황에 대한 용역조회")
-	@GetMapping("/getCntrctInfoListServc")
-	public ResponseEntity<String> getCntrctInfoListServc() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListServc", "계약현황에 대한 용역조회"), asyncTaskExecutor);
-	}
+	@Operation(summary = "5년전 데이터까지 수집")
+	@GetMapping("/collectionLastFiveYearData")
+	public ResponseEntity<String> collectionLastFiveYearData() {
+		LocalDateTime today = LocalDateTime.now();
 
-	@Operation(summary = "계약현황에 대한 외자조회")
-	@GetMapping("/getCntrctInfoListFrgcpt")
-	public ResponseEntity<String> getCntrctInfoListFrgcpt() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListFrgcpt", "계약현황에 대한 외자조회"), asyncTaskExecutor);
-	}
+		// int startYear = today.getYear() - 10; // 5년전 데이터까지 수집
+		int startYear = 2020;
+		int startMonth = 1;
+		int endYear = today.getYear();
+		int endMonth = 12;
 
-	@Operation(summary = "계약현황에 대한 물품조회")
-	@GetMapping("/getCntrctInfoListThng")
-	public ResponseEntity<String> getCntrctInfoListThng() {
-		return asyncProcess(() -> saveCntrctInfo("getCntrctInfoListThng", "계약현황에 대한 물품조회"), asyncTaskExecutor);
-	}
-
-	@Operation(summary = "나라장터검색조건에 의한 계약현황 수집")
-	@GetMapping("/colctThisYearCntrctInfo")
-	public ResponseEntity<String> colctThisYearCntrctInfo() {
-		List<Runnable> runnables = List.of(
-			() -> saveThisYearCntrctInfo("getCntrctInfoListCnstwk", "계약현황에 대한 공사조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListServc", "계약현황에 대한 용역조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListFrgcpt", "계약현황에 대한 외자조회"),
-			() -> saveThisYearCntrctInfo("getCntrctInfoListThng", "계약현황에 대한 물품조회")
-		);
-		return asyncParallelProcess(runnables, asyncTaskExecutor);
-	}
-
-	private void saveThisYearCntrctInfo(String serviceId, String serviceDescription) {
-		int thisYear = LocalDateTime.now().getYear();
-		int thisMonth = LocalDateTime.now().getMonthValue();
-		saveCntrctInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
-	}
-
-	private void saveCntrctInfo(String serviceId, String serviceDescription) {
-		int lastYear = LocalDateTime.now().minusYears(1).getYear();
-		saveCntrctInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
-	}
-
-	private void saveCntrctInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -85,58 +64,119 @@ public class CntrctInfoController extends G2BAbstractBidController {
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "01";
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-				int startPage;
-				int totalPage;
+				getUriMap().forEach((serviceId, serviceDescription) -> {
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
+				});
+			}
+		}
 
-				CntrctInfoRequestDto requestDto = CntrctInfoRequestDto.builder()
-					.serviceKey(BidEnum.SERIAL_KEY.getKey())
-					.serviceId(serviceId)
-					.serviceDescription(serviceDescription)
-					.inqryBgnDt(inqryBgnDt)
-					.inqryEndDt(inqryEndDt)
-					.numOfRows(100)
-					.inqryDiv(1)
-					.type("json")
-					.build();
+		return ResponseEntity.ok().body("success");
+	}
 
-				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-				URI uri = uriComponentsBuilder.build().toUri();
+	@Operation(summary = "어제/오늘 데이터 수집")
+	@GetMapping("/collectionTodayAndYesterdayData")
+	public ResponseEntity<String> collectionTodayAndYesterdayData() {
+		LocalDateTime today = LocalDateTime.now(); // 오늘
+		LocalDateTime yesterday = today.minusDays(1); // 어제
 
-				CntrctInfoReponseDto responseDto = getResponse(CntrctInfoReponseDto.class, uri);
+		String inqryBgnDt = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String inqryEndDt = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-				if (responseDto == null) {
-					return;
+		List<Runnable> runnables = new ArrayList<>();
+
+		getUriMap().forEach((serviceId, serviceDescription) -> {
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt));
+		});
+
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
+	}
+
+	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		CntrctInfoRequestDto requestDto = CntrctInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			CntrctInfoReponseDto responseDto = getResponse(CntrctInfoReponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			int totalPage = responseDto.getTotalPage();
+
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(CntrctInfoReponseDto.class, uri);
+				}
+				cntrctInfoService.batchInsertHrcspSsstndrdInfo(responseDto.getItems());
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
+
+	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		CntrctInfoRequestDto requestDto = CntrctInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			CntrctInfoReponseDto responseDto = getResponse(CntrctInfoReponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
+
+			requestDto.setTotalCount(responseDto.getTotalCount());
+			requestDto.setTotalPage(responseDto.getTotalPage());
+
+			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+				if (pageNo == 1) {
+					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
+				} else {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(CntrctInfoReponseDto.class, uri);
+
+					requestDto.setTotalCount(responseDto.getTotalCount());
+					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				}
 
-				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-				startPage = bidSchdulHistManageService.getStartPage(requestDto);
-				totalPage = responseDto.getTotalPage();
-
-				requestDto.setTotalCount(responseDto.getTotalCount());
-				requestDto.setTotalPage(responseDto.getTotalPage());
-
-				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-					if (pageNo == 1) {
-						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					} else {
-						uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-
-						responseDto = getResponse(CntrctInfoReponseDto.class, uri);
-
-						requestDto.setTotalCount(responseDto.getTotalCount());
-						requestDto.setTotalPage(responseDto.getTotalPage());
-
-						cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					}
-
-					try {
-						Thread.sleep(1000 * 20);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
 			}
 		}
 	}

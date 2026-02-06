@@ -97,9 +97,6 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
-		int startPage = 1;
-		int totalPage;
-
 		HrcspSsstndrdInfoRequestDto requestDto = HrcspSsstndrdInfoRequestDto
 			.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -125,9 +122,13 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 				return;
 			}
 
-			totalPage = responseDto.getTotalPage();
+			int totalPage = responseDto.getTotalPage();
 
-			for (int pageNo = totalPage; pageNo >= startPage; pageNo--) {
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
+				}
 				hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(responseDto.getItems());
 				Thread.sleep(1000 * 30);
 			}
@@ -139,9 +140,6 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 	}
 
 	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
-		int startPage;
-		int totalPage;
-
 		HrcspSsstndrdInfoRequestDto requestDto = HrcspSsstndrdInfoRequestDto
 			.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
@@ -168,8 +166,8 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 			}
 
 			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-			startPage = bidSchdulHistManageService.getStartPage(requestDto);
-			totalPage = responseDto.getTotalPage();
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
 
 			requestDto.setTotalCount(responseDto.getTotalCount());
 			requestDto.setTotalPage(responseDto.getTotalPage());
@@ -179,9 +177,7 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 				if (pageNo == 1) {
 					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				} else {
-					uri = uriComponentsBuilder.cloneBuilder()
-						.replaceQueryParam("pageNo", pageNo)
-						.build().toUri();
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 
 					// 페이지별 uri 호출
 					responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);

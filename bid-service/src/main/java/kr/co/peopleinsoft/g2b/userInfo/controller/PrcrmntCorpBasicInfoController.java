@@ -7,6 +7,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.prcrmntCorp.PrcrmntCorpBasicInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.PrcrmntCorpBasicInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +19,17 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("/g2b/usrInfoService")
+@RequestMapping("/g2b/usrInfoService/prcrmntCorpBasicInfoService")
 @Tag(name = "조달청_나라장터 사용자정보 서비스 - 조달업체 기본정보 조회", description = "https://www.data.go.kr/data/15129466/openapi.do")
 public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
+
+	private static final Logger logger = LoggerFactory.getLogger(PrcrmntCorpBasicInfoController.class);
 
 	private final PrcrmntCorpBasicInfoService prcrmntCorpBasicInfoService;
 
@@ -29,30 +37,23 @@ public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 		this.prcrmntCorpBasicInfoService = prcrmntCorpBasicInfoService;
 	}
 
-	@Operation(summary = "조달업체 기본정보 / 업종정보 / 공급물품정보 수집")
-	@GetMapping("/saveStepPrcrmntCorpBasicInfo")
-	public ResponseEntity<String> saveStepPrcrmntCorpBasicInfo() {
-		return asyncProcess(() -> savePrcrmntCorpBasicInfo("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회"), asyncTaskExecutor);
+	private Map<String, String> getUriMap() {
+		Map<String, String> uriMap = new HashMap<>();
+		uriMap.put("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회");
+		return uriMap;
 	}
 
-	@Operation(summary = "이번년도 조달업체 기본정보 / 업종정보 / 공급물품정보 수집")
-	@GetMapping("/colctThisYearPrcrmntCorpBasicInfo")
-	public ResponseEntity<String> colctThisYearPrcrmntCorpBasicInfo() {
-		return asyncProcess(() -> saveThisYearPrcrmntCorpBasicInfo("getPrcrmntCorpBasicInfo02", "조달업체 기본정보 조회"), asyncTaskExecutor);
-	}
+	@Operation(summary = "5년전 데이터까지 수집")
+	@GetMapping("/collectionLastFiveYearData")
+	public ResponseEntity<String> collectionLastFiveYearData() {
+		LocalDateTime today = LocalDateTime.now();
 
-	private void saveThisYearPrcrmntCorpBasicInfo(String serviceId, String serviceDescription) {
-		int thisYear = LocalDateTime.now().getYear();
-		int thisMonth = LocalDateTime.now().getMonthValue();
-		savePrcrmntCorpBasicInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
-	}
+		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		int startYear = today.getYear();
+		int startMonth = 1;
+		int endYear = today.getYear();
+		int endMonth = 12;
 
-	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription) {
-		int lastYear = LocalDateTime.now().minusYears(1).getYear();
-		savePrcrmntCorpBasicInfo(serviceId, serviceDescription, 2020, lastYear, 1, 12);
-	}
-
-	private void savePrcrmntCorpBasicInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -60,61 +61,126 @@ public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				int startPage;
-				int totalPage;
+				getUriMap().forEach((serviceId, serviceDescription) -> {
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
+				});
+			}
+		}
 
-				PrcrmntCorpBasicInfoRequestDto requestDto = PrcrmntCorpBasicInfoRequestDto.builder()
-					.serviceKey(BidEnum.SERIAL_KEY.getKey())
-					.serviceId(serviceId)
-					.serviceDescription(serviceDescription)
-					.inqryBgnDt(inqryBgnDt)
-					.inqryEndDt(inqryEndDt)
-					.numOfRows(100)
-					.inqryDiv(1)
-					.type("json")
-					.build();
+		return ResponseEntity.ok().body("success");
+	}
 
-				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-				URI uri = uriComponentsBuilder.build().toUri();
+	@Operation(summary = "어제/오늘 데이터 수집")
+	@GetMapping("/collectionTodayAndYesterdayData")
+	public ResponseEntity<String> collectionTodayAndYesterdayData() {
+		LocalDateTime today = LocalDateTime.now(); // 오늘
+		LocalDateTime yesterday = today.minusDays(1); // 어제
 
-				PrcrmntCorpBasicInfoResponseDto responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+		String todayStart = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String todayEnd = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				if (responseDto == null) {
-					return;
+		String yesterdayStart = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
+
+		List<Runnable> runnables = new ArrayList<>();
+
+		getUriMap().forEach((serviceId, serviceDescription) -> {
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
+		});
+
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
+	}
+
+	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		PrcrmntCorpBasicInfoRequestDto requestDto = PrcrmntCorpBasicInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			PrcrmntCorpBasicInfoResponseDto responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			int totalPage = responseDto.getTotalPage();
+
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+				}
+				prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(responseDto.getItems());
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
+
+	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		PrcrmntCorpBasicInfoRequestDto requestDto = PrcrmntCorpBasicInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			PrcrmntCorpBasicInfoResponseDto responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+
+			if (responseDto == null) {
+				return;
+			}
+
+			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
+
+			requestDto.setTotalCount(responseDto.getTotalCount());
+			requestDto.setTotalPage(responseDto.getTotalPage());
+
+			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+				if (pageNo == 1) {
+					prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(uri, pageNo, responseDto.getItems(), requestDto);
+				} else {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+
+					requestDto.setTotalCount(responseDto.getTotalCount());
+					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+					updateColctPageInfo(requestDto);
+
+					prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				}
 
-				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-				startPage = bidSchdulHistManageService.getStartPage(requestDto);
-				totalPage = responseDto.getTotalPage();
-
-				requestDto.setTotalCount(responseDto.getTotalCount());
-				requestDto.setTotalPage(responseDto.getTotalPage());
-
-				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-					if (pageNo == 1) {
-						prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					} else {
-						uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-
-						responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
-
-						requestDto.setTotalCount(responseDto.getTotalCount());
-						requestDto.setTotalPage(responseDto.getTotalPage());
-
-						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-						updateColctPageInfo(requestDto);
-
-						prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					}
-
-					try {
-						Thread.sleep(1000 * 20);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
 			}
 		}
 	}

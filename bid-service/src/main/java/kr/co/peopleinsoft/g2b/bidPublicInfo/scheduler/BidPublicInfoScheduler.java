@@ -18,10 +18,7 @@ import java.util.HashMap;
 
 @Controller
 @RequestMapping("/scheduler/bidPublicInfoService")
-@Tag(
-	name = "나라장터 입찰공고정보서비스(BidPublicInfoService)"
-	, description = "조달청의 나라장터에서 제공하는 물품, 용역, 공사, 외자 입찰공고목록, 입찰공고상세정보, 기초금액정보, 면허제한정보, 참가가능지역정보, 입찰공고 변경이력를 제공하며 나라장터 입찰공고 검색조건으로도 업무별 입찰공고 정보를 제공하는 나라장터 입찰공고정보서비스\n" +
-	". 조달청과 연계기관의 입찰공고 정보 또한 제공")
+@Tag(name = "나라장터 입찰공고정보서비스(BidPublicInfoService)", description = "조달청의 나라장터에서 제공하는 물품, 용역, 공사, 외자 입찰공고목록, 입찰공고상세정보, 기초금액정보, 면허제한정보, 참가가능지역정보, 입찰공고 변경이력를 제공하며 나라장터 입찰공고 검색조건으로도 업무별 입찰공고 정보를 제공하는 나라장터 입찰공고정보서비스 조달청과 연계기관의 입찰공고 정보 또한 제공")
 public class BidPublicInfoScheduler extends CmmnAbstractController {
 
 	private final CmmnScheduleManager cmmnScheduleManager;
@@ -41,11 +38,11 @@ public class BidPublicInfoScheduler extends CmmnAbstractController {
 		return ResponseEntity.ok().body(jobList);
 	}
 
-	@Operation(summary = "어제,오늘 데이터만 수집 (10분 단위 수집)", description = "최근 입찰공고 데이터 수집")
+	@Operation(summary = "어제,오늘 데이터만 수집 (5분 단위 수집)", description = "최근 입찰공고 데이터 수집")
 	@GetMapping("/CollectionTodayAndYesterDayBidInfoJob")
 	public ResponseEntity<String> CollectionTodayAndYesterDayBidInfoJob() throws SchedulerException, JsonProcessingException {
-		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterDayBidInfoJob", "최신자료수집"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterDayBidInfoJob.class, "CollectionTodayAndYesterDayBidInfoJob", "최신자료수집", "최근 입찰공고 데이터 수집", "0 */10 * * * ?", new HashMap<>());
+		cmmnScheduleManager.deleteJob("CollectionTodayAndYesterDayBidInfoJob", "입찰공고"); // 이전에 등록된 job 삭제
+		cmmnScheduleManager.createCronJob(CollectionTodayAndYesterDayBidInfoJob.class, "CollectionTodayAndYesterDayBidInfoJob", "입찰공고", "최근 입찰공고 데이터 수집", "0 */5 * * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

@@ -65,7 +65,7 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				getUriMap().forEach((serviceId, serviceDescription) -> {
-					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt, 0), asyncTaskExecutor);
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
 				});
 			}
 		}
@@ -88,17 +88,14 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		List<Runnable> runnables = new ArrayList<>();
 
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
-			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd), asyncTaskExecutor);
+			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
 		});
 
 		return ResponseEntity.ok().body("success");
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
-		int startPage = 1;
-		int totalPage;
-
 		BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
 			.serviceId(serviceId)
@@ -110,7 +107,6 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 			.type("json")
 			.build();
 
-		// URI 를 빌드하고
 		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
 		URI uri = uriComponentsBuilder.build().toUri();
 
@@ -121,11 +117,15 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 				return;
 			}
 
-			totalPage = responseDto.getTotalPage();
+			int totalPage = responseDto.getTotalPage();
 
-			for (int pageNo = totalPage; pageNo >= startPage; pageNo--) {
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+				}
 				bidPublicInfoService.batchInsertPublicInfo(responseDto.getItems());
-				Thread.sleep(1000 * 30);
+				Thread.sleep(1000 * 20);
 			}
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
@@ -134,9 +134,7 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		}
 	}
 
-	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt, int startPage) {
-		int totalPage;
-
+	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
 		BidPublicInfoRequestDto requestDto = BidPublicInfoRequestDto.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
 			.serviceId(serviceId)
@@ -160,8 +158,8 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 			}
 
 			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-			startPage = bidSchdulHistManageService.getStartPage(requestDto);
-			totalPage = responseDto.getTotalPage();
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
 
 			requestDto.setTotalCount(responseDto.getTotalCount());
 			requestDto.setTotalPage(responseDto.getTotalPage());

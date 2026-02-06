@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class DminsttInfoJob extends DminsttInfoController implements Job {
+public class CollectionLastFiveYearDataJob extends DminsttInfoController implements Job {
 
-	public DminsttInfoJob(DminsttInfoService dminsttInfoService) {
+	public CollectionLastFiveYearDataJob(DminsttInfoService dminsttInfoService) {
 		super(dminsttInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		saveStepDminsttInfo();
+		collectionLastFiveYearData();
 	}
 }

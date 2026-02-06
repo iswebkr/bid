@@ -7,6 +7,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoRequestDto;
 import kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoResponseDto;
 import kr.co.peopleinsoft.g2b.userInfo.service.DminsttInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +19,17 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("/g2b/usrInfoService")
+@RequestMapping("/g2b/usrInfoService/dminsttInfoService")
 @Tag(name = "조달청_나라장터 사용자정보 서비스 - 수요기관정보조회", description = "https://www.data.go.kr/data/15129466/openapi.do")
 public class DminsttInfoController extends G2BAbstractBidController {
+
+	private static final Logger logger = LoggerFactory.getLogger(DminsttInfoController.class);
 
 	private final DminsttInfoService dminsttInfoService;
 
@@ -29,30 +37,22 @@ public class DminsttInfoController extends G2BAbstractBidController {
 		this.dminsttInfoService = dminsttInfoService;
 	}
 
-	@Operation(summary = "모든 사용자 정보 저장")
-	@GetMapping("/saveStepDminsttInfo")
-	public ResponseEntity<String> saveStepDminsttInfo() {
-		return asyncProcess(() -> saveDminsttInfo("getDminsttInfo02", "수요기관정보조회"), asyncTaskExecutor);
+	private Map<String, String> getUriMap() {
+		Map<String, String> uriMap = new HashMap<>();
+		uriMap.put("getDminsttInfo02", "수요기관정보조회");
+		return uriMap;
 	}
 
-	@Operation(summary = "이번년도 모든 사용자 정보 저장")
-	@GetMapping("/colctThisYearDminsttInfo")
-	public ResponseEntity<String> colctThisYearDminsttInfo() {
-		return asyncProcess(() -> saveThisYearDminsttInfo("getDminsttInfo02", "수요기관정보조회"), asyncTaskExecutor);
-	}
+	@Operation(summary = "5년전 데이터까지 수집")
+	@GetMapping("/collectionLastFiveYearData")
+	public ResponseEntity<String> collectionLastFiveYearData() {
+		LocalDateTime today = LocalDateTime.now();
 
-	private void saveThisYearDminsttInfo(String serviceId, String serviceDescription) {
-		int thisYear = LocalDateTime.now().getYear();
-		int thisMonth = LocalDateTime.now().getMonthValue();
-		saveDminsttInfo(serviceId, serviceDescription, thisYear, thisYear, 1, thisMonth);
-	}
+		int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		int startMonth = 1;
+		int endYear = today.getYear();
+		int endMonth = 12;
 
-	private void saveDminsttInfo(String serviceId, String serviceDescription) {
-		int lastYear = LocalDateTime.now().minusYears(1).getYear();
-		saveDminsttInfo(serviceId, serviceDescription, 2000, lastYear, 1, 12);
-	}
-
-	private void saveDminsttInfo(String serviceId, String serviceDescription, int startYear, int endYear, int startMonth, int endMonth) {
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
@@ -60,58 +60,121 @@ public class DminsttInfoController extends G2BAbstractBidController {
 				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
 				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				int startPage;
-				int totalPage;
+				getUriMap().forEach((serviceId, serviceDescription) -> {
+					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
+				});
+			}
+		}
 
-				DminsttInfoRequestDto requestDto = DminsttInfoRequestDto.builder()
-					.serviceKey(BidEnum.SERIAL_KEY.getKey())
-					.serviceId(serviceId)
-					.serviceDescription(serviceDescription)
-					.inqryBgnDt(inqryBgnDt)
-					.inqryEndDt(inqryEndDt)
-					.numOfRows(100)
-					.inqryDiv(1)
-					.type("json")
-					.build();
+		return ResponseEntity.ok().body("success");
+	}
 
-				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-				URI uri = uriComponentsBuilder.build().toUri();
+	@Operation(summary = "어제/오늘 데이터 수집")
+	@GetMapping("/collectionTodayAndYesterdayData")
+	public ResponseEntity<String> collectionTodayAndYesterdayData() {
+		LocalDateTime today = LocalDateTime.now(); // 오늘
+		LocalDateTime yesterday = today.minusDays(1); // 어제
 
-				DminsttInfoResponseDto responseDto = getResponse(DminsttInfoResponseDto.class, uri);
+		String todayStart = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String todayEnd = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
-				if (responseDto == null) {
-					return;
+		String yesterdayStart = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000";
+		String yesterdayEnd = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
+
+		List<Runnable> runnables = new ArrayList<>();
+
+		getUriMap().forEach((serviceId, serviceDescription) -> {
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
+		});
+
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
+	}
+
+	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		DminsttInfoRequestDto requestDto = DminsttInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			DminsttInfoResponseDto responseDto = getResponse(DminsttInfoResponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			int totalPage = responseDto.getTotalPage();
+
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					dminsttInfoService.batchInsertDminsttInfo(responseDto.getItems());
+					Thread.sleep(1000 * 20);
+				}
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
+
+	private void collectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
+		DminsttInfoRequestDto requestDto = DminsttInfoRequestDto.builder()
+			.serviceKey(BidEnum.SERIAL_KEY.getKey())
+			.serviceId(serviceId)
+			.serviceDescription(serviceDescription)
+			.inqryBgnDt(inqryBgnDt)
+			.inqryEndDt(inqryEndDt)
+			.numOfRows(100)
+			.inqryDiv(1)
+			.type("json")
+			.build();
+
+		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+		URI uri = uriComponentsBuilder.build().toUri();
+
+		try {
+			DminsttInfoResponseDto responseDto = getResponse(DminsttInfoResponseDto.class, uri);
+
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
+			}
+
+			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
+
+			requestDto.setTotalCount(responseDto.getTotalCount());
+			requestDto.setTotalPage(responseDto.getTotalPage());
+
+			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+				if (pageNo == 1) {
+					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
+				} else {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(DminsttInfoResponseDto.class, uri);
+
+					requestDto.setTotalCount(responseDto.getTotalCount());
+					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				}
 
-				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-				startPage = bidSchdulHistManageService.getStartPage(requestDto);
-				totalPage = responseDto.getTotalPage();
-
-				requestDto.setTotalCount(responseDto.getTotalCount());
-				requestDto.setTotalPage(responseDto.getTotalPage());
-
-				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-					if (pageNo == 1) {
-						dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					} else {
-						uri = uriComponentsBuilder.cloneBuilder()
-							.replaceQueryParam("pageNo", pageNo)
-							.build().toUri();
-
-						responseDto = getResponse(DminsttInfoResponseDto.class, uri);
-
-						requestDto.setTotalCount(responseDto.getTotalCount());
-						requestDto.setTotalPage(responseDto.getTotalPage());
-
-						dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
-					}
-
-					try {
-						Thread.sleep(1000 * 20);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
+				Thread.sleep(1000 * 20);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
 			}
 		}
 	}

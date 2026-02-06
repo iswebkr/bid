@@ -10,18 +10,23 @@ import java.util.List;
 
 @Service
 public class PrcrmntCorpBasicInfoService extends G2BAbstractBidService {
-	public <T extends BidRequestDto> int batchInsertPrcrmntCorpBasicInfo(URI uri, int pageNo, List<PrcrmntCorpBasicInfoDto> items, T requestDto) {
+	public int batchInsertPrcrmntCorpBasicInfo(List<PrcrmntCorpBasicInfoDto> items) {
 		int rowCnt;
-
 		for (PrcrmntCorpBasicInfoDto item : items) {
 			cmmnMapper.insert("PrcrmntCorpBasicInfoMapper.batchInsertPrcrmntCorpBasicInfo", item);
 		}
-
 		rowCnt = cmmnMapper.flushBatchStatementsCount();
+		return rowCnt;
+	}
 
+	public <T extends BidRequestDto> int batchInsertPrcrmntCorpBasicInfo(URI uri, int pageNo, List<PrcrmntCorpBasicInfoDto> items, T requestDto) {
+		int rowCnt;
+		for (PrcrmntCorpBasicInfoDto item : items) {
+			cmmnMapper.insert("PrcrmntCorpBasicInfoMapper.batchInsertPrcrmntCorpBasicInfo", item);
+		}
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
-
 		return rowCnt;
 	}
 }

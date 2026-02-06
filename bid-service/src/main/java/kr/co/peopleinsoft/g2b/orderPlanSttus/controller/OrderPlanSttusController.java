@@ -106,9 +106,6 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
-		int startPage = 1;
-		int totalPage;
-
 		OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
 			.serviceId(serviceId)
@@ -132,9 +129,14 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 				return;
 			}
 
-			totalPage = responseDto.getTotalPage();
+			int totalPage = responseDto.getTotalPage();
 
-			for (int pageNo = totalPage; pageNo >= startPage; pageNo--) {
+			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
+				if (pageNo > 1) {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
+				}
+
 				orderPlanSttusService.batchInsertBidOrderPlan(responseDto.getItems());
 				Thread.sleep(1000 * 20);
 			}
@@ -146,9 +148,6 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 	}
 
 	private void collectionData(String serviceId, String serviceDescription, String orderBgnYm, String orderEndYm, String inqryBgnDt, String inqryEndDt) {
-		int startPage;
-		int totalPage;
-
 		OrderPlanSttusRequestDto requestDto = OrderPlanSttusRequestDto.builder()
 			.serviceKey(BidEnum.SERIAL_KEY.getKey())
 			.serviceId(serviceId)
@@ -162,45 +161,44 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 			.type("json")
 			.build();
 
-		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-		URI uri = uriComponentsBuilder.build().toUri();
+		try {
+			UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+			URI uri = uriComponentsBuilder.build().toUri();
 
-		OrderPlanSttusResponseDto responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
+			OrderPlanSttusResponseDto responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
 
-		if (responseDto == null || responseDto.getTotalCount() <= 0) {
-			return;
-		}
-
-		// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-		startPage = bidSchdulHistManageService.getStartPage(requestDto);
-		totalPage = responseDto.getTotalPage();
-
-		requestDto.setTotalCount(responseDto.getTotalCount());
-		requestDto.setTotalPage(responseDto.getTotalPage());
-
-		for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-			if (pageNo == 1) {
-				orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
-			} else {
-				uri = uriComponentsBuilder.cloneBuilder()
-					.replaceQueryParam("pageNo", pageNo)
-					.build().toUri();
-
-				responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
-
-				requestDto.setTotalCount(responseDto.getTotalCount());
-				requestDto.setTotalPage(responseDto.getTotalPage());
-
-				// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-				updateColctPageInfo(requestDto);
-
-				orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
+			if (responseDto == null || responseDto.getTotalCount() <= 0) {
+				return;
 			}
 
-			try {
+			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+			int totalPage = responseDto.getTotalPage();
+
+			requestDto.setTotalCount(responseDto.getTotalCount());
+			requestDto.setTotalPage(responseDto.getTotalPage());
+
+			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+				if (pageNo == 1) {
+					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
+				} else {
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
+
+					requestDto.setTotalCount(responseDto.getTotalCount());
+					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+					updateColctPageInfo(requestDto);
+
+					orderPlanSttusService.batchInsertBidOrderPlan(uri, pageNo, responseDto.getItems(), requestDto);
+				}
+
 				Thread.sleep(1000 * 20);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error(e.getMessage());
 			}
 		}
 	}

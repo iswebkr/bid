@@ -6,14 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class ColctLatestDminsttInfoJob extends DminsttInfoController implements Job {
+public class CollectionTodayAndYesterdayDataJob extends DminsttInfoController implements Job {
 
-	public ColctLatestDminsttInfoJob(DminsttInfoService dminsttInfoService) {
+	public CollectionTodayAndYesterdayDataJob(DminsttInfoService dminsttInfoService) {
 		super(dminsttInfoService);
 	}
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		colctThisYearDminsttInfo();
+		collectionTodayAndYesterdayData();
 	}
 }

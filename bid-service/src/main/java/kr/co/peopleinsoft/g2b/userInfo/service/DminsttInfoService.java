@@ -10,18 +10,23 @@ import java.util.List;
 
 @Service
 public class DminsttInfoService extends G2BAbstractBidService {
-	public <T extends BidRequestDto> int batchInsertDminsttInfo(URI uri, int pageNo, List<DminsttInfoDto> items, T requestDto) {
+	public int batchInsertDminsttInfo(List<DminsttInfoDto> items) {
 		int rowCnt;
-
 		for (DminsttInfoDto item : items) {
 			cmmnMapper.insert("DminsttInfoMapper.batchInsertDminsttInfo", item);
 		}
-
 		rowCnt = cmmnMapper.flushBatchStatementsCount();
+		return rowCnt;
+	}
 
+	public <T extends BidRequestDto> int batchInsertDminsttInfo(URI uri, int pageNo, List<DminsttInfoDto> items, T requestDto) {
+		int rowCnt;
+		for (DminsttInfoDto item : items) {
+			cmmnMapper.insert("DminsttInfoMapper.batchInsertDminsttInfo", item);
+		}
+		rowCnt = cmmnMapper.flushBatchStatementsCount();
 		// 스케줄러 로그기록
 		insertSchdulHistLog(uri, pageNo, requestDto, rowCnt);
-
 		return rowCnt;
 	}
 }
