@@ -3,91 +3,91 @@
 
 <mapper namespace="ScsbidListSttusMapper">
 	<sql id="insertScsbidListSttusQuery">
-		-- 낙찰자정보 등록
-		INSERT INTO tb_bid_winner (
-		bid_ntce_no -- 입찰공고번호
-		,   bid_ntce_ord -- 입찰공고차수
-		,   bid_clsfc_no -- 입찰분류번호 (예: 물품, 용역, 공사 등 구분)
-		,   bidwinnr_bizno -- 낙찰자사업자등록번호 (10자리 또는 13자리)
-		,   rbid_no -- 재입찰번호 (재입찰 시 부여되는 일련번호)
-		,   ntce_div_cd -- 공고구분코드 (예: 공개경쟁, 제한경쟁 등)
-		,   bid_ntce_nm -- 입찰공고명
-		,   prtcpt_cnum -- 참가업체수 (해당 입찰에 참가한 총 업체 수)
-		,   bidwinnr_nm -- 낙찰자명 (낙찰받은 업체 또는 개인의 명칭)
-		,   bidwinnr_ceo_nm -- 낙찰자대표자명 (낙찰 업체의 대표자 성명)
-		,   bidwinnr_adrs -- 낙찰자주소 (낙찰 업체의 사업장 주소)
-		,   bidwinnr_tel_no -- 낙찰자전화번호
-		,   sucsfbid_amt -- 낙찰금액 (원, 최종 낙찰된 금액)
-		,   sucsfbid_rate -- 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리)
-		,   rl_openg_dt -- 실제개찰일시 (실제로 개찰이 진행된 일시)
-		,   fnl_sucsf_date -- 최종낙찰일자 (최종 낙찰이 확정된 날짜)
-		,   dminstt_cd -- 수요기관코드
-		,   dminstt_nm -- 수요기관명
-		,   rgst_dt -- 등록일시 (조달청 시스템 등록일시)
-		,   fnl_sucsf_corp_ofcl -- 최종낙찰업체담당자 (낙찰 업체의 담당자명)
-		,   created_dt -- 생성일시 (시스템 등록일시)
-		,   created_by -- 생성자 (시스템 등록자)
-		,   updated_dt -- 수정일시 (시스템 수정일시)
-		,   updated_by -- 수정자 (시스템 수정자)
-		) VALUES (
-		#{bidNtceNo} -- 입찰공고번호
-		,   #{bidNtceOrd} -- 입찰공고차수
-		,   #{bidClsfcNo} -- 입찰분류번호 (예: 물품, 용역, 공사 등 구분)
-		,   #{bidwinnrBizno} -- 낙찰자사업자등록번호 (10자리 또는 13자리)
-		,   #{rbidNo} -- 재입찰번호 (재입찰 시 부여되는 일련번호)
-		,   #{ntceDivCd} -- 공고구분코드 (예: 공개경쟁, 제한경쟁 등)
-		,   #{bidNtceNm} -- 입찰공고명
-		,   #{prtcptCnum} -- 참가업체수 (해당 입찰에 참가한 총 업체 수)
-		,   #{bidwinnrNm} -- 낙찰자명 (낙찰받은 업체 또는 개인의 명칭)
-		,   #{bidwinnrCeoNm} -- 낙찰자대표자명 (낙찰 업체의 대표자 성명)
-		,   #{bidwinnrAdrs} -- 낙찰자주소 (낙찰 업체의 사업장 주소)
-		,   #{bidwinnrTelNo} -- 낙찰자전화번호
-		,   #{sucsfbidAmt} -- 낙찰금액 (원, 최종 낙찰된 금액)
-		,   #{sucsfbidRate} -- 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리)
-		,   #{rlOpengDt} -- 실제개찰일시 (실제로 개찰이 진행된 일시)
-		,   #{fnlSucsfDate} -- 최종낙찰일자 (최종 낙찰이 확정된 날짜)
-		,   #{dminsttCd} -- 수요기관코드
-		,   #{dminsttNm} -- 수요기관명
-		,   #{rgstDt} -- 등록일시 (조달청 시스템 등록일시)
-		,   #{fnlSucsfCorpOfcl} -- 최종낙찰업체담당자 (낙찰 업체의 담당자명)
-		,   CURRENT_TIMESTAMP -- 생성일시 (시스템 등록일시)
-		,   #{createdBy} -- 생성자 (시스템 등록자)
-		,   CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
-		,   #{updatedBy} -- 수정자 (시스템 수정자)
+		insert into tb_bid_winner (
+				bid_ntce_no                   /* 입찰공고번호 [PK] */
+				, bid_ntce_ord                  /* 입찰공고차수 [PK] */
+				, bid_clsfc_no                  /* 입찰분류번호 (예: 물품, 용역, 공사 등 구분) [PK] */
+				, bidwinnr_bizno                /* 낙찰자사업자등록번호 (10자리 또는 13자리) [PK] */
+				, rbid_no                       /* 재입찰번호 (재입찰 시 부여되는 일련번호) */
+				, ntce_div_cd                   /* 공고구분코드 (예: 공개경쟁, 제한경쟁 등) */
+				, bid_ntce_nm                   /* 입찰공고명 */
+				, prtcpt_cnum                   /* 참가업체수 (해당 입찰에 참가한 총 업체 수) */
+				, bidwinnr_nm                   /* 낙찰자명 (낙찰받은 업체 또는 개인의 명칭) */
+				, bidwinnr_ceo_nm               /* 낙찰자대표자명 (낙찰 업체의 대표자 성명) */
+				, bidwinnr_adrs                 /* 낙찰자주소 (낙찰 업체의 사업장 주소) */
+				, bidwinnr_tel_no               /* 낙찰자전화번호 */
+				, sucsfbid_amt                  /* 낙찰금액 (원, 최종 낙찰된 금액) */
+				, sucsfbid_rate                 /* 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리) */
+				, rl_openg_dt                   /* 실제개찰일시 (실제로 개찰이 진행된 일시) */
+				, fnl_sucsf_date                /* 최종낙찰일자 (최종 낙찰이 확정된 날짜) */
+				, dminstt_cd                    /* 수요기관코드 */
+				, dminstt_nm                    /* 수요기관명 */
+				, rgst_dt                       /* 등록일시 (조달청 시스템 등록일시) */
+				, fnl_sucsf_corp_ofcl           /* 최종낙찰업체담당자 (낙찰 업체의 담당자명) */
+				, created_dt                    /* 생성일시 (시스템 등록일시) */
+				, created_by                    /* 생성자 (시스템 등록자) */
+				, updated_dt                    /* 수정일시 (시스템 수정일시) */
+				, updated_by                    /* 수정자 (시스템 수정자) */
+		) values (
+				#{bidNtceNo}                  /* 입찰공고번호 [PK] */
+				, #{bidNtceOrd}                 /* 입찰공고차수 [PK] */
+				, #{bidClsfcNo}                 /* 입찰분류번호 (예: 물품, 용역, 공사 등 구분) [PK] */
+				, #{bidwinnrBizno}              /* 낙찰자사업자등록번호 (10자리 또는 13자리) [PK] */
+				, #{rbidNo}                     /* 재입찰번호 (재입찰 시 부여되는 일련번호) */
+				, #{ntceDivCd}                  /* 공고구분코드 (예: 공개경쟁, 제한경쟁 등) */
+				, #{bidNtceNm}                  /* 입찰공고명 */
+				, #{prtcptCnum}                 /* 참가업체수 (해당 입찰에 참가한 총 업체 수) */
+				, #{bidwinnrNm}                 /* 낙찰자명 (낙찰받은 업체 또는 개인의 명칭) */
+				, #{bidwinnrCeoNm}              /* 낙찰자대표자명 (낙찰 업체의 대표자 성명) */
+				, #{bidwinnrAdrs}               /* 낙찰자주소 (낙찰 업체의 사업장 주소) */
+				, #{bidwinnrTelNo}              /* 낙찰자전화번호 */
+				, #{sucsfbidAmt}                /* 낙찰금액 (원, 최종 낙찰된 금액) */
+				, #{sucsfbidRate}               /* 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리) */
+				, #{rlOpengDt}                  /* 실제개찰일시 (실제로 개찰이 진행된 일시) */
+				, #{fnlSucsfDate}               /* 최종낙찰일자 (최종 낙찰이 확정된 날짜) */
+				, #{dminsttCd}                  /* 수요기관코드 */
+				, #{dminsttNm}                  /* 수요기관명 */
+				, #{rgstDt}                     /* 등록일시 (조달청 시스템 등록일시) */
+				, #{fnlSucsfCorpOfcl}           /* 최종낙찰업체담당자 (낙찰 업체의 담당자명) */
+				, CURRENT_TIMESTAMP                  /* 생성일시 (시스템 등록일시) */
+				, #{createdBy}                  /* 생성자 (시스템 등록자) */
+				, CURRENT_TIMESTAMP                  /* 수정일시 (시스템 수정일시) */
+				, #{updatedBy}                  /* 수정자 (시스템 수정자) */
 		)
 	</sql>
 
 	<select id="selectScsbidListSttus">
-		-- 낙찰자정보 조회
-		SELECT
-		a.bid_ntce_no -- 입찰공고번호
-		,   a.bid_ntce_ord -- 입찰공고차수
-		,   a.bid_clsfc_no -- 입찰분류번호 (예: 물품, 용역, 공사 등 구분)
-		,   a.bidwinnr_bizno -- 낙찰자사업자등록번호 (10자리 또는 13자리)
-		,   a.rbid_no -- 재입찰번호 (재입찰 시 부여되는 일련번호)
-		,   a.ntce_div_cd -- 공고구분코드 (예: 공개경쟁, 제한경쟁 등)
-		,   a.bid_ntce_nm -- 입찰공고명
-		,   a.prtcpt_cnum -- 참가업체수 (해당 입찰에 참가한 총 업체 수)
-		,   a.bidwinnr_nm -- 낙찰자명 (낙찰받은 업체 또는 개인의 명칭)
-		,   a.bidwinnr_ceo_nm -- 낙찰자대표자명 (낙찰 업체의 대표자 성명)
-		,   a.bidwinnr_adrs -- 낙찰자주소 (낙찰 업체의 사업장 주소)
-		,   a.bidwinnr_tel_no -- 낙찰자전화번호
-		,   a.sucsfbid_amt -- 낙찰금액 (원, 최종 낙찰된 금액)
-		,   a.sucsfbid_rate -- 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리)
-		,   a.rl_openg_dt -- 실제개찰일시 (실제로 개찰이 진행된 일시)
-		,   a.fnl_sucsf_date -- 최종낙찰일자 (최종 낙찰이 확정된 날짜)
-		,   a.dminstt_cd -- 수요기관코드
-		,   a.dminstt_nm -- 수요기관명
-		,   a.rgst_dt -- 등록일시 (조달청 시스템 등록일시)
-		,   a.fnl_sucsf_corp_ofcl -- 최종낙찰업체담당자 (낙찰 업체의 담당자명)
-		,   a.created_dt -- 생성일시 (시스템 등록일시)
-		,   a.created_by -- 생성자 (시스템 등록자)
-		,   a.updated_dt -- 수정일시 (시스템 수정일시)
-		,   a.updated_by -- 수정자 (시스템 수정자)
-		FROM tb_bid_winner a -- 낙찰자정보
+		select
+				bid_ntce_no                   /* 입찰공고번호 [PK] */
+				, bid_ntce_ord                  /* 입찰공고차수 [PK] */
+				, bid_clsfc_no                  /* 입찰분류번호 (예: 물품, 용역, 공사 등 구분) [PK] */
+				, bidwinnr_bizno                /* 낙찰자사업자등록번호 (10자리 또는 13자리) [PK] */
+				, rbid_no                       /* 재입찰번호 (재입찰 시 부여되는 일련번호) */
+				, ntce_div_cd                   /* 공고구분코드 (예: 공개경쟁, 제한경쟁 등) */
+				, bid_ntce_nm                   /* 입찰공고명 */
+				, prtcpt_cnum                   /* 참가업체수 (해당 입찰에 참가한 총 업체 수) */
+				, bidwinnr_nm                   /* 낙찰자명 (낙찰받은 업체 또는 개인의 명칭) */
+				, bidwinnr_ceo_nm               /* 낙찰자대표자명 (낙찰 업체의 대표자 성명) */
+				, bidwinnr_adrs                 /* 낙찰자주소 (낙찰 업체의 사업장 주소) */
+				, bidwinnr_tel_no               /* 낙찰자전화번호 */
+				, sucsfbid_amt                  /* 낙찰금액 (원, 최종 낙찰된 금액) */
+				, sucsfbid_rate                 /* 낙찰률 (예정가격 대비 낙찰금액 비율, 소수점 4자리) */
+				, rl_openg_dt                   /* 실제개찰일시 (실제로 개찰이 진행된 일시) */
+				, fnl_sucsf_date                /* 최종낙찰일자 (최종 낙찰이 확정된 날짜) */
+				, dminstt_cd                    /* 수요기관코드 */
+				, dminstt_nm                    /* 수요기관명 */
+				, rgst_dt                       /* 등록일시 (조달청 시스템 등록일시) */
+				, fnl_sucsf_corp_ofcl           /* 최종낙찰업체담당자 (낙찰 업체의 담당자명) */
+				, created_dt                    /* 생성일시 (시스템 등록일시) */
+				, created_by                    /* 생성자 (시스템 등록자) */
+				, updated_dt                    /* 수정일시 (시스템 수정일시) */
+				, updated_by                    /* 수정자 (시스템 수정자) */
+		from tb_bid_winner
+		where bid_ntce_no = #{bidNtceNo} AND bid_ntce_ord = #{bidNtceOrd} AND bid_clsfc_no = #{bidClsfcNo} AND bidwinnr_bizno = #{bidwinnrBizno}
 	</select>
 
 	<insert id="batchInsertScsbidListSttus">
 		<include refid="insertScsbidListSttusQuery" />
+		ON CONFLICT(bid_ntce_no, bid_ntce_ord, bid_clsfc_no, bidwinnr_bizno) DO NOTHING
 	</insert>
 </mapper>

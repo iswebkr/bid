@@ -3,91 +3,91 @@
 <mapper namespace="OpengComptResultListInfoMapper">
 
 	<sql id="insertOpengComptResultListInfoQuery">
-		-- 개찰완료 등록
-		INSERT INTO tb_bid_open_complete (
-		bid_ntce_no -- 입찰공고번호
-		,   bid_ntce_ord -- 입찰공고차수
-		,   openg_rank -- 개찰순위 (1위, 2위, 3위 등 투찰 순위)
-		,   bid_clsfc_no -- 입찰분류번호 (예: 0=일반입찰)
-		,   openg_rslt_div_nm -- 개찰결과구분명 (예: 낙찰, 유찰, 실격 등)
-		,   rbid_no -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
-		,   prcbdr_bizno -- 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리)
-		,   prcbdr_nm -- 투찰자명 (입찰에 참여한 업체명 또는 개인명)
-		,   prcbdr_ceo_nm -- 투찰자대표자명 (투찰 업체의 대표자 성명)
-		,   bidprc_amt -- 투찰금액 (원, 투찰자가 제시한 입찰 금액)
-		,   bidprcrt -- 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리)
-		,   rmrk -- 비고 (특이사항, 실격사유 등)
-		,   cnstty_accot_bid_amt_url -- 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL)
-		,   drwt_no1 -- 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호)
-		,   drwt_no2 -- 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호)
-		,   bidprc_dt -- 투찰일시 (투찰자가 입찰가격을 제출한 일시)
-		,   bid_prce_evl_val -- 입찰가격평가값 (가격 평가 점수, 소수점 4자리)
-		,   tech_evl_val -- 기술평가값 (기술 평가 점수, 소수점 4자리)
-		,   total_evl_amt_val -- 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리)
-		,   tech_evl_natur_val -- 기술평가성질값 (기술평가의 성격 또는 등급)
-		,   created_dt -- 생성일시 (시스템 등록일시)
-		,   created_by -- 생성자 (시스템 등록자)
-		,   updated_dt -- 수정일시 (시스템 수정일시)
-		,   updated_by -- 수정자 (시스템 수정자)
-		) VALUES (
-		#{bidNtceNo} -- 입찰공고번호
-		,   #{bidNtceOrd} -- 입찰공고차수
-		,   #{opengRank} -- 개찰순위 (1위, 2위, 3위 등 투찰 순위)
-		,   #{bidClsfcNo} -- 입찰분류번호 (예: 0=일반입찰)
-		,   #{opengRsltDivNm} -- 개찰결과구분명 (예: 낙찰, 유찰, 실격 등)
-		,   #{rbidNo} -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
-		,   #{prcbdrBizno} -- 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리)
-		,   #{prcbdrNm} -- 투찰자명 (입찰에 참여한 업체명 또는 개인명)
-		,   #{prcbdrCeoNm} -- 투찰자대표자명 (투찰 업체의 대표자 성명)
-		,   #{bidprcAmt} -- 투찰금액 (원, 투찰자가 제시한 입찰 금액)
-		,   #{bidprcrt} -- 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리)
-		,   #{rmrk} -- 비고 (특이사항, 실격사유 등)
-		,   #{cnsttyAccotBidAmtUrl} -- 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL)
-		,   #{drwtNo1} -- 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호)
-		,   #{drwtNo2} -- 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호)
-		,   #{bidprcDt} -- 투찰일시 (투찰자가 입찰가격을 제출한 일시)
-		,   #{bidPrceEvlVal} -- 입찰가격평가값 (가격 평가 점수, 소수점 4자리)
-		,   #{techEvlVal} -- 기술평가값 (기술 평가 점수, 소수점 4자리)
-		,   #{totalEvlAmtVal} -- 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리)
-		,   #{techEvlNaturVal} -- 기술평가성질값 (기술평가의 성격 또는 등급)
-		,   CURRENT_TIMESTAMP -- 생성일시 (시스템 등록일시)
-		,   #{createdBy} -- 생성자 (시스템 등록자)
-		,   CURRENT_TIMESTAMP -- 수정일시 (시스템 수정일시)
-		,   #{updatedBy} -- 수정자 (시스템 수정자)
+		insert into tb_bid_open_complete (
+				bid_ntce_no                   /* 입찰공고번호 [PK] */
+				, bid_ntce_ord                  /* 입찰공고차수 [PK] */
+				, openg_rank                    /* 개찰순위 (1위, 2위, 3위 등 투찰 순위) [PK] */
+				, bid_clsfc_no                  /* 입찰분류번호 (예: 0=일반입찰) */
+				, openg_rslt_div_nm             /* 개찰결과구분명 (예: 낙찰, 유찰, 실격 등) */
+				, rbid_no                       /* 재입찰번호 (예: 000=최초입찰, 001=재입찰) */
+				, prcbdr_bizno                  /* 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리) */
+				, prcbdr_nm                     /* 투찰자명 (입찰에 참여한 업체명 또는 개인명) */
+				, prcbdr_ceo_nm                 /* 투찰자대표자명 (투찰 업체의 대표자 성명) */
+				, bidprc_amt                    /* 투찰금액 (원, 투찰자가 제시한 입찰 금액) */
+				, bidprcrt                      /* 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리) */
+				, rmrk                          /* 비고 (특이사항, 실격사유 등) */
+				, cnstty_accot_bid_amt_url      /* 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL) */
+				, drwt_no1                      /* 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호) */
+				, drwt_no2                      /* 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호) */
+				, bidprc_dt                     /* 투찰일시 (투찰자가 입찰가격을 제출한 일시) */
+				, bid_prce_evl_val              /* 입찰가격평가값 (가격 평가 점수, 소수점 4자리) */
+				, tech_evl_val                  /* 기술평가값 (기술 평가 점수, 소수점 4자리) */
+				, total_evl_amt_val             /* 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리) */
+				, tech_evl_natur_val            /* 기술평가성질값 (기술평가의 성격 또는 등급) */
+				, created_dt                    /* 생성일시 (시스템 등록일시) */
+				, created_by                    /* 생성자 (시스템 등록자) */
+				, updated_dt                    /* 수정일시 (시스템 수정일시) */
+				, updated_by                    /* 수정자 (시스템 수정자) */
+		) values (
+				#{bidNtceNo}                  /* 입찰공고번호 [PK] */
+				, #{bidNtceOrd}                 /* 입찰공고차수 [PK] */
+				, #{opengRank}                  /* 개찰순위 (1위, 2위, 3위 등 투찰 순위) [PK] */
+				, #{bidClsfcNo}                 /* 입찰분류번호 (예: 0=일반입찰) */
+				, #{opengRsltDivNm}             /* 개찰결과구분명 (예: 낙찰, 유찰, 실격 등) */
+				, #{rbidNo}                     /* 재입찰번호 (예: 000=최초입찰, 001=재입찰) */
+				, #{prcbdrBizno}                /* 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리) */
+				, #{prcbdrNm}                   /* 투찰자명 (입찰에 참여한 업체명 또는 개인명) */
+				, #{prcbdrCeoNm}                /* 투찰자대표자명 (투찰 업체의 대표자 성명) */
+				, #{bidprcAmt}                  /* 투찰금액 (원, 투찰자가 제시한 입찰 금액) */
+				, #{bidprcrt}                   /* 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리) */
+				, #{rmrk}                       /* 비고 (특이사항, 실격사유 등) */
+				, #{cnsttyAccotBidAmtUrl}       /* 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL) */
+				, #{drwtNo1}                    /* 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호) */
+				, #{drwtNo2}                    /* 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호) */
+				, #{bidprcDt}                   /* 투찰일시 (투찰자가 입찰가격을 제출한 일시) */
+				, #{bidPrceEvlVal}              /* 입찰가격평가값 (가격 평가 점수, 소수점 4자리) */
+				, #{techEvlVal}                 /* 기술평가값 (기술 평가 점수, 소수점 4자리) */
+				, #{totalEvlAmtVal}             /* 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리) */
+				, #{techEvlNaturVal}            /* 기술평가성질값 (기술평가의 성격 또는 등급) */
+				, CURRENT_TIMESTAMP                  /* 생성일시 (시스템 등록일시) */
+				, #{createdBy}                  /* 생성자 (시스템 등록자) */
+				, CURRENT_TIMESTAMP                 /* 수정일시 (시스템 수정일시) */
+				, #{updatedBy}                  /* 수정자 (시스템 수정자) */
 		)
 	</sql>
 
 	<select id="selectOpengComptResultListInfo">
-		-- 개찰완료 조회
-		SELECT
-		a.bid_ntce_no -- 입찰공고번호
-		,   a.bid_ntce_ord -- 입찰공고차수
-		,   a.openg_rank -- 개찰순위 (1위, 2위, 3위 등 투찰 순위)
-		,   a.bid_clsfc_no -- 입찰분류번호 (예: 0=일반입찰)
-		,   a.openg_rslt_div_nm -- 개찰결과구분명 (예: 낙찰, 유찰, 실격 등)
-		,   a.rbid_no -- 재입찰번호 (예: 000=최초입찰, 001=재입찰)
-		,   a.prcbdr_bizno -- 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리)
-		,   a.prcbdr_nm -- 투찰자명 (입찰에 참여한 업체명 또는 개인명)
-		,   a.prcbdr_ceo_nm -- 투찰자대표자명 (투찰 업체의 대표자 성명)
-		,   a.bidprc_amt -- 투찰금액 (원, 투찰자가 제시한 입찰 금액)
-		,   a.bidprcrt -- 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리)
-		,   a.rmrk -- 비고 (특이사항, 실격사유 등)
-		,   a.cnstty_accot_bid_amt_url -- 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL)
-		,   a.drwt_no1 -- 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호)
-		,   a.drwt_no2 -- 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호)
-		,   a.bidprc_dt -- 투찰일시 (투찰자가 입찰가격을 제출한 일시)
-		,   a.bid_prce_evl_val -- 입찰가격평가값 (가격 평가 점수, 소수점 4자리)
-		,   a.tech_evl_val -- 기술평가값 (기술 평가 점수, 소수점 4자리)
-		,   a.total_evl_amt_val -- 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리)
-		,   a.tech_evl_natur_val -- 기술평가성질값 (기술평가의 성격 또는 등급)
-		,   a.created_dt -- 생성일시 (시스템 등록일시)
-		,   a.created_by -- 생성자 (시스템 등록자)
-		,   a.updated_dt -- 수정일시 (시스템 수정일시)
-		,   a.updated_by -- 수정자 (시스템 수정자)
-		FROM tb_bid_open_complete a -- 개찰완료
+		select
+				bid_ntce_no                   /* 입찰공고번호 [PK] */
+				, bid_ntce_ord                  /* 입찰공고차수 [PK] */
+				, openg_rank                    /* 개찰순위 (1위, 2위, 3위 등 투찰 순위) [PK] */
+				, bid_clsfc_no                  /* 입찰분류번호 (예: 0=일반입찰) */
+				, openg_rslt_div_nm             /* 개찰결과구분명 (예: 낙찰, 유찰, 실격 등) */
+				, rbid_no                       /* 재입찰번호 (예: 000=최초입찰, 001=재입찰) */
+				, prcbdr_bizno                  /* 투찰자사업자번호 (입찰에 참여한 업체의 사업자등록번호, 10자리) */
+				, prcbdr_nm                     /* 투찰자명 (입찰에 참여한 업체명 또는 개인명) */
+				, prcbdr_ceo_nm                 /* 투찰자대표자명 (투찰 업체의 대표자 성명) */
+				, bidprc_amt                    /* 투찰금액 (원, 투찰자가 제시한 입찰 금액) */
+				, bidprcrt                      /* 투찰률 (예정가격 대비 투찰금액 비율, %, 소수점 2자리) */
+				, rmrk                          /* 비고 (특이사항, 실격사유 등) */
+				, cnstty_accot_bid_amt_url      /* 공종분담투찰금액URL (건설공사의 공종별 분담 금액 상세 URL) */
+				, drwt_no1                      /* 추첨번호1 (예비가격 추첨 시 첫 번째 추첨 번호) */
+				, drwt_no2                      /* 추첨번호2 (예비가격 추첨 시 두 번째 추첨 번호) */
+				, bidprc_dt                     /* 투찰일시 (투찰자가 입찰가격을 제출한 일시) */
+				, bid_prce_evl_val              /* 입찰가격평가값 (가격 평가 점수, 소수점 4자리) */
+				, tech_evl_val                  /* 기술평가값 (기술 평가 점수, 소수점 4자리) */
+				, total_evl_amt_val             /* 종합평가금액값 (가격+기술 종합 평가 점수, 소수점 4자리) */
+				, tech_evl_natur_val            /* 기술평가성질값 (기술평가의 성격 또는 등급) */
+				, created_dt                    /* 생성일시 (시스템 등록일시) */
+				, created_by                    /* 생성자 (시스템 등록자) */
+				, updated_dt                    /* 수정일시 (시스템 수정일시) */
+				, updated_by                    /* 수정자 (시스템 수정자) */
+		from tb_bid_open_complete
+		where bid_ntce_no = #{bidNtceNo} AND bid_ntce_ord = #{bidNtceOrd} AND openg_rank = #{opengRank}
 	</select>
 
 	<insert id="batchInsertOpengComptResultListInfo">
 		<include refid="insertOpengComptResultListInfoQuery" />
+		ON CONFLICT(bid_ntce_no, bid_ntce_ord, openg_rank) DO NOTHING
 	</insert>
 </mapper>

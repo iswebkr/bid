@@ -3,7 +3,7 @@
 <mapper namespace="PrcrmntCorpBasicInfoMapper">
 
 	<sql id="insertPrcrmntCorpBasicInfoQuery">
-		insert into public.tb_bid_procurement_company (
+		insert into tb_bid_procurement_company (
 				bizno                         /* 사업자번호 (업체를 고유하게 식별하는 사업자등록번호, 10자리) [PK] */
 				, corp_nm                       /* 업체명 (업체의 정식 명칭) */
 				, eng_corp_nm                   /* 영문업체명 (업체의 영문 명칭) */
@@ -91,7 +91,7 @@
 				, created_by                    /* 생성자 (시스템 등록자) */
 				, updated_dt                    /* 수정일시 (시스템 수정일시) */
 				, updated_by                    /* 수정자 (시스템 수정자) */
-		from public.tb_bid_procurement_company
+		from tb_bid_procurement_company
 		where bizno = #{bizno}
 	</select>
 

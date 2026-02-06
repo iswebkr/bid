@@ -116,7 +116,7 @@
 	</insert>
 
 	<update id="updateDminsttInfo" parameterType="kr.co.peopleinsoft.g2b.userInfo.dto.dminsttInfo.DminsttInfoDto">
-		update public.tb_bid_demand_institute
+		update tb_bid_demand_institute
 		set
 				dminstt_nm = #{dminsttNm}                    /* 수요기관명 (수요기관의 정식 명칭) */
 				, dminstt_abrvt_nm = #{dminsttAbrvtNm}         /* 수요기관약어명 (수요기관의 약칭) */

@@ -4,7 +4,7 @@
 <mapper namespace="BidOrderPlanSttusMapper">
 
 	<sql id="insertOrderPlanQuery">
-		insert into public.tb_bid_order_plan (
+		insert into tb_bid_order_plan (
 				order_plan_unty_no            /* 발주계획통합번호 (발주계획의 고유 통합 번호) [PK] */
 				, order_plan_sno                /* 발주계획일련번호 (발주계획의 일련번호) */
 				, order_ord                     /* 발주차수 (발주 차수) */
@@ -200,7 +200,7 @@
 				, created_by                    /* 생성자 (시스템 등록자) */
 				, updated_dt                    /* 수정일시 (시스템 수정일시) */
 				, updated_by                    /* 수정자 (시스템 수정자) */
-		from public.tb_bid_order_plan
+		from tb_bid_order_plan
 		where order_plan_unty_no = #{orderPlanUntyNo}
 	</select>
 

@@ -3,7 +3,7 @@
 <mapper namespace="CntrctInfoMapper">
 	<sql id="insertCntrctInfoQuery">
 		-- 계약현황 등록
-		insert into public.tb_bid_contract_status (
+		insert into tb_bid_contract_status (
 				unty_cntrct_no                /* 통합계약번호 (계약을 고유하게 식별하는 번호) [PK] */
 				, bsns_div_nm                   /* 업무구분명 (예: 물품구매, 용역, 공사 등) */
 				, dcsn_cntrct_no                /* 결정계약번호 (계약 결정 시 부여되는 번호) */
@@ -230,7 +230,7 @@
 				, created_by                    /* 생성자 (시스템 등록자) */
 				, updated_dt                    /* 수정일시 (시스템 수정일시) */
 				, updated_by                    /* 수정자 (시스템 수정자) */
-		from public.tb_bid_contract_status
+		from tb_bid_contract_status
 		where unty_cntrct_no = #{untyCntrctNo}
 	</select>
 
