@@ -48,7 +48,7 @@ public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		// int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
 		int startYear = today.getYear();
 		int startMonth = 1;
 		int endYear = today.getYear();
@@ -121,7 +121,15 @@ public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
 				}
-				prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(responseDto.getItems());
+
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
+				if (responseDto.getTotalCount() > 0) {
+					prcrmntCorpBasicInfoService.batchInsertPrcrmntCorpBasicInfo(responseDto.getItems());
+				}
+
 				Thread.sleep(1000 * 20);
 			}
 		} catch (Exception e) {
@@ -166,6 +174,10 @@ public class PrcrmntCorpBasicInfoController extends G2BAbstractBidController {
 				} else {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(PrcrmntCorpBasicInfoResponseDto.class, uri);
+
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
 
 					requestDto.setTotalCount(responseDto.getTotalCount());
 					requestDto.setTotalPage(responseDto.getTotalPage());

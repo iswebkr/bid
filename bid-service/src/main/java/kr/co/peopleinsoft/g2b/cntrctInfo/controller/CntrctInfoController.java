@@ -120,6 +120,11 @@ public class CntrctInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(CntrctInfoReponseDto.class, uri);
 				}
+
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
 				cntrctInfoService.batchInsertHrcspSsstndrdInfo(responseDto.getItems());
 				Thread.sleep(1000 * 20);
 			}
@@ -166,8 +171,15 @@ public class CntrctInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(CntrctInfoReponseDto.class, uri);
 
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
+
 					requestDto.setTotalCount(responseDto.getTotalCount());
 					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+					updateColctPageInfo(requestDto);
 
 					cntrctInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				}

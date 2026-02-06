@@ -88,11 +88,11 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		List<Runnable> runnables = new ArrayList<>();
 
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd), asyncTaskExecutor);
-			asyncProcess(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd), asyncTaskExecutor);
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
+			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
 		});
 
-		return ResponseEntity.ok().body("success");
+		return asyncParallelProcess(runnables, asyncTaskExecutor);
 	}
 
 	private void todayCollectionData(String serviceId, String serviceDescription, String inqryBgnDt, String inqryEndDt) {
@@ -124,6 +124,11 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
 				}
+
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
 				bidPublicInfoService.batchInsertPublicInfo(responseDto.getItems());
 				Thread.sleep(1000 * 20);
 			}
@@ -170,21 +175,20 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 					responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
 				}
 
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
 				requestDto.setTotalCount(responseDto.getTotalCount());
 				requestDto.setTotalPage(responseDto.getTotalPage());
 
 				// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
 				updateColctPageInfo(requestDto);
 
-				// 수집 데이터 정보 저장
 				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
 
 				// 30초
-				try {
-					Thread.sleep(1000 * 30);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+				Thread.sleep(1000 * 20);
 			}
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {

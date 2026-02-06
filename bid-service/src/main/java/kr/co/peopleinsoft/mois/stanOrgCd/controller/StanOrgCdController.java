@@ -131,9 +131,7 @@ public class StanOrgCdController extends G2BAbstractBidController {
 		}
 
 		for (int pageNo = startPage; pageNo <= endPage; pageNo++) {
-			URI uri = uriComponentsBuilder.cloneBuilder()
-				.replaceQueryParam("pageNo", pageNo)
-				.build().toUri();
+			URI uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 			stanOrgCdService.batchInsertStanOrgCd(uri, pageNo, requestDto);
 
 			// 30초

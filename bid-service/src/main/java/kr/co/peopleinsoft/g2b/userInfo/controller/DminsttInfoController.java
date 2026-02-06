@@ -48,7 +48,8 @@ public class DminsttInfoController extends G2BAbstractBidController {
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		// int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
+		int startYear = today.getYear();
 		int startMonth = 1;
 		int endYear = today.getYear();
 		int endMonth = 12;
@@ -117,9 +118,16 @@ public class DminsttInfoController extends G2BAbstractBidController {
 
 			for (int pageNo = totalPage; pageNo >= 1; pageNo--) {
 				if (pageNo > 1) {
-					dminsttInfoService.batchInsertDminsttInfo(responseDto.getItems());
-					Thread.sleep(1000 * 20);
+					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+					responseDto = getResponse(DminsttInfoResponseDto.class, uri);
 				}
+
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
+				dminsttInfoService.batchInsertDminsttInfo(responseDto.getItems());
+				Thread.sleep(1000 * 20);
 			}
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
@@ -164,8 +172,15 @@ public class DminsttInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(DminsttInfoResponseDto.class, uri);
 
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
+
 					requestDto.setTotalCount(responseDto.getTotalCount());
 					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+					updateColctPageInfo(requestDto);
 
 					dminsttInfoService.batchInsertDminsttInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				}

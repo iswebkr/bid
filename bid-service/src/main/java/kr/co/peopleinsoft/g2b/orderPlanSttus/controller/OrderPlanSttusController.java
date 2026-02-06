@@ -137,6 +137,10 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 					responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
 				}
 
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
 				orderPlanSttusService.batchInsertBidOrderPlan(responseDto.getItems());
 				Thread.sleep(1000 * 20);
 			}
@@ -184,6 +188,10 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 				} else {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(OrderPlanSttusResponseDto.class, uri);
+
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
 
 					requestDto.setTotalCount(responseDto.getTotalCount());
 					requestDto.setTotalPage(responseDto.getTotalPage());

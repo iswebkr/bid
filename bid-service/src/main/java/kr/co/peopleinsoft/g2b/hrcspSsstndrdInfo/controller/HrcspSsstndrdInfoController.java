@@ -129,6 +129,11 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
 					responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
 				}
+
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					break;
+				}
+
 				hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(responseDto.getItems());
 				Thread.sleep(1000 * 30);
 			}
@@ -178,9 +183,11 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
 				} else {
 					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
-
-					// 페이지별 uri 호출
 					responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
+
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
 
 					requestDto.setTotalCount(responseDto.getTotalCount());
 					requestDto.setTotalPage(responseDto.getTotalPage());
