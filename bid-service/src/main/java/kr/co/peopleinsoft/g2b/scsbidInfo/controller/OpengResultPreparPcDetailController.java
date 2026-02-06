@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/g2b/scsbidInfoService")
+@RequestMapping("/g2b/scsbidInfoService/opengResultPreparPcDetail")
 @Tag(name = "나라장터 낙찰정보서비스 - 개찰결과 예비가격상세 목록 정보 수집", description = "https://www.data.go.kr/data/15129397/openapi.do")
 public class OpengResultPreparPcDetailController extends G2BAbstractBidController {
 

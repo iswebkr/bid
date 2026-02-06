@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.HashMap;
 
 @Controller
-@RequestMapping("/scheduler/ScsbidInfoService")
+@RequestMapping("/scheduler/ScsbidInfoService/opengResultPreparPcDetail")
 @Tag(name = "나라장터 낙찰정보서비스(ScsbidInfoService)", description = "나라장터 개찰결과를 물품, 공사, 용역, 외자의 업무별로 제공하는 서비스로 각 업무별로 최종낙찰자, 개찰순위, 복수예비가 및 예비가격 정보를 제공하며 개찰완료목록, 재입찰목록, 유찰목록 또한 제공하는 나라장터 낙찰정보서비스")
 public class OpengResultPreparPcDetailScheduler {
 
