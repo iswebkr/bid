@@ -46,28 +46,41 @@ public class CntrctInfoController extends G2BAbstractBidController {
 		return uriMap;
 	}
 
+	private UriComponentsBuilder getUriComponentsBuilder(CntrctInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt())
+			.queryParam("type", "json");
+	}
+
 	@Operation(summary = "5년전 데이터까지 수집")
 	@GetMapping("/collectionLastFiveYearData")
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		// int startYear = today.getYear() - 10; // 5년전 데이터까지 수집
-		int startYear = today.getYear();
+		int startYear = 2020;
 		int endYear = today.getYear();
 		int startMonth = 1;
 		int endMonth = 12;
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 
-			if(targetYear == today.getYear()) {
+			if (targetYear == today.getYear()) {
 				endMonth = today.getMonthValue();
 			}
 
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
-				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "01";
-				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+				String inqryBgnDt = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM")) + "010000";
+				String inqryEndDt = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "2359";
 
 				getUriMap().forEach((serviceId, serviceDescription) -> {
 					asyncProcess(() -> collectionData(serviceId, serviceDescription, inqryBgnDt, inqryEndDt), asyncTaskExecutor);
@@ -196,19 +209,5 @@ public class CntrctInfoController extends G2BAbstractBidController {
 				logger.error(e.getMessage());
 			}
 		}
-	}
-
-	private UriComponentsBuilder getUriComponentsBuilder(CntrctInfoRequestDto requestDto) {
-		return UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("apis.data.go.kr")
-			.pathSegment("1230000/ao/CntrctInfoService", requestDto.getServiceId())
-			.queryParam("serviceKey", requestDto.getServiceKey())
-			.queryParam("pageNo", 1)
-			.queryParam("numOfRows", requestDto.getNumOfRows())
-			.queryParam("inqryDiv", requestDto.getInqryDiv())
-			.queryParam("type", "json")
-			.queryParam("inqryBgnDate", requestDto.getInqryBgnDt())
-			.queryParam("inqryEndDate", requestDto.getInqryEndDt());
 	}
 }

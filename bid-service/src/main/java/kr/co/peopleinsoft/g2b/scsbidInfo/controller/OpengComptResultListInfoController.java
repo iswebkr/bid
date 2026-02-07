@@ -43,13 +43,24 @@ public class OpengComptResultListInfoController extends G2BAbstractBidController
 		return uriMap;
 	}
 
+	private UriComponentsBuilder getUriComponentsBuilder(OpengComptResultListInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("bidNtceNo", requestDto.getBidNtceNo()) // 필수 (입찰공고번호)
+			.queryParam("type", "json");
+	}
+
 	@Operation(summary = "5년전 데이터까지 수집")
 	@GetMapping("/collectionLastFiveYearData")
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
-		int startYear = today.getYear();
+		int startYear = 2020;
 		int startMonth = 1;
 		int endYear = today.getYear();
 		int endMonth = 12;
@@ -197,17 +208,5 @@ public class OpengComptResultListInfoController extends G2BAbstractBidController
 				logger.error(e.getMessage());
 			}
 		}
-	}
-
-	private UriComponentsBuilder getUriComponentsBuilder(OpengComptResultListInfoRequestDto requestDto) {
-		return UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("apis.data.go.kr")
-			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-			.queryParam("serviceKey", requestDto.getServiceKey())
-			.queryParam("pageNo", 1)
-			.queryParam("numOfRows", requestDto.getNumOfRows())
-			.queryParam("bidNtceNo", requestDto.getBidNtceNo()) // 필수 (입찰공고번호)
-			.queryParam("type", "json");
 	}
 }

@@ -38,7 +38,7 @@ public class CntrctInfoScheduler extends CmmnAbstractController {
 	@GetMapping("/CollectionLastFiveYearDataJob")
 	public ResponseEntity<String> CollectionLastFiveYearDataJob() throws SchedulerException, JsonProcessingException {
 		cmmnScheduleManager.deleteJob("CollectionLastFiveYearDataJob", "CntrctInfoService"); // 이전에 등록된 job 삭제
-		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "CntrctInfoService", "최근 몇년간의 계약정보 데이터 수집", "0 0 21 * * ?", new HashMap<>());
+		cmmnScheduleManager.createCronJob(CollectionLastFiveYearDataJob.class, "CollectionLastFiveYearDataJob", "CntrctInfoService", "최근 몇년간의 계약정보 데이터 수집", "0 0 22 * * ?", new HashMap<>());
 		String jobList = cmmnSchedulerInfoService.getAllJobsAndTriggersAsJson();
 		return ResponseEntity.ok().body(jobList);
 	}

@@ -66,8 +66,7 @@ public class ScsbidInfoSttsController extends G2BAbstractBidController {
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
-		int startYear = today.getYear();
+		int startYear = 2020;
 		int endYear = today.getYear();
 		int startMonth = 1;
 		int endMonth = 12;

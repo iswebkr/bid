@@ -46,13 +46,28 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 		return uriMap;
 	}
 
+	private UriComponentsBuilder getUriComponentsBuilder(OrderPlanSttusRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("type", "json")
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
+			.queryParam("orderEndYm", requestDto.getOrderEndYm())
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
+	}
+
 	@Operation(summary = "5년전 데이터까지 수집")
 	@GetMapping("/collectionLastFiveYearData")
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
-		int startYear = today.getYear();
+		int startYear = 2020;
 		int endYear = today.getYear();
 		int startMonth = 1;
 		int endMonth = 12;
@@ -214,21 +229,5 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 				logger.error(e.getMessage());
 			}
 		}
-	}
-
-	private UriComponentsBuilder getUriComponentsBuilder(OrderPlanSttusRequestDto requestDto) {
-		return UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("apis.data.go.kr")
-			.pathSegment("1230000/ao/OrderPlanSttusService", requestDto.getServiceId())
-			.queryParam("serviceKey", requestDto.getServiceKey())
-			.queryParam("pageNo", 1)
-			.queryParam("numOfRows", requestDto.getNumOfRows())
-			.queryParam("type", "json")
-			.queryParam("inqryDiv", requestDto.getInqryDiv())
-			.queryParam("orderBgnYm", requestDto.getOrderBgnYm())
-			.queryParam("orderEndYm", requestDto.getOrderEndYm())
-			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

@@ -60,7 +60,6 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 			.queryParam("inqryEndDt", requestDto.getInqryEndDt())
 			// .queryParam("bidNtceNo", "")
 			.queryParam("type", requestDto.getType());
-
 	}
 
 	@Operation(summary = "5년전 데이터까지 수집")
@@ -68,8 +67,7 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
-		int startYear = today.getYear();
+		int startYear = 2020;
 		int endYear = today.getYear();
 		int startMonth = 1;
 		int endMonth = 12;
