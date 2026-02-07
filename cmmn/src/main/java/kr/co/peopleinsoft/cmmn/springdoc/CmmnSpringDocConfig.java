@@ -102,7 +102,7 @@ public class CmmnSpringDocConfig {
 	GroupedOpenApi schedulerInfoServiceGroup() {
 		return GroupedOpenApi.builder()
 			.group("01. All Scheduler")
-			.pathsToMatch("/scheduler/**")
+			.pathsToMatch("/g2b/**/scheduler/**")
 			.build();
 	}
 
@@ -111,14 +111,6 @@ public class CmmnSpringDocConfig {
 		return GroupedOpenApi.builder()
 			.group("02. Scheduler Management Service")
 			.pathsToMatch("/scheduler/manage/**")
-			.build();
-	}
-
-	@Bean
-	GroupedOpenApi latestSchedulerInfoServiceGroup() {
-		return GroupedOpenApi.builder()
-			.group("03. A collection of the latest data collection schedulers")
-			.pathsToMatch("/scheduler/**/latest/**")
 			.build();
 	}
 

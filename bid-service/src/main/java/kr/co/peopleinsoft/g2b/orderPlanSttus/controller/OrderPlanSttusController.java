@@ -53,11 +53,16 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 
 		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
 		int startYear = today.getYear();
-		int startMonth = 1;
 		int endYear = today.getYear();
+		int startMonth = 1;
 		int endMonth = 12;
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+
+			if(targetYear == today.getYear()) {
+				endMonth = today.getMonthValue();
+			}
+
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 

@@ -55,6 +55,11 @@ public class OpengComptResultListInfoController extends G2BAbstractBidController
 		int endMonth = 12;
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+
+			if(targetYear == today.getYear()) {
+				endMonth = today.getMonthValue();
+			}
+
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 

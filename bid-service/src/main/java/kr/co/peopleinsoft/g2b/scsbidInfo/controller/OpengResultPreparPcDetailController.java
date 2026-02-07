@@ -7,6 +7,7 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailRequestDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailResponseDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultPreparPcDetailService;
+import org.apache.poi.openxml4j.opc.TargetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,22 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 		return uriMap;
 	}
 
+	private UriComponentsBuilder getUriComponentsBuilder(OpengResultPreparPcDetailRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt())
+			// .queryParam("bidNtceNo", "")
+			.queryParam("type", requestDto.getType());
+
+	}
+
 	@Operation(summary = "5년전 데이터까지 수집")
 	@GetMapping("/collectionLastFiveYearData")
 	public ResponseEntity<String> collectionLastFiveYearData() {
@@ -53,11 +70,16 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 
 		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
 		int startYear = today.getYear();
-		int startMonth = 1;
 		int endYear = today.getYear();
+		int startMonth = 1;
 		int endMonth = 12;
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+
+			if(targetYear == today.getYear()) {
+				endMonth = today.getMonthValue();
+			}
+
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
@@ -194,19 +216,5 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 				logger.error(e.getMessage());
 			}
 		}
-	}
-
-	private UriComponentsBuilder getUriComponentsBuilder(OpengResultPreparPcDetailRequestDto requestDto) {
-		return UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("apis.data.go.kr")
-			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-			.queryParam("serviceKey", requestDto.getServiceKey())
-			.queryParam("pageNo", 1)
-			.queryParam("inqryDiv", requestDto.getInqryDiv())
-			.queryParam("numOfRows", requestDto.getNumOfRows())
-			.queryParam("type", requestDto.getType())
-			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }

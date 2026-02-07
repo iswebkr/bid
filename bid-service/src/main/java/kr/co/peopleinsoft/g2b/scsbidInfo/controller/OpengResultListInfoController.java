@@ -46,6 +46,21 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 		return uriMap;
 	}
 
+	private UriComponentsBuilder getUriComponentsBuilder(OpengResultListInfoRequestDto requestDto) {
+		return UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("apis.data.go.kr")
+			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
+			.queryParam("serviceKey", requestDto.getServiceKey())
+			.queryParam("pageNo", 1)
+			.queryParam("numOfRows", requestDto.getNumOfRows())
+			.queryParam("inqryDiv", requestDto.getInqryDiv())
+			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
+			.queryParam("inqryEndDt", requestDto.getInqryEndDt())
+			// .queryParam("bidNtceNo", "");
+			.queryParam("type", "json");
+	}
+
 	@Operation(summary = "5년전 데이터까지 수집")
 	@GetMapping("/collectionLastFiveYearData")
 	public ResponseEntity<String> collectionLastFiveYearData() {
@@ -53,11 +68,16 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 
 		//int startYear = today.getYear() - 5; // 5년전 데이터까지 수집
 		int startYear = today.getYear();
-		int startMonth = 1;
 		int endYear = today.getYear();
+		int startMonth = 1;
 		int endMonth = 12;
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
+
+			if (targetYear == today.getYear()) {
+				endMonth = today.getMonthValue();
+			}
+
 			for (int targetMonth = endMonth; targetMonth >= startMonth; targetMonth--) {
 				YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
 
@@ -195,19 +215,5 @@ public class OpengResultListInfoController extends G2BAbstractBidController {
 				logger.error(e.getMessage());
 			}
 		}
-	}
-
-	private UriComponentsBuilder getUriComponentsBuilder(OpengResultListInfoRequestDto requestDto) {
-		return UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("apis.data.go.kr")
-			.pathSegment("1230000/as/ScsbidInfoService", requestDto.getServiceId())
-			.queryParam("serviceKey", requestDto.getServiceKey())
-			.queryParam("pageNo", 1)
-			.queryParam("numOfRows", requestDto.getNumOfRows())
-			.queryParam("inqryDiv", requestDto.getInqryDiv())
-			.queryParam("type", "json")
-			.queryParam("inqryBgnDt", requestDto.getInqryBgnDt())
-			.queryParam("inqryEndDt", requestDto.getInqryEndDt());
 	}
 }
