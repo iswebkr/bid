@@ -6,6 +6,8 @@ import kr.co.peopleinsoft.cmmn.dto.BidColctHistResultDto;
 import kr.co.peopleinsoft.cmmn.dto.BidRequestDto;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class BidSchdulHistManageService extends CmmnAbstractService {
 	public <T extends BidRequestDto> int getStartPage(T requestDto) {
@@ -29,6 +31,17 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 		}
 
 		return startPage;
+	}
+
+	public <T extends BidRequestDto> boolean getColctCompleteYn(T requestDto) {
+		BidColctHistDto paramDto = new BidColctHistDto();
+		paramDto.setColctId(requestDto.getServiceId());
+		paramDto.setColctBgnDt(requestDto.getInqryBgnDt());
+		paramDto.setColctEndDt(requestDto.getInqryEndDt());
+
+		BidColctHistResultDto resultDto = cmmnMapper.selectOne("BidColctHistMapper.selectColctHistResultByDate", paramDto);
+
+		return Objects.equals(resultDto.getMaxTotPage(), resultDto.getColctCmplPage()) && resultDto.getDiffCount() < 10;
 	}
 
 	public <T extends BidRequestDto> BidColctHistResultDto selectBidColctHistResultDto(T requestDto) {

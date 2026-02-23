@@ -72,7 +72,7 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 
-			if(targetYear == today.getYear()) {
+			if (targetYear == today.getYear()) {
 				endMonth = today.getMonthValue();
 			}
 
@@ -176,51 +176,56 @@ public class HrcspSsstndrdInfoController extends G2BAbstractBidController {
 			.build();
 
 		try {
-			// URI 를 빌드하고
-			UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-			URI uri = uriComponentsBuilder.build().toUri();
+			// 전체페이지와 수집완료페이지가 같고 남은 데이터 컨수가 10건 이하면 완료되었다고 보자.
+			boolean colctComplete = bidSchdulHistManageService.getColctCompleteYn(requestDto);
 
-			// URI 호출 결과값을 기반으로
-			HrcspSsstndrdInfoResponseDto responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
+			if (!colctComplete) {
+				// URI 를 빌드하고
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-			// 첫페이지 데이터 없으면 이후 작업 진행 없음
-			if (responseDto == null || responseDto.getTotalCount() == 0) {
-				return;
-			}
+				// URI 호출 결과값을 기반으로
+				HrcspSsstndrdInfoResponseDto responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
 
-			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
-			int totalPage = responseDto.getTotalPage();
-
-			requestDto.setTotalCount(responseDto.getTotalCount());
-			requestDto.setTotalPage(responseDto.getTotalPage());
-
-			// 첫 페이지부터 전체 페이지수 만큼 루프를 돌며 데이터 저장
-			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-				if (pageNo == 1) {
-					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
-				} else {
-					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
-					responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
-
-					if (responseDto == null || responseDto.getTotalCount() <= 0) {
-						break;
-					}
-
-					requestDto.setTotalCount(responseDto.getTotalCount());
-					requestDto.setTotalPage(responseDto.getTotalPage());
-
-					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-					updateColctPageInfo(requestDto);
-
-					// 페이지별 수집 데이터 저장 (100건씩)
-					hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
+				// 첫페이지 데이터 없으면 이후 작업 진행 없음
+				if (responseDto == null || responseDto.getTotalCount() == 0) {
+					return;
 				}
 
-				try {
-					Thread.sleep(1000 * 30);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				int totalPage = responseDto.getTotalPage();
+
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
+
+				// 첫 페이지부터 전체 페이지수 만큼 루프를 돌며 데이터 저장
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+						responseDto = getResponse(HrcspSsstndrdInfoResponseDto.class, uri);
+
+						if (responseDto == null || responseDto.getTotalCount() <= 0) {
+							break;
+						}
+
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
+
+						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+						updateColctPageInfo(requestDto);
+
+						// 페이지별 수집 데이터 저장 (100건씩)
+						hrcspSsstndrdInfoService.batchInsertHrcspSsstndrdInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					}
+
+					try {
+						Thread.sleep(1000 * 30);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		} catch (Exception e) {

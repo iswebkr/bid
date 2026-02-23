@@ -7,7 +7,6 @@ import kr.co.peopleinsoft.cmmn.dto.BidEnum;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailRequestDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.dto.opengResultPreparPcDetail.OpengResultPreparPcDetailResponseDto;
 import kr.co.peopleinsoft.g2b.scsbidInfo.service.OpengResultPreparPcDetailService;
-import org.apache.poi.openxml4j.opc.TargetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +73,7 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 
-			if(targetYear == today.getYear()) {
+			if (targetYear == today.getYear()) {
 				endMonth = today.getMonthValue();
 			}
 
@@ -171,43 +170,48 @@ public class OpengResultPreparPcDetailController extends G2BAbstractBidControlle
 			.type("json")
 			.build();
 
-		UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-		URI uri = uriComponentsBuilder.build().toUri();
-
 		try {
-			OpengResultPreparPcDetailResponseDto responseDto = getResponse(OpengResultPreparPcDetailResponseDto.class, uri);
+			// 전체페이지와 수집완료페이지가 같고 남은 데이터 컨수가 10건 이하면 완료되었다고 보자.
+			boolean colctComplete = bidSchdulHistManageService.getColctCompleteYn(requestDto);
 
-			if (responseDto == null || responseDto.getTotalCount() <= 0) {
-				return;
-			}
+			if (!colctComplete) {
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
-			int totalPage = responseDto.getTotalPage();
+				OpengResultPreparPcDetailResponseDto responseDto = getResponse(OpengResultPreparPcDetailResponseDto.class, uri);
 
-			requestDto.setTotalCount(responseDto.getTotalCount());
-			requestDto.setTotalPage(responseDto.getTotalPage());
-
-			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-				if (pageNo == 1) {
-					opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, responseDto.getItems(), requestDto);
-				} else {
-					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
-					responseDto = getResponse(OpengResultPreparPcDetailResponseDto.class, uri);
-
-					if (responseDto == null || responseDto.getTotalCount() <= 0) {
-						break;
-					}
-
-					requestDto.setTotalCount(responseDto.getTotalCount());
-					requestDto.setTotalPage(responseDto.getTotalPage());
-
-					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-					updateColctPageInfo(requestDto);
-
-					opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, responseDto.getItems(), requestDto);
+				if (responseDto == null || responseDto.getTotalCount() <= 0) {
+					return;
 				}
 
-				Thread.sleep(1000 * 20);
+				int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				int totalPage = responseDto.getTotalPage();
+
+				requestDto.setTotalCount(responseDto.getTotalCount());
+				requestDto.setTotalPage(responseDto.getTotalPage());
+
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo == 1) {
+						opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					} else {
+						uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+						responseDto = getResponse(OpengResultPreparPcDetailResponseDto.class, uri);
+
+						if (responseDto == null || responseDto.getTotalCount() <= 0) {
+							break;
+						}
+
+						requestDto.setTotalCount(responseDto.getTotalCount());
+						requestDto.setTotalPage(responseDto.getTotalPage());
+
+						// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+						updateColctPageInfo(requestDto);
+
+						opengResultPreparPcDetailService.batchInsertOpengResultPreparPcDetailInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					}
+
+					Thread.sleep(1000 * 20);
+				}
 			}
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {

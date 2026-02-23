@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.2</version>
+		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -123,6 +123,15 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+
+			<!-- Source: https://mvnrepository.com/artifact/io.netty/netty-bom -->
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-bom</artifactId>
+				<version>4.2.10.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -228,6 +237,31 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.14.1</version>
+		</dependency>
+
+		<!-- ====================================================== -->
+		<!-- Telegram -->
+		<!-- ====================================================== -->
+
+		<!-- Source: https://mvnrepository.com/artifact/com.github.rubenlagus.TelegramBots/telegrambots-springboot-longpolling-starter -->
+		<dependency>
+			<groupId>com.github.rubenlagus.TelegramBots</groupId>
+			<artifactId>telegrambots-springboot-longpolling-starter</artifactId>
+			<version>v9.2.0</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/com.github.rubenlagus.TelegramBots/telegrambots-longpolling -->
+		<dependency>
+			<groupId>com.github.rubenlagus.TelegramBots</groupId>
+			<artifactId>telegrambots-longpolling</artifactId>
+			<version>v9.2.0</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/com.github.rubenlagus.TelegramBots/telegrambots-client -->
+		<dependency>
+			<groupId>com.github.rubenlagus.TelegramBots</groupId>
+			<artifactId>telegrambots-client</artifactId>
+			<version>v9.2.0</version>
 		</dependency>
 
 		<!-- ====================================================== -->
@@ -537,7 +571,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- ====================================================== -->

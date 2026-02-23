@@ -72,7 +72,7 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 
 		for (int targetYear = endYear; targetYear >= startYear; targetYear--) {
 
-			if(targetYear == today.getYear()) {
+			if (targetYear == today.getYear()) {
 				endMonth = today.getMonthValue();
 			}
 
@@ -106,6 +106,7 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		List<Runnable> runnables = new ArrayList<>();
 
 		getUriMap().forEach((serviceId, serviceDescription) -> {
+
 			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
 			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
 		});
@@ -170,43 +171,48 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 			.build();
 
 		try {
-			// URI 를 빌드하고
-			UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
-			URI uri = uriComponentsBuilder.build().toUri();
+			// 전체페이지와 수집완료페이지가 같고 남은 데이터 컨수가 10건 이하면 완료되었다고 보자.
+			boolean colctComplete = bidSchdulHistManageService.getColctCompleteYn(requestDto);
 
-			BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+			if (!colctComplete) {
+				// URI 를 빌드하고
+				UriComponentsBuilder uriComponentsBuilder = getUriComponentsBuilder(requestDto);
+				URI uri = uriComponentsBuilder.build().toUri();
 
-			if (responseDto == null || responseDto.getTotalCount() <= 0) {
-				return;
-			}
-
-			// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
-			int startPage = bidSchdulHistManageService.getStartPage(requestDto);
-			int totalPage = responseDto.getTotalPage();
-
-			requestDto.setTotalCount(responseDto.getTotalCount());
-			requestDto.setTotalPage(responseDto.getTotalPage());
-
-			for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
-				if (pageNo > 1) {
-					uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
-					responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
-				}
+				BidPublicInfoResponseDto responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
 
 				if (responseDto == null || responseDto.getTotalCount() <= 0) {
-					break;
+					return;
 				}
+
+				// 페이지 설정 (이전에 수집된 페이지를 기반으로 startPage 재설정)
+				int startPage = bidSchdulHistManageService.getStartPage(requestDto);
+				int totalPage = responseDto.getTotalPage();
 
 				requestDto.setTotalCount(responseDto.getTotalCount());
 				requestDto.setTotalPage(responseDto.getTotalPage());
 
-				// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
-				updateColctPageInfo(requestDto);
+				for (int pageNo = startPage; pageNo <= totalPage; pageNo++) {
+					if (pageNo > 1) {
+						uri = uriComponentsBuilder.cloneBuilder().replaceQueryParam("pageNo", pageNo).build().toUri();
+						responseDto = getResponse(BidPublicInfoResponseDto.class, uri);
+					}
 
-				bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
+					if (responseDto == null || responseDto.getTotalCount() <= 0) {
+						break;
+					}
 
-				// 30초
-				Thread.sleep(1000 * 20);
+					requestDto.setTotalCount(responseDto.getTotalCount());
+					requestDto.setTotalPage(responseDto.getTotalPage());
+
+					// 페이지별 URI 호출 결과 전체페이지수 및 전체카운트 업데이트 (중간에 추가된 데이터가 있을 수 있음)
+					updateColctPageInfo(requestDto);
+
+					bidPublicInfoService.batchInsertPublicInfo(uri, pageNo, responseDto.getItems(), requestDto);
+
+					// 30초
+					Thread.sleep(1000 * 20);
+				}
 			}
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
