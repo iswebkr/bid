@@ -20,7 +20,7 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 
 		BidColctHistResultDto resultDto = cmmnMapper.selectOne("BidColctHistMapper.selectColctHistResultByDate", paramDto);
 
-		if(resultDto == null) {
+		if (resultDto == null) {
 			return startPage;
 		}
 
@@ -40,6 +40,10 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 		paramDto.setColctEndDt(requestDto.getInqryEndDt());
 
 		BidColctHistResultDto resultDto = cmmnMapper.selectOne("BidColctHistMapper.selectColctHistResultByDate", paramDto);
+
+		if (resultDto == null) {
+			return false;
+		}
 
 		return Objects.equals(resultDto.getMaxTotPage(), resultDto.getColctCmplPage()) && resultDto.getDiffCount() < 10;
 	}

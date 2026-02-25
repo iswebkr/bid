@@ -61,7 +61,7 @@ public class OpengComptResultListInfoController extends G2BAbstractBidController
 		LocalDateTime today = LocalDateTime.now();
 
 		int startYear = 2020;
-		int endYear = today.getYear();
+		int endYear = 2025;
 		int startMonth = 1;
 		int endMonth = 12;
 
