@@ -4,6 +4,9 @@
 
 */target/
 target/
+build/
+
+.idea/
 
 # User-specific stuff
 .idea/**/workspace.xml
