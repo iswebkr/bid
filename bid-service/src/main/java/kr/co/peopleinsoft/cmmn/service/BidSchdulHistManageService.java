@@ -45,7 +45,7 @@ public class BidSchdulHistManageService extends CmmnAbstractService {
 			return false;
 		}
 
-		if("complete".equals(resultDto.getColctState())) {
+		if ("complete".equals(resultDto.getColctState())) {
 			return true;
 		}
 
