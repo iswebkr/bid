@@ -106,7 +106,6 @@ public class BidPublicInfoController extends G2BAbstractBidController {
 		List<Runnable> runnables = new ArrayList<>();
 
 		getUriMap().forEach((serviceId, serviceDescription) -> {
-
 			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, todayStart, todayEnd));
 			runnables.add(() -> todayCollectionData(serviceId, serviceDescription, yesterdayStart, yesterdayEnd));
 		});
