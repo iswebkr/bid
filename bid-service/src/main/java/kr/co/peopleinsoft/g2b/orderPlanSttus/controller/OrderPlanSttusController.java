@@ -67,7 +67,7 @@ public class OrderPlanSttusController extends G2BAbstractBidController {
 	public ResponseEntity<String> collectionLastFiveYearData() {
 		LocalDateTime today = LocalDateTime.now();
 
-		int startYear = 2025;
+		int startYear = 2020;
 		int endYear = 2025;
 		int startMonth = 1;
 		int endMonth = 12;
